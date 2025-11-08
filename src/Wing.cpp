@@ -84,14 +84,23 @@ namespace Airplane {
 
 
 
-
-
 	double Wing::calcWeight() const {
 		double weight = -1;
 		// Need to figure out approx
 		return weight;
 	}
 
+
+
+
+	double Wing::calcReynolds(const double velocity, const double kinematicViscosity) {
+
+		return velocity * MAC / kinematicViscosity;
+	}
+
+	double Wing::calcWettedArea() {
+		return 2 * area * 1.02;
+	}
 
 
 
@@ -117,7 +126,16 @@ namespace Airplane {
 		return weight;
 	}
 
+	double Wing::getAR() const {
+		return aspectRatio;
+	}
 
+	double Wing::getEllipticalEffic() const {
+		return .8;
+	}
+	double Wing::getC_L(const double AoA) const {
+		return 1 * AoA;
+	}
 
 
 

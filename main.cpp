@@ -69,6 +69,7 @@ using namespace Airplane;
 
 int main() {
 	// Airfoil characteristics for my HT and VT:
+	// Let's use a NACA 2412 for starters
 	
 	// Givens:
 	Wing VT(99.68, 86.68, 86.68, 40, 0);												// Set in Stone

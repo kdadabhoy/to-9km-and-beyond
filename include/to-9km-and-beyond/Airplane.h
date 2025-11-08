@@ -1,10 +1,10 @@
 #ifndef AIRPLANE_H
 #define AIRPLANE_H
 
-#include "Wing.h"
-#include "TurboFan.h"
-#include "Nacelle.h"
-#include "Fuselage.h"
+#include "to-9km-and-beyond/Wing.h"
+#include "to-9km-and-beyond/TurboFan.h"
+#include "to-9km-and-beyond/Nacelle.h"
+#include "to-9km-and-beyond/Fuselage.h"
 
 namespace Airplane {
 	class Airplane {

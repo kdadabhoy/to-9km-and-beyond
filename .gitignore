@@ -20,6 +20,7 @@ Release/
 x64/
 bin/
 out/
+**/x64/Debug/
 
 # User-specific files
 *.suo

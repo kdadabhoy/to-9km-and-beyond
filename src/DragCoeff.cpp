@@ -1,0 +1,83 @@
+#include <iostream>
+#include "to-9km-and-beyond/DragCoeff.h"
+#include "to-9km-and-beyond/Wing.h"
+#include <cmath>
+
+using namespace std;
+using namespace Airplane;
+
+namespace AeroCoeff {
+	DragCoeff::DragCoeff() {
+		parasiteCoeff = 0;
+		inducedCoeff = 0;
+		compressibCoeff = 0;
+		Wing = Airplane::Wing();
+		referenceArea = 0;
+
+	}
+	
+
+
+
+	DragCoeff::DragCoeff(const Airplane::Wing& inWing, const double inReferenceArea) {
+		Wing = inWing;
+		referenceArea = inReferenceArea;
+		parasiteCoeff = calcParasiteCoeff(0, 1.5723e-4);
+		inducedCoeff = calcInducedCoeff(0);
+	}
+
+
+
+
+
+	double DragCoeff::calcTotalDragCoeff(const double AoA, const double velocity,
+		const double kinematicViscosity, const double temp) 
+	{
+		int R = 1717;
+		double Mach = velocity / sqrt(1.4 * R * temp);
+		return calcParasiteCoeff(velocity, kinematicViscosity) + calcCompressibCoeff(Mach) + calcInducedCoeff(AoA);
+	}
+
+
+
+
+	double DragCoeff::calcParasiteCoeff(const double velocity, const double kinematicViscosity) {
+		double Re;
+		double areaRatio;
+		Re = Wing.calcReynolds(velocity, kinematicViscosity);
+		areaRatio = Wing.calcWettedArea() / Wing.getArea();
+
+		if (Re >= 5e5) {
+			return areaRatio * .455 / pow(log10(Re), 2.58);
+		} else if (Re > .001) {
+			return areaRatio * 1.328 / sqrt(Re);
+		} else {
+			return 0;
+		}
+
+	}
+
+
+
+	double DragCoeff::calcInducedCoeff(const double AoA) {
+		const double pi = 3.141592653589;
+		double CL = Wing.getC_L(AoA);
+		return (CL*CL) / (pi * Wing.getEllipticalEffic() * Wing.getAR());
+	}
+
+
+
+
+	double DragCoeff::calcCompressibCoeff(const double Mach) {
+		if (Mach < .30) {
+			return 0;
+		} else {
+			// Need to implement digitized CDC graph
+			return 1;
+		}
+	}
+
+
+
+
+}

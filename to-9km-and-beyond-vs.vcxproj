@@ -126,14 +126,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\Airfoil.cpp" />
     <ClCompile Include="src\Airplane.cpp" />
+    <ClCompile Include="src\DragCoeff.cpp" />
     <ClCompile Include="src\Fuselage.cpp" />
+    <ClCompile Include="src\LiftCoeff.cpp" />
     <ClCompile Include="src\Nacelle.cpp" />
     <ClCompile Include="src\TurboFan.cpp" />
     <ClCompile Include="src\Wing.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\to-9km-and-beyond\AeroCoeff.h" />
+    <ClInclude Include="include\to-9km-and-beyond\Airfoil.h" />
     <ClInclude Include="include\to-9km-and-beyond\Airplane.h" />
     <ClInclude Include="include\to-9km-and-beyond\AtmosphereProperties.h" />
     <ClInclude Include="include\to-9km-and-beyond\DragCoeff.h" />

@@ -17,6 +17,9 @@ namespace Airplane {
 		// Copy constrcutor
 		Wing(const Wing& other);
 
+		// Useful Functions
+		double calcReynolds(const double velocity, const double kinematicViscosity);
+		double calcWettedArea();
 
 		// Accessors
 		double getArea() const;
@@ -24,6 +27,9 @@ namespace Airplane {
 		double getTaperRatio() const;
 		double getAspectRatio() const;
 		double getWeight() const;
+		double getAR() const;
+		double getEllipticalEffic() const;           // Just calling this .8 for now
+		double getC_L(const double AoA) const;                       // Just calling this 1 rn need to implement with airfoil stuff
 
 
 	private:
