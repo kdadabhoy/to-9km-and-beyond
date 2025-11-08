@@ -1,0 +1,45 @@
+# ============================
+# Visual Studio build files
+# ============================
+
+# Build results
+*.obj
+*.exe
+*.pdb
+*.idb
+*.ipdb
+*.iobj
+*.ilk
+*.log
+*.tlog
+
+# Visual Studio folders
+.vs/
+Debug/
+Release/
+x64/
+bin/
+out/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# ============================
+# OS-generated files
+# ============================
+Thumbs.db
+.DS_Store
+
+# ============================
+# Optional: Filters file
+# ============================
+# If you want to keep Filters in Git, comment out the line below
+*.filters
+
+# ============================
+# Track your source & headers
+# ============================
+# Nothing here; src/ and include/ are tracked
