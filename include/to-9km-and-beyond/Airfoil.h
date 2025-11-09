@@ -5,8 +5,8 @@
 namespace Airplane {
 	class Airfoil {
 	public:
-		Airfoil();
-		Airfoil(int inNACA);
+		//Airfoil();
+		//Airfoil(int inNACA);
 
 
 	private:
@@ -17,7 +17,7 @@ namespace Airplane {
 		// need function to convert to 3D lift
 	};
 
-
+}
 
 	/*
 		NACA

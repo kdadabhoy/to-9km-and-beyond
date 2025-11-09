@@ -1,13 +1,14 @@
 #include <iostream>
-#include "to-9km-and-beyond/Airfoil.h"
+#include "to-9km-and-beyond/LiftCoeff.h"
 
 using namespace std;
 
 namespace Airplane {
-	Airfoil::Airfoil() {
+	/*
+	LiftCoeff::LiftCoeff() {
 		
 	}
-
+	*/
 
 
 

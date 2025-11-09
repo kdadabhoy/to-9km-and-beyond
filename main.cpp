@@ -9,6 +9,7 @@
 
 
 using namespace std;
+using namespace atmosphere_properties;
 using namespace Airplane;
 
 /*
@@ -17,10 +18,6 @@ using namespace Airplane;
 	- Need to Create Aero Coefficients
 	- Probably need to create an Airfoil Class 
 
-
-	- Need to write my AtmosphericProperties Class
-		- This needs to be robust enough to give me atmosphere info for different heights
-		- Mainly need density at different heights
 
 	- In Wing Class
 		- Need to incoporate the Airfoil class into my Wings
@@ -51,9 +48,6 @@ using namespace Airplane;
 		1. Optimize span
 		2. Optimize airfoil
 
-
-
-
 */
 
 
@@ -67,6 +61,11 @@ using namespace Airplane;
 
 */
 
+
+
+
+
+// Useful main
 int main() {
 	// Airfoil characteristics for my HT and VT:
 	// Let's use a NACA 2412 for starters
@@ -115,6 +114,25 @@ int main() {
 
 
 
+
+
+
+
+
+/*
+
+// Testing AtmosphereProperties 
+
+int main() {
+	AtmosphereProperties Cond(49000);
+	cout << "Height: " << Cond.getHeight() << " Density: " << Cond.getDensity() << " Pressure : " <<
+		Cond.getStaticPressure() << " Temp: " << Cond.getTemperature() <<
+		" Speed of Sound: " << Cond.getSpeedOfSound() << endl;
+
+	return 0;
+}
+
+*/
 
 
 

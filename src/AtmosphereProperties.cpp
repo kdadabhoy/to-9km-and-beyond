@@ -5,7 +5,7 @@
 
 using namespace std;
 
-namespace AtmosphereProperties {
+namespace atmosphere_properties {
 	AtmosphereProperties::AtmosphereProperties() {
 		height = 0;
 		calcAllPropertities();
@@ -26,7 +26,8 @@ namespace AtmosphereProperties {
 		calcStaticPressure();
 		calcDensity();
 		calcViscosity();
-		calcKinematicVisc();        
+		calcKinematicVisc();  
+		calcSpeedofSound();
 	}
 
 
@@ -76,7 +77,7 @@ namespace AtmosphereProperties {
 		double temp = calcTemperature(inHeight);
 
 		if (inHeight < TROPOSPHERE_UPPER_LIMIT) {
-			return 2166 * pow((temp / 518.6), 5.256);
+			return 2116 * pow((temp / 518.6), 5.256);
 		} else if (inHeight < LOWER_STRATOSPHERE_UPPER_LIMIT) {
 			return 473.1 * exp(1.73 - (.000048 * inHeight));
 		} else {
@@ -90,7 +91,7 @@ namespace AtmosphereProperties {
 		assert(height >= 0);
 
 		if (height < TROPOSPHERE_UPPER_LIMIT) {
-			staticPressure = 2166 * pow((temperature / 518.6), 5.256);
+			staticPressure = 2116 * pow((temperature / 518.6), 5.256);
 			return;
 		} else if (height < LOWER_STRATOSPHERE_UPPER_LIMIT) {
 			staticPressure = 473.1 * exp(1.73 - (.000048 * height));
@@ -165,6 +166,21 @@ namespace AtmosphereProperties {
 
 
 
+	// Speed of Sound Functions
+	double AtmosphereProperties::calcSpeedofSound(double inHeight) const {
+		double temp = calcTemperature(inHeight);
+		return sqrt(GAMMA * GAS_CONSTANT * temp);
+	}
+
+
+
+	void AtmosphereProperties::calcSpeedofSound() {
+		speedOfSound = sqrt(GAMMA * GAS_CONSTANT * temperature);
+		return;
+	}
+
+
+
 
 
 
@@ -204,7 +220,12 @@ namespace AtmosphereProperties {
 		return temperature;
 	}
 
+	double AtmosphereProperties::getSpeedOfSound() const {
+		return speedOfSound;
+	}
 
-
+	double AtmosphereProperties::getHeight() const {
+		return height;
+	}
 
 }

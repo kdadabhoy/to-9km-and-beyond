@@ -2,7 +2,7 @@
 #define ATMOSPHEREPROPERTIES_H
 // #include
 
-namespace AtmosphereProperties {
+namespace atmosphere_properties {
 	class AtmosphereProperties {
 	public:
 		AtmosphereProperties();
@@ -12,19 +12,22 @@ namespace AtmosphereProperties {
 		void setHeight(double inHeight);                    // Sets new height and recalculates all propertites
 
 		//Accessors:
-		double getDensity() const;
-		double getViscosity() const;
-		double getKinematicVisc() const;
-		double getStaticPressure() const;
-		double getTemperature() const;
+		double getDensity() const;                  // slug/ft^3
+		double getViscosity() const;                // slug/(ft*s)
+		double getKinematicVisc() const;            // ft^2/s
+		double getStaticPressure() const;           // lb/ft^2 
+		double getTemperature() const;              // R
+		double getSpeedOfSound() const;             // ft/s
+		double getHeight() const;                   // ft
 
 		// Other functions - Suggested to just use setHeight and accessors
 		// Especially if you need all quantities (for efficiency reasons)
-		double calcTemperature(double inHeight) const;        // Rankine         Using NASA Model
-		double calcDensity(double inHeight) const;            // slug/ft^3,      Using P=rho*R*T
-		double calcStaticPressure(double inHeight) const;     // lb/ft^2       Using NASA Model
-		double calcViscosity(double inHeight) const;          // slug/(ft*s)     Using Sutherland Law
-		double calcKinematicVisc(double inHeight) const;      // ft^2/s,       Using v = mu / rho
+		double calcTemperature(double inHeight) const;        // Rankine      Using NASA Model (sea level -> h=0)
+		double calcDensity(double inHeight) const;            // slug/ft^3,   Using P=rho*R*T
+		double calcStaticPressure(double inHeight) const;     // lb/ft^2      Using NASA Model(sea level -> h=0)
+		double calcViscosity(double inHeight) const;          // slug/(ft*s)  Using Sutherland Law
+		double calcKinematicVisc(double inHeight) const;      // ft^2/s,      Using v = mu / rho
+		double calcSpeedofSound(double inHeight) const;       // ft/s
 
 
 
@@ -35,27 +38,30 @@ namespace AtmosphereProperties {
 		double viscosity;             // slug/(ft*s)
 		double kinematicViscosity;    // ft^2/s
 		double temperature;           // Rankine
+		double speedOfSound;          // ft/s
 
 		//Useful Constants
 		static const int TROPOSPHERE_UPPER_LIMIT = 36152;               // NASA Model
-		static const int LOWER_STRATOSPHERE_UPPER_LIMIT = 36152;        // NASA Model
-		static const int F_to_R = 459.7;                                // add this for deg F to deg R
+		static const int LOWER_STRATOSPHERE_UPPER_LIMIT = 82345;        // NASA Model
+		static constexpr double F_to_R = 459.7;                         // add this for deg F to deg R
 		static const int GAS_CONSTANT = 1718;                           // ft*lbf/(slug*R) 
-		static const int SUTHERLAND_REF_VISC = 3.737e-7;                // slug/(ft*s)
-		static const int SUTHERLAND_REF_TEMP = 518.67;                  // Rankine
-		static const int SUTHERLAND_CONSTANT= 198.72;                   // Rankine
+		static constexpr double SUTHERLAND_REF_VISC = 3.737e-7;         // slug/(ft*s)
+		static constexpr double SUTHERLAND_REF_TEMP = 518.67;           // Rankine
+		static constexpr double SUTHERLAND_CONSTANT= 198.72;            // Rankine
+		static constexpr double GAMMA = 1.4;                                   // Air gamma
+
 
 
 		void calcAllPropertities();    // Calcs all propertites in an effiecient manner.
 
 
 		// These functions calculate and set their respective member variable for the height that is stored.
-		void calcTemperature();        // Rankine         Using NASA Model
+		void calcTemperature();        // Rankine         Using NASA Model (sea level -> h=0)
 		void calcDensity();            // slug/ft^3,      Using P=rho*R*T
-		void calcStaticPressure();     // lb/ft^2       Using NASA Model
+		void calcStaticPressure();     // lb/ft^2         Using NASA Model (sea level -> h=0)
 		void calcViscosity();          // slug/(ft*s)     Using Sutherland Law
-		void calcKinematicVisc();      // ft^2/s,       Using v = mu / rho
-
+		void calcKinematicVisc();      // ft^2/s,         Using v = mu / rho
+		void calcSpeedofSound();       // ft/s
 	};
 }
 

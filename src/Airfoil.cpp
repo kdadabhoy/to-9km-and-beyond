@@ -4,9 +4,14 @@
 using namespace std;
 
 namespace Airplane {
+	/*
 	Airfoil::Airfoil() {
-		
+		NACA = 0;
 	}
+	*/
+
+
+
 
 
 
