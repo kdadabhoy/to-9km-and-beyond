@@ -2,7 +2,7 @@
 #include "to-9km-and-beyond/Fuselage.h"
 using namespace std;
 
-namespace Airplane {
+namespace airplane {
 
 	Fuselage::Fuselage() {
 		weight = -1;

@@ -10,7 +10,8 @@
 
 using namespace std;
 using namespace atmosphere_properties;
-using namespace Airplane;
+using namespace airplane;
+using namespace turbofan;
 
 /*
 	To Do List:

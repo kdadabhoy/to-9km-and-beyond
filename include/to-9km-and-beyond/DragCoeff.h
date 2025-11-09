@@ -3,11 +3,11 @@
 #include "to-9km-and-beyond/Wing.h"
 
 
-namespace AeroCoeff {
+namespace aeroCoeff {
 	class DragCoeff {
 	public:
 		DragCoeff();
-		DragCoeff(const Airplane::Wing& inWing, const double inReferenceArea);
+		DragCoeff(const airplane::Wing& inWing, const double inReferenceArea);
 		double calcTotalDragCoeff(const double AoA, const double velocity,
 			const double kinematicViscosity, const double temp);
 
@@ -16,7 +16,7 @@ namespace AeroCoeff {
 		double inducedCoeff;
 		double compressibCoeff;
 
-		Airplane::Wing Wing;
+		const airplane::Wing* Wing;
 		double referenceArea;
 
 		double calcParasiteCoeff(const double velocity, const double kinematicViscosity);

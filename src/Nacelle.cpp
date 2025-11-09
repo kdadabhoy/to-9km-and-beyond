@@ -2,7 +2,7 @@
 #include "to-9km-and-beyond/Nacelle.h"
 using namespace std;
 
-namespace Airplane {
+namespace airplane {
 
 	Nacelle::Nacelle() {
 		weight = -1;

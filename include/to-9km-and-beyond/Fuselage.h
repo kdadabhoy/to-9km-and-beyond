@@ -2,7 +2,7 @@
 #define FUSELAGE_H
 // #include
 
-namespace Airplane {
+namespace airplane {
 	class Fuselage {
 	public:
 		Fuselage();

@@ -4,14 +4,14 @@
 #include <cmath>
 
 using namespace std;
-using namespace Airplane;
+using namespace airplane;
 
-namespace AeroCoeff {
+namespace aeroCoeff {
 	DragCoeff::DragCoeff() {
 		parasiteCoeff = 0;
 		inducedCoeff = 0;
 		compressibCoeff = 0;
-		Wing = Airplane::Wing();
+		Wing = &airplane::Wing();
 		referenceArea = 0;
 
 	}
@@ -19,8 +19,8 @@ namespace AeroCoeff {
 
 
 
-	DragCoeff::DragCoeff(const Airplane::Wing& inWing, const double inReferenceArea) {
-		Wing = inWing;
+	DragCoeff::DragCoeff(const airplane::Wing& inWing, const double inReferenceArea) {
+		Wing = &inWing;
 		referenceArea = inReferenceArea;
 		parasiteCoeff = calcParasiteCoeff(0, 1.5723e-4);
 		inducedCoeff = calcInducedCoeff(0);
@@ -44,8 +44,8 @@ namespace AeroCoeff {
 	double DragCoeff::calcParasiteCoeff(const double velocity, const double kinematicViscosity) {
 		double Re;
 		double areaRatio;
-		Re = Wing.calcReynolds(velocity, kinematicViscosity);
-		areaRatio = Wing.calcWettedArea() / Wing.getArea();
+		Re = Wing->calcReynolds(velocity, kinematicViscosity);
+		areaRatio = Wing->calcWettedArea() / Wing->getArea();
 
 		if (Re >= 5e5) {
 			return areaRatio * .455 / pow(log10(Re), 2.58);
@@ -61,8 +61,8 @@ namespace AeroCoeff {
 
 	double DragCoeff::calcInducedCoeff(const double AoA) {
 		const double pi = 3.141592653589;
-		double CL = Wing.getC_L(AoA);
-		return (CL*CL) / (pi * Wing.getEllipticalEffic() * Wing.getAR());
+		double CL = Wing->getC_L(AoA);
+		return (CL*CL) / (pi * Wing->getEllipticalEffic() * Wing->getAR());
 	}
 
 

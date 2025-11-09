@@ -2,7 +2,7 @@
 #define NACELLE_H
 // #include
 
-namespace Airplane {
+namespace airplane {
 	class Nacelle {
 	public:
 		Nacelle();

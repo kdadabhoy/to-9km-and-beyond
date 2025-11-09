@@ -2,7 +2,7 @@
 #include "to-9km-and-beyond/Wing.h"
 using namespace std;
 
-namespace Airplane {
+namespace airplane {
 	// Default Constructor
 	Wing::Wing() {
 		tipChord = -1;

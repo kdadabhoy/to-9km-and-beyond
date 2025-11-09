@@ -2,7 +2,7 @@
 #define AIRFOIL_H
 
 
-namespace Airplane {
+namespace airplane {
 	class Airfoil {
 	public:
 		//Airfoil();

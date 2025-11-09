@@ -4,7 +4,7 @@
 
 
 
-namespace Airplane {
+namespace airplane {
 	class Wing {
 	public:
 
@@ -51,7 +51,7 @@ namespace Airplane {
 
 
 		// Aero Lift Coeffs
-
+		// xxxxxx
 
 
 		double calcArea(const double inTaperRatio) const;                     // Assumes Trapezodial Wing, Needs rootChord, span to be defined

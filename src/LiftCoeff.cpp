@@ -3,7 +3,7 @@
 
 using namespace std;
 
-namespace Airplane {
+namespace airplane {
 	/*
 	LiftCoeff::LiftCoeff() {
 		

@@ -129,6 +129,7 @@
     <ClCompile Include="src\Airfoil.cpp" />
     <ClCompile Include="src\Airplane.cpp" />
     <ClCompile Include="src\AtmosphereProperties.cpp" />
+    <ClCompile Include="src\CF34_3B1.cpp" />
     <ClCompile Include="src\DragCoeff.cpp" />
     <ClCompile Include="src\Fuselage.cpp" />
     <ClCompile Include="src\LiftCoeff.cpp" />
@@ -140,6 +141,7 @@
     <ClInclude Include="include\to-9km-and-beyond\Airfoil.h" />
     <ClInclude Include="include\to-9km-and-beyond\Airplane.h" />
     <ClInclude Include="include\to-9km-and-beyond\AtmosphereProperties.h" />
+    <ClInclude Include="include\to-9km-and-beyond\CF34_3B1.h" />
     <ClInclude Include="include\to-9km-and-beyond\DragCoeff.h" />
     <ClInclude Include="include\to-9km-and-beyond\Fuselage.h" />
     <ClInclude Include="include\to-9km-and-beyond\LiftCoeff.h" />

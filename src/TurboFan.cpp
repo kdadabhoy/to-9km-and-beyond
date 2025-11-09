@@ -2,7 +2,8 @@
 #include "to-9km-and-beyond/TurboFan.h"
 using namespace std;
 
-namespace Airplane {
+
+namespace turbofan {
 
 	TurboFan::TurboFan() {
 		weight = -1;

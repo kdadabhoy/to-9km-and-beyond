@@ -1,6 +1,7 @@
 #ifndef ATMOSPHEREPROPERTIES_H
 #define ATMOSPHEREPROPERTIES_H
-// #include
+
+// Works in imperial units
 
 namespace atmosphere_properties {
 	class AtmosphereProperties {

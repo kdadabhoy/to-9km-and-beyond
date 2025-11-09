@@ -1,8 +1,9 @@
 #ifndef TURBOFAN_H
 #define TURBOFAN_H
-// #include
+// Base Class for CF34_3B1 (and possibly other turbofan engines)
 
-namespace Airplane {
+
+namespace turbofan {
 	class TurboFan {
 
 	public:
@@ -24,7 +25,6 @@ namespace Airplane {
 		// Stuff for fuel consumption map per mach
 		// Stuff for performance map per mach
 	};
-
 
 }
 

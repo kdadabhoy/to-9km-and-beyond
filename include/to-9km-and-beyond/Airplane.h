@@ -5,16 +5,20 @@
 #include "to-9km-and-beyond/TurboFan.h"
 #include "to-9km-and-beyond/Nacelle.h"
 #include "to-9km-and-beyond/Fuselage.h"
+using turbofan::TurboFan;
 
-namespace Airplane {
+
+// Assumes that plane is symmetric and has 2 engines (wings are symmetrical)
+
+namespace airplane {
 	class Airplane {
 	public:
 		Airplane();
-		Airplane(Wing inWing, Wing inHT, Wing inVT, TurboFan inEngine, Nacelle inNacelle, Fuselage inFuselage, double inFuelWeight, double inPayLoadWeight);
+		Airplane(Wing& inWing, Wing& inHT, Wing& inVT, TurboFan& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight);
 
 
-		double calculateLift();
-		double calculateDrag();
+		//double calculateLift();
+		//double calculateDrag();
 
 
 	private:
@@ -24,16 +28,16 @@ namespace Airplane {
 		double payLoadWeight;     
 		double fuelWeight;
 
-		Wing HT;                // One Planform of Horizontal Tail (one side)
-		Wing VT;                // One Planform of Vertical Tail (one side)
-		Wing mainWing;          // One Planform of Main Wing (one side)
-		TurboFan engine;        // Assumption that 2 engines are both with same propertities and that they are turbofans
-		Nacelle nacelle;        // Assumption that 2 nacelles, both with same propertities
-		Fuselage fuselage; 
+		Wing* HT;                // One Planform of Horizontal Tail (one side)
+		Wing* VT;                // One Planform of Vertical Tail (one side)
+		Wing* mainWing;          // One Planform of Main Wing (one side)
+		TurboFan* engine;        // Assumption that 2 engines are both with same propertities and that they are turbofans
+		Nacelle* nacelle;        // Assumption that 2 nacelles, both with same propertities
+		Fuselage* fuselage; 
 
 
 
-		double calcTotalWeight();
+		double calcTotalWeight() const;
 	};
 
 
