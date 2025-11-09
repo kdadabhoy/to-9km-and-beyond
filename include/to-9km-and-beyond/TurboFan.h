@@ -3,7 +3,7 @@
 // Base Class for CF34_3B1 (and possibly other turbofan engines)
 
 
-namespace turbofan {
+namespace airplane {
 	class TurboFan {
 
 	public:

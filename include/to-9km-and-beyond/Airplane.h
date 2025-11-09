@@ -5,7 +5,6 @@
 #include "to-9km-and-beyond/TurboFan.h"
 #include "to-9km-and-beyond/Nacelle.h"
 #include "to-9km-and-beyond/Fuselage.h"
-using turbofan::TurboFan;
 
 
 // Assumes that plane is symmetric and has 2 engines (wings are symmetrical)

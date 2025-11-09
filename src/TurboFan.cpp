@@ -3,7 +3,7 @@
 using namespace std;
 
 
-namespace turbofan {
+namespace airplane {
 
 	TurboFan::TurboFan() {
 		weight = -1;

@@ -5,7 +5,6 @@
 #include "to-9km-and-beyond/Nacelle.h"
 
 using namespace std;
-using namespace turbofan;
 
 namespace airplane {
 
