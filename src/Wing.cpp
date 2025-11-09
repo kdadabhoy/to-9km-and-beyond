@@ -84,6 +84,8 @@ namespace Airplane {
 
 
 
+	//Weight Calc
+
 	double Wing::calcWeight() const {
 		double weight = -1;
 		// Need to figure out approx
@@ -93,12 +95,18 @@ namespace Airplane {
 
 
 
-	double Wing::calcReynolds(const double velocity, const double kinematicViscosity) {
+
+	// Semi-Related Calculations
+
+	double Wing::calcReynolds(const double velocity, const double kinematicViscosity) const {
 
 		return velocity * MAC / kinematicViscosity;
 	}
 
-	double Wing::calcWettedArea() {
+
+
+
+	double Wing::calcWettedArea() const {
 		return 2 * area * 1.02;
 	}
 

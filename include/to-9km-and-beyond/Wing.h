@@ -18,8 +18,8 @@ namespace Airplane {
 		Wing(const Wing& other);
 
 		// Useful Functions
-		double calcReynolds(const double velocity, const double kinematicViscosity);
-		double calcWettedArea();
+		double calcReynolds(const double velocity, const double kinematicViscosity) const;
+		double calcWettedArea() const;
 
 		// Accessors
 		double getArea() const;

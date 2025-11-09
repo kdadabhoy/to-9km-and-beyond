@@ -128,6 +128,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\Airfoil.cpp" />
     <ClCompile Include="src\Airplane.cpp" />
+    <ClCompile Include="src\AtmosphereProperties.cpp" />
     <ClCompile Include="src\DragCoeff.cpp" />
     <ClCompile Include="src\Fuselage.cpp" />
     <ClCompile Include="src\LiftCoeff.cpp" />
