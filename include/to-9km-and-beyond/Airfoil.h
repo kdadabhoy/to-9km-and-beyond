@@ -26,7 +26,7 @@ namespace airplane {
 		double getCl_AlphaTerm() const;				// Radians
 		double getCl_KnottTerm() const;             // No one really cares about this
 		double getCl_alphaZeroLift() const;			// Radians
-
+		void printName() const;
 
 
 

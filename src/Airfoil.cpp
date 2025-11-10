@@ -69,7 +69,6 @@ namespace airplane {
 		return 0;
 	}
 
-	// ^ Verify above funciton
 
 
 
@@ -101,6 +100,10 @@ namespace airplane {
 
 	double Airfoil::getCl_KnottTerm() const {
 		return Cl.getCL_Knott();
+	}
+
+	void Airfoil::printName() const {
+		std::cout << "NACA: " << NACA << std::endl;
 	}
 
 

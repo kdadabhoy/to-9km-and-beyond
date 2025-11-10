@@ -129,7 +129,7 @@ namespace airplane {
 
 		//a0 = Cl2D_alphaTerm / (1 + (Cl2D_alphaTerm / (pi * ellipEfficiency * aspectRatio)));      // Different formula that uses efficiency
 
-		assert(sweepAngle < (pi/2));
+		assert(sweepAngle <= 89.0);
 		a0 = (pi * aspectRatio) / (1 + sqrt(1 + pow((pi * aspectRatio) / (Cl2D_alphaTerm * cos(radSweepAngle)), 2)));        // Accounts for Sweep Angle
 
 		knottTerm = Cl2D_alphaZeroLift * a0;

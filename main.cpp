@@ -21,16 +21,9 @@ using namespace airplane;
 /*
 	To Do List:
 
-	- Need to Create Aero Coefficients
-	- Probably need to create an Airfoil Class 
-
-
 	- In Wing Class
-		- Need to incoporate the Airfoil class into my Wings
-			- Need to choose an airfoil and run with it for now
 		- Need to add a public reynolds number function
 		- Need to add a total drag fucntion (given a velocity and density)
-		- Wetted Area helper function
 
 
 
@@ -39,6 +32,7 @@ using namespace airplane;
 		- Need to write the fuel consumption / Thrust and mach number curve stuff into my engine class
 		- Need to have a Power vs Speed curve for all atmospheres
 			- And need to be able to tell me the speed that will have the max excess power
+			- Prob a main() function
 
 	-In the Airplane Class
 		- Need to get my total Lift and total Drag given a velocity by calling on Wing Drag/Lift functions
@@ -52,7 +46,7 @@ using namespace airplane;
 
 	- General Idea for optimizing
 		1. Optimize span
-		2. Optimize airfoil
+		2. Optimize airfoil (need a alpha zero AoA for NACA to do this)
 
 */
 
@@ -62,8 +56,9 @@ using namespace airplane;
 /* 
 	Useful to know :
 	Airplane(inWing, inHT, inVT, inEngine, inNacelle, inFuselage, inFuelWeight, inPayLoadWeight);
-	Wing(inSpan, inTipChord, inRootChord, inSweepAngle, weight), everything in inches, weight is optional.. if you dont add it then it will auto calc it for you
-	
+	Wing(Airfoil, inSpan, inTipChord, inRootChord, inSweepAngle, weight), everything in inches, weight is optional.. if you dont add it then it will auto calc it for you
+	Airfoil(string inNACA, double inAlphaZeroLift);
+
 
 */
 
@@ -75,9 +70,9 @@ using namespace airplane;
 int main() {
 	// Airfoil characteristics for my HT and VT:
 	// Let's use a NACA 2412 for starters.. 
-		// bc need to implement lifting line theory into LiftCoeff Class
-	LiftCoeff Cl_NACA2412(.178, 6.25);
-	Airfoil NACA2412("2412", Cl_NACA2412, -.0349);
+		// bc need to implement 2D zero alpha
+	//LiftCoeff Cl_NACA2412(.178, 6.25);
+	Airfoil NACA2412("2412", -.0349);
 
 
 
@@ -108,7 +103,6 @@ int main() {
 
 	// Airplane we have with everything
 	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
-
 
 
 

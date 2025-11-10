@@ -67,7 +67,7 @@ namespace aeroCoeff {
 
 	double DragCoeff::calcInducedCoeff(const double AoA) {
 		assert(Wing != nullptr);
-		double CL = Wing->getC_L(AoA);
+		double CL = Wing->getC_L_rad(AoA);
 
 		return (CL*CL) / (pi * Wing->getEllipticalEffic() * Wing->getAR());
 	}
