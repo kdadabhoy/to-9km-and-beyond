@@ -1,12 +1,15 @@
 #include <iostream>
+#include <string>
 
-#include "to-9km-and-beyond/Nacelle.h"
 #include "to-9km-and-beyond/Airplane.h"
-#include "to-9km-and-beyond/Wing.h"
-#include "to-9km-and-beyond/Fuselage.h"
 #include "to-9km-and-beyond/AtmosphereProperties.h"
-#include "to-9km-and-beyond/CF34_3B1.h"
+#include "to-9km-and-beyond/Wing.h"
 #include "to-9km-and-beyond/Airfoil.h"
+#include "to-9km-and-beyond/Nacelle.h"
+#include "to-9km-and-beyond/Fuselage.h"
+#include "to-9km-and-beyond/CF34_3B1.h"
+#include "to-9km-and-beyond/LiftCoeff.h"
+
 
 
 using namespace std;
@@ -71,8 +74,12 @@ using namespace airplane;
 // Useful main
 int main() {
 	// Airfoil characteristics for my HT and VT:
-	// Let's use a NACA 2412 for starters
-	Airfoil NACA2412(2412);
+	// Let's use a NACA 2412 for starters.. 
+		// bc need to implement lifting line theory into LiftCoeff Class
+	LiftCoeff Cl_NACA2412(.178, 6.25);
+	Airfoil NACA2412("2412", Cl_NACA2412, -.0349);
+
+
 
 	// Other Variables
 	double currentHeight = 0;
@@ -80,8 +87,8 @@ int main() {
 
 
 	// Givens:
-	Wing VT(99.68, 86.68, 86.68, 40, 0);												// Set in Stone
-	Wing HT(239.67, 23.55, 72.45, 32.04, 0);											// Set in Stone
+	Wing VT(NACA2412, 99.68, 86.68, 86.68, 40, 0);												// Set in Stone
+	Wing HT(NACA2412, 239.67, 23.55, 72.45, 32.04, 0);											// Set in Stone
 	double givenAirplaneWeight = 23000 * 2.20462;										// lbms, this it the HT + VT + Fuselage + startingFuel + Payload
 	double startingFuelWeight = 1000 * 2.20462;											// lbm
 	double payLoadWeight = 1000 * 2.20462;												// lbm
@@ -97,7 +104,7 @@ int main() {
 	double mainTipChord = 100;
 	double mainRootChord = 100;
 	double mainSweepAngle = 30;
-	Wing mainWing(mainSpan, mainTipChord, mainRootChord, mainSweepAngle);
+	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);
 
 	// Airplane we have with everything
 	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);

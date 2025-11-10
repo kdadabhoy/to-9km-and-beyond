@@ -1,5 +1,7 @@
 #ifndef WING_H
 #define WING_H
+#include "to-9km-and-beyond/Airfoil.h"
+#include "to-9km-and-beyond/LiftCoeff.h"
 // Prob should add assignment operator at some point
 
 
@@ -8,8 +10,8 @@ namespace airplane {
 	public:
 
 		Wing();  // Default Constructor
-		Wing(double inSpan, double inTipChord, double inRootChord, double inSweepAngle);  // Takes in inches, used for main wing
-		Wing(double inSpan, double inTipChord, double inRootChord, double inSweepAngle, double inWeight);  // Takes in inches, used for HT, and VT (ignore weight)
+		Wing(Airfoil& inAirfoil, double inSpan, double inTipChord, double inRootChord, double inSweepAngle);  // Takes in inches, used for main wing
+		Wing(Airfoil& inAirfoil, double inSpan, double inTipChord, double inRootChord, double inSweepAngle, double inWeight);  // Takes in inches, used for HT, and VT (ignore weight)
 		// Wing(double inSpan, double inTipChord, double inRootChord, double inSweepAngle, ...);  // Constructor that takes in every variable
 
 
@@ -27,16 +29,19 @@ namespace airplane {
 		double getAspectRatio() const;
 		double getWeight() const;
 		double getAR() const;
-		double getEllipticalEffic() const;							 // Just calling this .8 for now
-		double getC_L(const double AoA) const;                       // Just calling this 1 rn need to implement with airfoil stuff
+		double getEllipticalEffic() const;								 // Just calling this .8 for now
+		double getC_L_rad(const double AoA) const;                       // AoA passed in as radians
+
+
 
 
 	private:
 		// Minimum to take in:
-		double tipChord;      // Stored in feet
-		double rootChord;     // Stored in feet
-		double span;          // Stored in feet
-		double sweepAngle;    // Stored in degrees
+		double tipChord;		// Stored in feet
+		double rootChord;		// Stored in feet
+		double span;			// Stored in feet
+		double sweepAngle;		// Stored in degrees
+		double ellipEfficiency; // Not sure if the equation we used is valid... but :)
 		// double dihedralAngle;            // ignoring for now
 
 
@@ -46,19 +51,24 @@ namespace airplane {
 		double aspectRatio;       // unitless
 		double taperRatio;        // unitless
 		double MAC;               // stored in feet
+		static constexpr double pi = 3.141592653589;
 
 
 
 		// Aero Lift Coeffs
-		// xxxxxx
-
+		LiftCoeff CL3D;
+		Airfoil* airfoil;
 
 		double calcArea(const double inTaperRatio) const;                     // Assumes Trapezodial Wing, Needs rootChord, span to be defined
 		double calcMAC(const double inTaperRatio) const;                      // Assumes Trapezodial Wing, Needs area, rootChord, taperRatio
 		double calcAspectRatio(const double inArea) const;
+		double calcEllipEfficiency(const double inAspectRatio) const;
 
 
 		double calcWeight() const;                                            // Need to figure out how to approx this
+
+		
+		void calcCL3D();													  // Converts 2D Cl into 3D CL, and sets CL to this
 
 
 	};

@@ -18,6 +18,30 @@ namespace airplane {
 	}
 
 
+
+	// Copy Constructor
+	LiftCoeff::LiftCoeff(LiftCoeff& other) {
+		CL_alpha = other.CL_alpha;
+		CL_knott = other.CL_knott;
+	}
+
+
+
+	// Assignment Operator
+	LiftCoeff& LiftCoeff::operator=(const LiftCoeff& other) {
+		if (this == &other) {
+			return *this;
+		} else {
+			CL_alpha = other.CL_alpha;
+			CL_knott = other.CL_knott;
+			return *this;
+		}
+	}
+
+
+
+
+
 	// Accessors:
 	double LiftCoeff::getCL_Alpha() const {
 		return CL_alpha;
@@ -49,27 +73,6 @@ namespace airplane {
 		return (CL_alpha * alpha) + CL_knott;
 	}
 
-
-
-
-	// Copy Constructor
-	LiftCoeff::LiftCoeff(LiftCoeff& other) {
-		CL_alpha = other.CL_alpha;
-		CL_knott = other.CL_knott;
-	}
-
-
-
-	// Assignment Operator
-	LiftCoeff& LiftCoeff::operator=(const LiftCoeff& other) {
-		if (this == &other) {
-			return *this;
-		} else {
-			CL_alpha = other.CL_alpha;
-			CL_knott = other.CL_knott;
-			return *this;
-		}
-	}
 
 
 

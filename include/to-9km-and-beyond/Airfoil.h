@@ -5,15 +5,27 @@
 // Intended to work with 4 series NACA airfoils
 // Prob should add assignment operator at some point
 
+/* Takeaways:
+		I only really care about 
+			Cl_alpha, which = 2pi = 6.28rad (good enough approx)
+			alphaZeroLift = ??? need to find equation and implement it at some point
+	
+ */
 
 namespace airplane {
 	class Airfoil {
 	public:
 		Airfoil();
 		Airfoil(const std::string& inNACA);
-		Airfoil(const std::string& inNACA, const LiftCoeff& inCl);
+		Airfoil(const std::string& inNACA, const LiftCoeff& inCl, double inAlphaZeroLift);
 		double getCl_deg(double inAlphaDeg);
 		double getCl_rad(double inAlphaRad);
+
+		double getCl_AlphaTerm();				// Radians
+		double getCl_alphaZeroLift();			// Radians
+
+
+
 
 	private:
 		std::string NACA;               
@@ -21,11 +33,14 @@ namespace airplane {
 		double posMaxCamber;								// Location of maximum camber (% of chord), 2nd digit
 		double maxThickness;								// maximum thickness (% of chord), last 2 digits
 		LiftCoeff Cl;										// Stored in radians
+		double alphaZeroLift;                               // Stored in radians
 		static constexpr double pi = 3.141592653589;
 
 
 		// Member Functions
-		LiftCoeff calcCl();										// Sets Cl in Radians
+		LiftCoeff calcCl() const;							// Returns Lift Coeff
+		double calcalphaZeroLift() const;							// returns alphaZeroLift in radians
+
 	};
 
 }

@@ -6,7 +6,7 @@ namespace airplane {
 	class LiftCoeff {
 	public:
 		LiftCoeff();
-		LiftCoeff(double inCL_alpha, double inCL_knott);
+		LiftCoeff(double inCL_alpha, double inCL_knott);		// takes in radians
 
 		LiftCoeff(LiftCoeff& other);							// Copy Constructor
 		LiftCoeff& operator=(const LiftCoeff& other);			// Assignment Operator

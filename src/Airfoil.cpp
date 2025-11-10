@@ -27,10 +27,11 @@ namespace airplane {
 
 
 
-	Airfoil::Airfoil(const std::string& inNACA, const LiftCoeff& inCl) {
+	Airfoil::Airfoil(const std::string& inNACA, const LiftCoeff& inCl, double inAlphaZeroLift) {
 		assert(inNACA.size() == 4);
 		NACA = inNACA;
 		Cl = inCl;
+		alphaZeroLift = inAlphaZeroLift;
 
 		maxCamber = std::stoi(NACA.substr(0, 1)) / 100.0;
 		posMaxCamber = std::stoi(NACA.substr(1, 1)) / 10.0;
@@ -45,10 +46,10 @@ namespace airplane {
 
 
 
-
 	// This seems to be a made up approx... Look up thin airfoil theory and prob write an integration thing to calculate this
 	// Verify below function
-	LiftCoeff Airfoil::calcCl() {
+	// Kind of irrelevant bc I dont really care about C0
+	LiftCoeff Airfoil::calcCl() const {
 		double C0;
 		double alphaTerm = 2*pi;														// Cl_alpha = 2pi for thin-airfoil theory approx        
 
@@ -58,7 +59,17 @@ namespace airplane {
 			C0 = (-2.0 * maxCamber / posMaxCamber) * (1 - (posMaxCamber / 2));          // radians, thin-airfoil theory approx
 		}
 
-		return LiftCoeff(alphaTerm, C0);
+		LiftCoeff tempCoeff(alphaTerm, C0);
+		return tempCoeff;
+	}
+
+
+	// ^ Verify above funciton
+
+
+	// Need to figure out math
+	double Airfoil::calcalphaZeroLift() const {
+		return 0;
 	}
 
 
@@ -66,14 +77,7 @@ namespace airplane {
 
 
 
-
-
-
-
-
-
-
-
+	// Helpful Functions
 	double Airfoil::getCl_deg(double inAlphaDeg) {
 		double alphaRad = inAlphaDeg * (pi / 180);
 		return Cl.get_CL_rad(alphaRad);
@@ -88,6 +92,14 @@ namespace airplane {
 
 
 
+	// Accessors:
+	double Airfoil::getCl_AlphaTerm() {
+		return Cl.getCL_Alpha();
+	}
+	
+	double Airfoil::getCl_alphaZeroLift() {
+		return alphaZeroLift;
+	}
 
 
 
