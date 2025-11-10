@@ -1,6 +1,7 @@
 #ifndef DRAGCOEFF_H
 #define DRAGCOEFF_H
 #include "to-9km-and-beyond/Wing.h"
+// Prob should add assignment operator at some point
 
 
 namespace aeroCoeff {
@@ -18,6 +19,7 @@ namespace aeroCoeff {
 
 		const airplane::Wing* Wing;
 		double referenceArea;
+		static constexpr double pi = 3.141592653589;
 
 		double calcParasiteCoeff(const double velocity, const double kinematicViscosity);
 		double calcInducedCoeff(const double AoA);

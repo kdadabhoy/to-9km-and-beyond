@@ -2,8 +2,10 @@
 #include "to-9km-and-beyond/AtmosphereProperties.h"
 #include <cmath>
 #include <cassert>
-
 using namespace std;
+// Prob should add assignment operator at some point
+
+
 
 namespace atmosphere_properties {
 	AtmosphereProperties::AtmosphereProperties() {

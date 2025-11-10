@@ -16,6 +16,16 @@ namespace airplane {
 		weight = other.weight;
 	}
 
+	//Assignment Operator
+	Fuselage& Fuselage::operator=(const Fuselage& other) {
+		if (this == &other) {
+			return *this;
+		} else {
+			weight = other.weight;
+			return *this;
+		}
+	}
+
 
 	double Fuselage::getWeight() const {
 		return weight;

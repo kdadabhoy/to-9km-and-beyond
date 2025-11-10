@@ -3,10 +3,10 @@
 #include "to-9km-and-beyond/Nacelle.h"
 #include "to-9km-and-beyond/Airplane.h"
 #include "to-9km-and-beyond/Wing.h"
-#include "to-9km-and-beyond/TurboFan.h"
 #include "to-9km-and-beyond/Fuselage.h"
 #include "to-9km-and-beyond/AtmosphereProperties.h"
 #include "to-9km-and-beyond/CF34_3B1.h"
+#include "to-9km-and-beyond/Airfoil.h"
 
 
 using namespace std;
@@ -72,7 +72,9 @@ using namespace airplane;
 int main() {
 	// Airfoil characteristics for my HT and VT:
 	// Let's use a NACA 2412 for starters
-	
+	Airfoil NACA2412(2412);
+
+	// Other Variables
 	double currentHeight = 0;
 	double time = 0;
 
@@ -98,7 +100,7 @@ int main() {
 	Wing mainWing(mainSpan, mainTipChord, mainRootChord, mainSweepAngle);
 
 	// Airplane we have with everything
-	Airplane MyAirplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
+	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 
 
 

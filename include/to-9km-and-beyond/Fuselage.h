@@ -8,6 +8,7 @@ namespace airplane {
 		Fuselage();
 		Fuselage(double inWeight);
 		Fuselage(const Fuselage& other); // Copy Constructor
+		Fuselage& operator=(const Fuselage& other);
 		double getWeight() const;
 		void setWeight(double inWeight);
 

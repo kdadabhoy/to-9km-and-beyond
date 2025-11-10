@@ -1,7 +1,6 @@
 #ifndef WING_H
 #define WING_H
-// #include
-
+// Prob should add assignment operator at some point
 
 
 namespace airplane {
@@ -28,7 +27,7 @@ namespace airplane {
 		double getAspectRatio() const;
 		double getWeight() const;
 		double getAR() const;
-		double getEllipticalEffic() const;           // Just calling this .8 for now
+		double getEllipticalEffic() const;							 // Just calling this .8 for now
 		double getC_L(const double AoA) const;                       // Just calling this 1 rn need to implement with airfoil stuff
 
 

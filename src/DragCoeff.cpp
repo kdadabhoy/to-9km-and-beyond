@@ -3,7 +3,6 @@
 #include "to-9km-and-beyond/Wing.h"
 #include <cmath>
 #include <cassert>
-
 using namespace std;
 using namespace airplane;
 
@@ -68,7 +67,6 @@ namespace aeroCoeff {
 
 	double DragCoeff::calcInducedCoeff(const double AoA) {
 		assert(Wing != nullptr);
-		const double pi = 3.141592653589;
 		double CL = Wing->getC_L(AoA);
 
 		return (CL*CL) / (pi * Wing->getEllipticalEffic() * Wing->getAR());

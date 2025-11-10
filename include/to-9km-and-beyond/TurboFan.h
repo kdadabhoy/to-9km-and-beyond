@@ -2,6 +2,8 @@
 #define TURBOFAN_H
 // Base Class for CF34_3B1 (and possibly other turbofan engines)
 // Worry about virtual keyword later, since I will always us member functions with derived object
+// Prob should add assignment operator at some point
+
 
 namespace airplane {
 	class TurboFan {
@@ -10,6 +12,7 @@ namespace airplane {
 		TurboFan();
 		TurboFan(double inWeight, double inSSLThrust);
 		TurboFan(const TurboFan& other); // Copy Constructor
+
 
 		// Accessors
 		double getWeight() const;

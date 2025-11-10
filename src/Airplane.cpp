@@ -4,8 +4,10 @@
 #include "to-9km-and-beyond/TurboFan.h"
 #include "to-9km-and-beyond/Nacelle.h"
 #include <cassert>
-
 using namespace std;
+
+// Prob should add assignment operator at some point
+
 
 namespace airplane {
 

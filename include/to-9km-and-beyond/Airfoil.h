@@ -1,20 +1,31 @@
 #ifndef AIRFOIL_H
 #define AIRFOIL_H
+#include "to-9km-and-beyond/LiftCoeff.h"
+#include <string>
+// Intended to work with 4 series NACA airfoils
+// Prob should add assignment operator at some point
 
 
 namespace airplane {
 	class Airfoil {
 	public:
-		//Airfoil();
-		//Airfoil(int inNACA);
-
+		Airfoil();
+		Airfoil(const std::string& inNACA);
+		Airfoil(const std::string& inNACA, const LiftCoeff& inCl);
+		double getCl_deg(double inAlphaDeg);
+		double getCl_rad(double inAlphaRad);
 
 	private:
-		int NACA;
-		double thickness;
-		double chord;
-		// need a function to calculate lift coeffs
-		// need function to convert to 3D lift
+		std::string NACA;               
+		double maxCamber;									// Maximum camber (% of chord), 1st digit
+		double posMaxCamber;								// Location of maximum camber (% of chord), 2nd digit
+		double maxThickness;								// maximum thickness (% of chord), last 2 digits
+		LiftCoeff Cl;										// Stored in radians
+		static constexpr double pi = 3.141592653589;
+
+
+		// Member Functions
+		LiftCoeff calcCl();										// Sets Cl in Radians
 	};
 
 }
