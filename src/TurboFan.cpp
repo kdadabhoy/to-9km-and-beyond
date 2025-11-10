@@ -7,15 +7,19 @@ namespace airplane {
 
 	TurboFan::TurboFan() {
 		weight = 0;
-		staticThrust = 0;
+		SSLThrust = 0;
+		specificFuelConsumption = 0;
+		thrustPerSSLThrust = 0;
 	}
 
 
 
 
-	TurboFan::TurboFan(double inWeight, double inStaticThrust) {
+	TurboFan::TurboFan(double inWeight, double inSSLThrust) {
 		weight = inWeight;
-		staticThrust = inStaticThrust;
+		SSLThrust = inSSLThrust;
+		specificFuelConsumption = .5;  // should prob take input
+		thrustPerSSLThrust = 1;        // should prob take input
 	}
 
 
@@ -25,7 +29,9 @@ namespace airplane {
 	// Copy constrcutor
 	TurboFan::TurboFan(const TurboFan& other) {
 		weight = other.weight;
-		staticThrust = other.staticThrust;
+		SSLThrust = other.SSLThrust;
+		specificFuelConsumption = other.specificFuelConsumption;
+		thrustPerSSLThrust = other.thrustPerSSLThrust;
 	}
 
 
@@ -36,8 +42,16 @@ namespace airplane {
 		return weight;
 	}
 
-	double TurboFan::getStaticThrust() const {
-		return staticThrust;
+	double TurboFan::getSSLThrust() const {
+		return SSLThrust;
+	}
+
+	double TurboFan::getThrustPerSSLThrust() const {
+		return thrustPerSSLThrust;
+	}
+
+	double TurboFan::getSpecificFuelConsumption() const {
+		return specificFuelConsumption;
 	}
 
 
@@ -51,7 +65,24 @@ namespace airplane {
 	}
 
 
-	void TurboFan::setStaticThrust(double inThrust) {
-		staticThrust = inThrust;
+	void TurboFan::setSSLThrust(double inThrust) {
+		SSLThrust = inThrust;
+	}
+
+
+	void TurboFan::setThrustPerSSLThrust(double inFrac) {
+		thrustPerSSLThrust = inFrac;
+	}
+
+
+	void TurboFan::setSpecificFuelConsumption(double inFrac) {
+		specificFuelConsumption = inFrac;
+	}
+
+
+
+	// Member Function
+	double TurboFan::getThrust() const {
+		return thrustPerSSLThrust * SSLThrust;
 	}
 }
