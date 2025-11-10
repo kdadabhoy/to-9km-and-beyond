@@ -2,16 +2,21 @@
 #include "to-9km-and-beyond/DragCoeff.h"
 #include "to-9km-and-beyond/Wing.h"
 #include <cmath>
+#include <cassert>
 
 using namespace std;
 using namespace airplane;
+
+// Think I have a mach function in atmosphere propertities... so maybe just pass in mach instead
+
+
 
 namespace aeroCoeff {
 	DragCoeff::DragCoeff() {
 		parasiteCoeff = 0;
 		inducedCoeff = 0;
 		compressibCoeff = 0;
-		Wing = &airplane::Wing();
+		Wing = nullptr;
 		referenceArea = 0;
 
 	}
@@ -42,8 +47,10 @@ namespace aeroCoeff {
 
 
 	double DragCoeff::calcParasiteCoeff(const double velocity, const double kinematicViscosity) {
+		assert(Wing != nullptr);
 		double Re;
 		double areaRatio;
+
 		Re = Wing->calcReynolds(velocity, kinematicViscosity);
 		areaRatio = Wing->calcWettedArea() / Wing->getArea();
 
@@ -60,8 +67,10 @@ namespace aeroCoeff {
 
 
 	double DragCoeff::calcInducedCoeff(const double AoA) {
+		assert(Wing != nullptr);
 		const double pi = 3.141592653589;
 		double CL = Wing->getC_L(AoA);
+
 		return (CL*CL) / (pi * Wing->getEllipticalEffic() * Wing->getAR());
 	}
 

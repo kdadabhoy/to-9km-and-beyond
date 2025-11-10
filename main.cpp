@@ -6,12 +6,14 @@
 #include "to-9km-and-beyond/TurboFan.h"
 #include "to-9km-and-beyond/Fuselage.h"
 #include "to-9km-and-beyond/AtmosphereProperties.h"
+#include "to-9km-and-beyond/CF34_3B1.h"
 
 
 using namespace std;
 using namespace atmosphere_properties;
 using namespace airplane;
-using namespace turbofan;
+
+
 
 /*
 	To Do List:
@@ -57,7 +59,7 @@ using namespace turbofan;
 /* 
 	Useful to know :
 	Airplane(inWing, inHT, inVT, inEngine, inNacelle, inFuselage, inFuelWeight, inPayLoadWeight);
-	Wing(inSpan, inTipChord, inRootChord, inSweepAngle, weight), weight is optional.. if you dont add it then it will auto calc it for you
+	Wing(inSpan, inTipChord, inRootChord, inSweepAngle, weight), everything in inches, weight is optional.. if you dont add it then it will auto calc it for you
 	
 
 */
@@ -71,36 +73,32 @@ int main() {
 	// Airfoil characteristics for my HT and VT:
 	// Let's use a NACA 2412 for starters
 	
+	double currentHeight = 0;
+	double time = 0;
+
+
 	// Givens:
 	Wing VT(99.68, 86.68, 86.68, 40, 0);												// Set in Stone
 	Wing HT(239.67, 23.55, 72.45, 32.04, 0);											// Set in Stone
 	double givenAirplaneWeight = 23000 * 2.20462;										// lbms, this it the HT + VT + Fuselage + startingFuel + Payload
 	double startingFuelWeight = 1000 * 2.20462;											// lbm
 	double payLoadWeight = 1000 * 2.20462;												// lbm
-	givenAirplaneWeight = givenAirplaneWeight - startingFuelWeight - payLoadWeight;
-	double fuselageWeight = .9 * givenAirplaneWeight;									// lbms... we will also store the VT and HT weight in this
-	double nacelleWeight = .05 * givenAirplaneWeight / 2;                               // just said each one is 2.5% of fuselage+VT+HT
+	givenAirplaneWeight = givenAirplaneWeight - startingFuelWeight - payLoadWeight - (2*1670);     // 1670 lbms is CF34_3B1
+	double fuselageWeight = .95 * givenAirplaneWeight;									// lbms... we will also store the VT and HT weight in this
+	double nacelleWeight = .025 * givenAirplaneWeight;                               // just said each one is 2.5% of fuselage+VT+HT
 	Fuselage fuselage(fuselageWeight);
 	Nacelle nacelle(nacelleWeight);
-
-
-	double currentHeight = 0;
-	double time = 0;
-
+	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
 	double mainSpan = 100;
 	double mainTipChord = 100;
 	double mainRootChord = 100;
 	double mainSweepAngle = 30;
-	Wing Wing(mainSpan, mainTipChord, mainRootChord, mainSweepAngle);
+	Wing mainWing(mainSpan, mainTipChord, mainRootChord, mainSweepAngle);
 
-
-	//TurboFan CF34_3B1();
-
-
-
-
+	// Airplane we have with everything
+	Airplane MyAirplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 
 
 
@@ -117,12 +115,77 @@ int main() {
 
 
 
+/*
+	// Testing Weight Assignments
+
+void weightCheck(Wing& VT, Wing HT, double fuel, double payload, Fuselage fuselage, Nacelle nacelle, CF34_3B1 engine);
+int main() {
+	// Airfoil characteristics for my HT and VT:
+	// Let's use a NACA 2412 for starters
+
+	double currentHeight = 0;
+	double time = 0;
+
+
+	// Givens:
+	Wing VT(99.68, 86.68, 86.68, 40, 0);												// Set in Stone
+	Wing HT(239.67, 23.55, 72.45, 32.04, 0);											// Set in Stone
+	double givenAirplaneWeight = 23000 * 2.20462;										// lbms, this it the HT + VT + Fuselage + startingFuel + Payload
+	double startingFuelWeight = 1000 * 2.20462;											// lbm
+	double payLoadWeight = 1000 * 2.20462;												// lbm
+	givenAirplaneWeight = givenAirplaneWeight - startingFuelWeight - payLoadWeight - (2 * 1670);     // 1670 lbms is CF34_3B1
+	double fuselageWeight = .95 * givenAirplaneWeight;									// lbms... we will also store the VT and HT weight in this
+	double nacelleWeight = .025 * givenAirplaneWeight;                               // just said each one is 2.5% of fuselage+VT+HT
+	Fuselage fuselage(fuselageWeight);
+	Nacelle nacelle(nacelleWeight);
+	CF34_3B1 CF34_3B1;
+
+	// Main Wing Stuff, this is what will be optimized
+	double mainSpan = 100;
+	double mainTipChord = 100;
+	double mainRootChord = 100;
+	double mainSweepAngle = 30;
+	Wing mainWing(mainSpan, mainTipChord, mainRootChord, mainSweepAngle);
+
+	// Airplane we have with everything
+	Airplane MyAirplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
+
+
+	weightCheck(VT, HT, startingFuelWeight, payLoadWeight, fuselage, nacelle, CF34_3B1);
+	double check = MyAirplane.getWeight();
+	cout << check << " " << (23000 * 2.20462) << endl;
+
+
+
+	return 0;
+}
+
+
+void weightCheck(Wing& VT, Wing HT, double fuel, double payload, Fuselage fuselage, Nacelle nacelle, CF34_3B1 engine) {
+	double givenWeight = 23000 * 2.20462;
+	double weight = VT.getWeight() + (2 * HT.getWeight()) + fuel + payload + fuselage.getWeight() + (2 * nacelle.getWeight()) + (2 * engine.getWeight());
+
+
+	if ((weight - givenWeight) < .001) {
+		cout << "Weight calcs are right" << endl;
+		return;
+	} else {
+		cout << "Weight calcs are wrong" << endl;
+		return;
+	}
+
+}
+
+	*/
+
+
+
 
 
 
 /*
 
-// Testing AtmosphereProperties 
+	// Testing AtmosphereProperties 
 
 int main() {
 	AtmosphereProperties Cond(49000);
@@ -161,8 +224,5 @@ int main() {
 	cout << "Area: " << area << " sqft" << endl;
 	cout << "Weight: " << weight << " lbm" << endl;
 	
-
-
-
 
 */

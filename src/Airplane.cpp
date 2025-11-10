@@ -3,20 +3,21 @@
 #include "to-9km-and-beyond/Wing.h"
 #include "to-9km-and-beyond/TurboFan.h"
 #include "to-9km-and-beyond/Nacelle.h"
+#include <cassert>
 
 using namespace std;
 
 namespace airplane {
 
 	Airplane::Airplane() {
-		mainWing = &Wing();
-		HT = &Wing();
-		VT = &Wing();
-		engine = &TurboFan();
-		nacelle = &Nacelle();
-		fuselage = &Fuselage();
-		fuelWeight = -1; 
-		payLoadWeight = -1; 
+		mainWing = nullptr;
+		HT = nullptr;
+		VT = nullptr;
+		engine = nullptr;
+		nacelle = nullptr;
+		fuselage = nullptr;
+		fuelWeight = 0; 
+		payLoadWeight = 0; 
 
 		totalWeight = calcTotalWeight();
 	}
@@ -39,14 +40,44 @@ namespace airplane {
 
 
 
+
+
 	double Airplane::calcTotalWeight() const {
-		return mainWing->getWeight() + HT->getWeight() + VT->getWeight()
-			+ engine->getWeight() + nacelle->getWeight() + fuselage->getWeight()
-			+ fuelWeight + payLoadWeight;
+		double total = 0.0;
+
+		if (mainWing) {
+			total += mainWing->getWeight();
+		}
+
+		if (HT) {
+			total += (HT->getWeight() * 2);
+		}
+
+		if (VT) {
+			total += VT->getWeight();
+		}
+
+		if (engine) {
+			total += (engine->getWeight() * 2);
+		}
+
+		if (nacelle) {
+			total += (nacelle->getWeight() * 2);
+		}
+
+		if (fuselage) {
+			total += fuselage->getWeight();
+		}
+
+		return total + fuelWeight + payLoadWeight;
 	}
 
 
 
+	// Accessor:
+	double Airplane::getWeight() const {
+		return totalWeight;
+	}
 
 
 

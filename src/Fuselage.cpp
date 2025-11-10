@@ -5,7 +5,7 @@ using namespace std;
 namespace airplane {
 
 	Fuselage::Fuselage() {
-		weight = -1;
+		weight = 0;
 	}
 	Fuselage::Fuselage(double inWeight) {
 		weight = inWeight;

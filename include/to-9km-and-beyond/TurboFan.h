@@ -8,19 +8,25 @@ namespace airplane {
 
 	public:
 		TurboFan();
-		TurboFan(double inWeight);
+		TurboFan(double inWeight, double inStaticThrust);
 		TurboFan(const TurboFan& other); // Copy Constructor
 
-
+		// Accessors
 		double getWeight() const;
+		double getStaticThrust() const;
+
+
+
+		// Mutators
 		void setWeight(double inWeight);
+		void setStaticThrust(double inThrust);
+
 
 	private:
 
-		double weight;
+		double weight;				  // lbm
+		double staticThrust;          // lbf, Sea-level static standard day thrust
 
-
-		//double staticThrust = 19500;          // Sea-level static standard day thrust in lbs
 		
 		// Stuff for fuel consumption map per mach
 		// Stuff for performance map per mach

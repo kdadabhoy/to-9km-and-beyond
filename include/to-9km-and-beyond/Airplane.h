@@ -20,6 +20,9 @@ namespace airplane {
 		//double calculateDrag();
 
 
+		// Accessors:
+		double getWeight() const;
+
 	private:
 		// memember variables
 		double totalWeight;

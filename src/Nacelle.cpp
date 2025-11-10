@@ -5,7 +5,7 @@ using namespace std;
 namespace airplane {
 
 	Nacelle::Nacelle() {
-		weight = -1;
+		weight = 0;
 	}
 	Nacelle::Nacelle(double inWeight) {
 		weight = inWeight;

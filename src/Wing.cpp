@@ -5,15 +5,15 @@ using namespace std;
 namespace airplane {
 	// Default Constructor
 	Wing::Wing() {
-		tipChord = -1;
-		rootChord = -1;
-		sweepAngle = -1;
-		span = -1;
-		taperRatio = -1;
-		area = -1;
-		MAC = -1;
-		aspectRatio = -1;
-		weight = -1;
+		tipChord = 0;
+		rootChord = 0;
+		sweepAngle = 0;
+		span = 0;
+		taperRatio = 0;
+		area = 0;
+		MAC = 0;
+		aspectRatio = 0;
+		weight = 0;
 	}
 
 

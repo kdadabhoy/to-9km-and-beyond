@@ -3,18 +3,20 @@
 #include "to-9km-and-beyond/TurboFan.h"
 using namespace std;
 
-namespace turbofan {
+namespace airplane {
 
-	CF34_3B1::CF34_3B1() : TurboFan::TurboFan() 
+	CF34_3B1::CF34_3B1() : TurboFan::TurboFan(1670, 19500)
 	{
+		// Assumes weight of CF34_3B1 is 1670 lbm
+		// Assumes Standard Day Sea Level Static Thrust of CF34_3B1 is 19500 lb	
 	}
 
 
 
 
 
-	CF34_3B1::CF34_3B1(double inWeight)
-		: TurboFan::TurboFan(inWeight) 
+	CF34_3B1::CF34_3B1(double inWeight, double inStaticThrust)
+		: TurboFan::TurboFan(inWeight, inStaticThrust) 
 	{
 	}
 
