@@ -3,6 +3,7 @@
 #include "to-9km-and-beyond/LiftCoeff.h"
 #include <string>
 // Intended to work with 4 series NACA airfoils
+	// Assumes slope of 2D Cl = 2*pi
 // Prob should add assignment operator at some point
 
 /* Takeaways:
@@ -17,12 +18,14 @@ namespace airplane {
 	public:
 		Airfoil();
 		Airfoil(const std::string& inNACA);
-		Airfoil(const std::string& inNACA, const LiftCoeff& inCl, double inAlphaZeroLift);
-		double getCl_deg(double inAlphaDeg);
-		double getCl_rad(double inAlphaRad);
+		Airfoil(const std::string& inNACA, double inAlphaZeroLift);
+		Airfoil(const std::string& inNACA, double inAlphaZeroLift, double inCl0);
+		double getCl_deg(double inAlphaDeg) const;
+		double getCl_rad(double inAlphaRad) const;
 
-		double getCl_AlphaTerm();				// Radians
-		double getCl_alphaZeroLift();			// Radians
+		double getCl_AlphaTerm() const;				// Radians
+		double getCl_KnottTerm() const;             // No one really cares about this
+		double getCl_alphaZeroLift() const;			// Radians
 
 
 
@@ -35,11 +38,13 @@ namespace airplane {
 		LiftCoeff Cl;										// Stored in radians
 		double alphaZeroLift;                               // Stored in radians
 		static constexpr double pi = 3.141592653589;
+		static constexpr double Cl_2D_SLOPE = 2*pi;			// We will approx that every airfoil has this slope (everyone assumes this)
 
 
 		// Member Functions
-		LiftCoeff calcCl() const;							// Returns Lift Coeff
-		double calcalphaZeroLift() const;							// returns alphaZeroLift in radians
+		double calcalphaZeroLift() const;					// returns alphaZeroLift in radians
+		// double calcCl0() const;							// Returns Cl0, kinda irrelvant
+
 
 	};
 

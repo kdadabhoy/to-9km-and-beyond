@@ -3,6 +3,7 @@
 #include "to-9km-and-beyond/Airfoil.h"
 #include "to-9km-and-beyond/LiftCoeff.h"
 #include <cmath>
+#include <cassert>
 using namespace std;
 
 
@@ -119,13 +120,18 @@ namespace airplane {
 
 	// CL 3D Calc
 	void Wing::calcCL3D() {
-		double Cl2D_alphaTerm = airfoil->getCl_AlphaTerm();
-		double Cl2D_alphaZeroLift = airfoil->getCl_alphaZeroLift();
+		double Cl2D_alphaTerm = airfoil->getCl_AlphaTerm();						// This is gunna be 2pi always
+		double Cl2D_alphaZeroLift = airfoil->getCl_alphaZeroLift();				// This differs by airfoil
 		double knottTerm;
 		double alphaTerm;
-		double a0;
+		double a0 = 0;
+		double radSweepAngle = sweepAngle * pi / 180;
 
-		a0 = Cl2D_alphaTerm / (1 + (Cl2D_alphaTerm / (pi * ellipEfficiency * aspectRatio)));
+		//a0 = Cl2D_alphaTerm / (1 + (Cl2D_alphaTerm / (pi * ellipEfficiency * aspectRatio)));      // Different formula that uses efficiency
+
+		assert(sweepAngle < (pi/2));
+		a0 = (pi * aspectRatio) / (1 + sqrt(1 + pow((pi * aspectRatio) / (Cl2D_alphaTerm * cos(radSweepAngle)), 2)));        // Accounts for Sweep Angle
+
 		knottTerm = Cl2D_alphaZeroLift * a0;
 		alphaTerm = a0;
 
