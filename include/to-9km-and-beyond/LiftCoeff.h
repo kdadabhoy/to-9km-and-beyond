@@ -21,11 +21,11 @@ namespace airplane {
 		void setCL_Knott(double inTerm);
 
 		// Useful Functions:
-		double get_CL_rad(double alpha) const;
+		double get_CL_rad(double alpha) const;     // CL_alpha * alpha + CL_knott
 
 	private:
-		double CL_alpha;
-		double CL_knott;
+		double CL_alpha;		// Stored in radians (whatever you put in is the sign)
+		double CL_knott;        // (whatever you put in is the sign)
 	};
 
 }

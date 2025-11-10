@@ -4,17 +4,14 @@
 #include <cmath>
 #include <cassert>
 using namespace std;
-using namespace airplane;
-
-// Think I have a mach function in atmosphere propertities... so maybe just pass in mach instead
 
 
 
-namespace aeroCoeff {
+namespace airplane {
 	DragCoeff::DragCoeff() {
 		parasiteCoeff = 0;
 		inducedCoeff = 0;
-		compressibCoeff = 0;
+		compressibilityCoeff = 0;
 		Wing = nullptr;
 		referenceArea = 0;
 
@@ -23,7 +20,7 @@ namespace aeroCoeff {
 
 
 
-	DragCoeff::DragCoeff(const airplane::Wing& inWing, const double inReferenceArea) {
+	DragCoeff::DragCoeff(airplane::Wing& inWing, double inReferenceArea) {
 		Wing = &inWing;
 		referenceArea = inReferenceArea;
 		parasiteCoeff = calcParasiteCoeff(0, 1.5723e-4);
@@ -33,30 +30,91 @@ namespace aeroCoeff {
 
 
 
+                 
 
-	double DragCoeff::calcTotalDragCoeff(const double AoA, const double velocity,
-		const double kinematicViscosity, const double temp) 
-	{
-		int R = 1717;
-		double Mach = velocity / sqrt(1.4 * R * temp);
-		return calcParasiteCoeff(velocity, kinematicViscosity) + calcCompressibCoeff(Mach) + calcInducedCoeff(AoA);
+
+	// Total Drag Functions 
+
+	// Need
+	// AoA,							or CL
+	// kinematicViscosity			or Reynolds	
+	// temp                         or Mach
+	// velocity    
+
+	// Prob also need Mach Critical Crest (have a wing function for this
+
+	// Total Drag Functions:
+
+	// Most efficient
+	double DragCoeff::calcTotalDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const {
+		return calcParasiteCoeff(Reynolds, wetAreaRatio) + calcCompressibilityCoeff(Mach) + calcInducedCoeff(AoA);
+
+	}
+
+
+	// Slightly inefficient
+	double DragCoeff::calcTotalDragCoeff(double AoA, double Reynolds, double Mach) const {
+		return calcParasiteCoeff(Reynolds) + calcCompressibilityCoeff(Mach) + calcInducedCoeff(AoA);
+	}
+
+
+	// Older one - works best for outside Wing Class implementations (?), honestly prob won't use
+	double DragCoeff::calcTotalDragCoeff(double AoA, double velocity, double kinematicViscosity, double temp, double wetAreaRatio) const {
+		double Mach = velocity / sqrt(1.4 * GAS_CONSTANT * temp);
+		return calcParasiteCoeff(velocity, kinematicViscosity, wetAreaRatio) + calcCompressibilityCoeff(Mach) + calcInducedCoeff(AoA);
 	}
 
 
 
 
-	double DragCoeff::calcParasiteCoeff(const double velocity, const double kinematicViscosity) {
-		assert(Wing != nullptr);
-		double Re;
-		double areaRatio;
 
-		Re = Wing->calcReynolds(velocity, kinematicViscosity);
-		areaRatio = Wing->calcWettedArea() / Wing->getArea();
+
+
+
+
+	// Parasite Drag Functions:
+	
+	// Most efficient
+	double DragCoeff::calcParasiteCoeff(double Reynolds, double wetAreaRatio) const {
+		assert(Wing != nullptr);
+
+		if (Reynolds >= 5e5) {
+			return wetAreaRatio * .455 / pow(log10(Reynolds), 2.58);
+		} else if (Reynolds > .001) {
+			return wetAreaRatio * 1.328 / sqrt(Reynolds);
+		} else {
+			return 0;
+		}
+	}
+
+
+
+	// Slightly inefficient
+	double DragCoeff::calcParasiteCoeff(double Reynolds) const {
+		assert(Wing != nullptr);
+		double wetAreaRatio = Wing->calcWettedArea() / Wing->getArea();
+
+		if (Reynolds >= 5e5) {
+			return wetAreaRatio * .455 / pow(log10(Reynolds), 2.58);
+		} else if (Reynolds > .001) {
+			return wetAreaRatio * 1.328 / sqrt(Reynolds);
+		} else {
+			return 0;
+		}
+	}
+
+
+
+
+	// Older one
+	double DragCoeff::calcParasiteCoeff(double velocity, double kinematicViscosity, double wetAreaRatio) const {
+		assert(Wing != nullptr);
+		double Re = Wing->calcReynolds(velocity, kinematicViscosity);
 
 		if (Re >= 5e5) {
-			return areaRatio * .455 / pow(log10(Re), 2.58);
+			return wetAreaRatio * .455 / pow(log10(Re), 2.58);
 		} else if (Re > .001) {
-			return areaRatio * 1.328 / sqrt(Re);
+			return wetAreaRatio * 1.328 / sqrt(Re);
 		} else {
 			return 0;
 		}
@@ -65,22 +123,26 @@ namespace aeroCoeff {
 
 
 
-	double DragCoeff::calcInducedCoeff(const double AoA) {
+
+
+	// Induced Drag Functions:
+	double DragCoeff::calcInducedCoeff(double AoA) const {
 		assert(Wing != nullptr);
 		double CL = Wing->getC_L_rad(AoA);
-
-		return (CL*CL) / (pi * Wing->getEllipticalEffic() * Wing->getAR());
+		return (CL*CL) / (pi * Wing->getEllipticalEffic() * Wing->getAspectRatio());
 	}
 
 
 
 
-	double DragCoeff::calcCompressibCoeff(const double Mach) {
+
+	// Induced Compressibility Functions:
+	double DragCoeff::calcCompressibilityCoeff(double Mach) const {
 		if (Mach < .30) {
-			return 0;
+			return 0;		// Keep as 0 bc negligble
 		} else {
 			// Need to implement digitized CDC graph
-			return 1;
+			return 0;
 		}
 	}
 

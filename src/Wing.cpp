@@ -2,12 +2,16 @@
 #include "to-9km-and-beyond/Wing.h"
 #include "to-9km-and-beyond/Airfoil.h"
 #include "to-9km-and-beyond/LiftCoeff.h"
+#include "to-9km-and-beyond/DragCoeff.h"
 #include <cmath>
 #include <cassert>
 using namespace std;
 
 
+
 namespace airplane {
+
+
 	// Default Constructor
 	Wing::Wing() {
 		airfoil = nullptr;
@@ -21,7 +25,11 @@ namespace airplane {
 		aspectRatio = 0;
 		weight = 0;
 		ellipEfficiency = 0;
+		wetAreaRatio = 0;
 	}
+
+
+
 
 
 
@@ -39,10 +47,14 @@ namespace airplane {
 		MAC = calcMAC(taperRatio);
 		aspectRatio = calcAspectRatio(area);
 		ellipEfficiency = calcEllipEfficiency(aspectRatio);
+		wetAreaRatio = this->calcWettedArea() / area;
 		calcCL3D();
-
+		
 		weight = calcWeight();
 	}
+
+
+
 
 
 	// HT and VT (so I can have weight = 0)
@@ -58,6 +70,7 @@ namespace airplane {
 		area = calcArea(taperRatio);
 		MAC = calcMAC(taperRatio);
 		aspectRatio = calcAspectRatio(area);
+		wetAreaRatio = this->calcWettedArea() / area;
 		calcCL3D();
 
 		weight = inWeight;
@@ -73,10 +86,12 @@ namespace airplane {
 		span = other.span;
 		taperRatio = other.taperRatio;
 		area = other.area;
+		wetAreaRatio = other.wetAreaRatio;
 		MAC = other.MAC;
 		aspectRatio = other.aspectRatio;
 		weight = other.weight;
 		ellipEfficiency = other.ellipEfficiency;
+
 		airfoil = other.airfoil;					// This could run into pointer errors... and prob needs dynamic memory allocation...
 													// But won't really be using a copy constructor so... :)
 	}
@@ -84,23 +99,31 @@ namespace airplane {
 
 
 
-	double Wing::calcArea(const double inTaperRatio) const {
+	double Wing::calcArea(double inTaperRatio) const {
 		return (0.5 * rootChord * span * (inTaperRatio + 1));
 	}
 
 
-	double Wing::calcMAC(const double inTaperRatio) const {
+	double Wing::calcMAC(double inTaperRatio) const {
 		return (2.0/3.0) * rootChord * ((1 + inTaperRatio + (inTaperRatio * inTaperRatio)) / (1 + inTaperRatio));
 	}
 
 
-	double Wing::calcAspectRatio(const double inArea) const {
-		return span * span / inArea;
+	double Wing::calcAspectRatio(double inArea) const {
+		return (span * span) / inArea;
 	}
 
-	double Wing::calcEllipEfficiency(const double inAspectRatio) const {
+
+	// I am not convinced by this emperical equation
+	// This emperical equation says that in the real world e goes down as AR goes up
+	double Wing::calcEllipEfficiency(double inAspectRatio) const {
 		double effic;
-		effic = 1.78 * (1 - (.045 * pow(inAspectRatio, 0.68))) - 0.65;
+		if(inAspectRatio >= 4  && inAspectRatio <= 11){
+			effic = (1.78 * (1 - (.045 * pow(inAspectRatio, 0.68)))) - 0.65;
+		} else {
+			effic = .80;
+		}
+
 		return effic;
 	}
 
@@ -118,6 +141,8 @@ namespace airplane {
 
 
 
+
+
 	// CL 3D Calc
 	void Wing::calcCL3D() {
 		double Cl2D_alphaTerm = airfoil->getCl_AlphaTerm();						// This is gunna be 2pi always
@@ -132,7 +157,7 @@ namespace airplane {
 		assert(sweepAngle <= 89.0);
 		a0 = (pi * aspectRatio) / (1 + sqrt(1 + pow((pi * aspectRatio) / (Cl2D_alphaTerm * cos(radSweepAngle)), 2)));        // Accounts for Sweep Angle
 
-		knottTerm = Cl2D_alphaZeroLift * a0;
+		knottTerm = Cl2D_alphaZeroLift * -1 * a0;								// CL = a0(alpha - zeroLiftalpha)
 		alphaTerm = a0;
 
 		CL3D.setCL_Alpha(alphaTerm);
@@ -143,7 +168,7 @@ namespace airplane {
 
 	// Semi-Related Calculations
 
-	double Wing::calcReynolds(const double velocity, const double kinematicViscosity) const {
+	double Wing::calcReynolds(double velocity, double kinematicViscosity) const {
 
 		return ((velocity * MAC) / kinematicViscosity);
 	}
@@ -154,7 +179,14 @@ namespace airplane {
 	}
 
 
+	double Wing::getTotalC_D_rad(double AoA, double referenceArea, double velocity, double kinematicViscosity, double temp) {
+		DragCoeff CD_Total(*this, referenceArea);
+		double Reynolds = this->calcReynolds(velocity, kinematicViscosity);
+		double Mach = velocity / sqrt(1.4 * GAS_CONSTANT * temp);
+		assert(Mach <= .98);
 
+		return CD_Total.calcTotalDragCoeff(AoA, Reynolds, Mach, wetAreaRatio);
+	}
 
 
 
@@ -179,15 +211,12 @@ namespace airplane {
 		return weight;
 	}
 
-	double Wing::getAR() const {
-		return aspectRatio;
-	}
 
 	double Wing::getEllipticalEffic() const {
 		return ellipEfficiency;
 	}
 
-	double Wing::getC_L_rad(const double AoA) const {
+	double Wing::getC_L_rad(double AoA) const {
 		return CL3D.get_CL_rad(AoA);
 	}
 

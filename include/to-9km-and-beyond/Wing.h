@@ -4,7 +4,6 @@
 #include "to-9km-and-beyond/LiftCoeff.h"
 // Prob should add assignment operator at some point
 
-
 namespace airplane {
 	class Wing {
 	public:
@@ -19,8 +18,14 @@ namespace airplane {
 		Wing(const Wing& other);
 
 		// Useful Functions
-		double calcReynolds(const double velocity, const double kinematicViscosity) const;
+		double calcReynolds(double velocity, double kinematicViscosity) const;
 		double calcWettedArea() const;
+
+		double getTotalC_D_rad(double AoA, double referenceArea,			// AoA in rad, referenceArea in ft^2, velocity in ft/s, Imperial for temp and kinematicVisc
+			double velocity, double kinematicViscosity, double temp);       // Can't easily be const bc I need to pass *this 
+
+
+
 
 		// Accessors
 		double getArea() const;
@@ -28,9 +33,10 @@ namespace airplane {
 		double getTaperRatio() const;
 		double getAspectRatio() const;
 		double getWeight() const;
-		double getAR() const;
 		double getEllipticalEffic() const;								 // Just calling this .8 for now
-		double getC_L_rad(const double AoA) const;                       // AoA passed in as radians
+		double getC_L_rad(double AoA) const;							 // AoA passed in as radians
+
+
 
 
 
@@ -51,7 +57,9 @@ namespace airplane {
 		double aspectRatio;       // unitless
 		double taperRatio;        // unitless
 		double MAC;               // stored in feet
+		double wetAreaRatio;      // Needed to make drag calculation more efficient
 		static constexpr double pi = 3.141592653589;
+		static constexpr double GAS_CONSTANT = 1716;
 
 
 
@@ -59,10 +67,10 @@ namespace airplane {
 		LiftCoeff CL3D;
 		Airfoil* airfoil;
 
-		double calcArea(const double inTaperRatio) const;                     // Assumes Trapezodial Wing, Needs rootChord, span to be defined
-		double calcMAC(const double inTaperRatio) const;                      // Assumes Trapezodial Wing, Needs area, rootChord, taperRatio
-		double calcAspectRatio(const double inArea) const;
-		double calcEllipEfficiency(const double inAspectRatio) const;
+		double calcArea(double inTaperRatio) const;                     // Assumes Trapezodial Wing, Needs rootChord, span to be defined
+		double calcMAC(double inTaperRatio) const;                      // Assumes Trapezodial Wing, Needs area, rootChord, taperRatio
+		double calcAspectRatio(double inArea) const;
+		double calcEllipEfficiency(double inAspectRatio) const;
 
 
 		double calcWeight() const;                                            // Need to figure out how to approx this

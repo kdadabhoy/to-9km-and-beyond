@@ -22,8 +22,9 @@ using namespace airplane;
 	To Do List:
 
 	- In Wing Class
-		- Need to add a public reynolds number function
-		- Need to add a total drag fucntion (given a velocity and density)
+		- Need to add a C_DC function
+			- This requires a Mach Critical Crest #
+			- This requires digitizing plots 	
 
 
 
@@ -33,6 +34,11 @@ using namespace airplane;
 		- Need to have a Power vs Speed curve for all atmospheres
 			- And need to be able to tell me the speed that will have the max excess power
 			- Prob a main() function
+
+	- In Fuselage class:
+		- Need to calculate parasitic drag from fuselage
+		- Need to calculate lift from fuselage
+
 
 	-In the Airplane Class
 		- Need to get my total Lift and total Drag given a velocity by calling on Wing Drag/Lift functions
@@ -95,15 +101,42 @@ int main() {
 	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
-	double mainSpan = 100;
-	double mainTipChord = 100;
-	double mainRootChord = 100;
-	double mainSweepAngle = 30;
+	double mainSpan = 120;
+	double mainTipChord = 12;
+	double mainRootChord = 24;
+	double mainSweepAngle = 15;
 	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);
 
 	// Airplane we have with everything
 	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 
+	// Testing CL3D Wing
+	double AoA = 5 * 3.1415 / 180;
+	AtmosphereProperties Cond(0);
+	double temp = Cond.getTemperature();
+	double kineVisc = Cond.getKinematicVisc();
+	double velocity = 500;
+
+
+	cout << "Area: " << mainWing.getArea() << endl;
+	cout << "AR: " << mainWing.getAspectRatio() << endl;
+	cout << "e: " << mainWing.getEllipticalEffic() << endl;
+	cout << "Sweep: " << mainSweepAngle << endl;
+	cout << "MAC: " << mainWing.getMAC() << endl;
+	cout << "AoA rad: " << AoA << endl;
+	cout << "CL3D total: " << mainWing.getC_L_rad(AoA) << endl;
+
+
+	double Re = mainWing.calcReynolds(velocity, kineVisc);
+	double totalDragCoeff = mainWing.getTotalC_D_rad(AoA, mainWing.getArea(), velocity, kineVisc, temp);
+
+	cout << endl << endl << endl;
+	cout << "kineVisc: " << kineVisc << endl;
+	cout << "velocity: " << velocity << endl;
+	cout << "temp: " << temp << endl << endl;
+
+	cout << "Re: " << Re << endl;
+	cout << "C_D: " << totalDragCoeff << endl;
 
 
 	return 0;
@@ -113,6 +146,66 @@ int main() {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+	// Testing CL3D Wing & Getting Drag from Wing member function
+
+	// Main Wing Stuff, this is what will be optimized
+	double mainSpan = 120;
+	double mainTipChord = 12;
+	double mainRootChord = 24;
+	double mainSweepAngle = 15;
+	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);
+
+	// Airplane we have with everything
+	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
+
+	// Testing CL3D Wing
+	double AoA = 5 * 3.1415 / 180;
+	AtmosphereProperties Cond(0);
+	double temp = Cond.getTemperature();
+	double kineVisc = Cond.getKinematicVisc();
+	double velocity = 500;
+
+
+	cout << "Area: " << mainWing.getArea() << endl;
+	cout << "AR: " << mainWing.getAspectRatio() << endl;
+	cout << "e: " << mainWing.getEllipticalEffic() << endl;
+	cout << "Sweep: " << mainSweepAngle << endl;
+	cout << "MAC: " << mainWing.getMAC() << endl;
+	cout << "AoA rad: " << AoA << endl;
+	cout << "CL3D total: " << mainWing.getC_L_rad(AoA) << endl;
+
+
+	double Re = mainWing.calcReynolds(velocity, kineVisc);
+	double totalDragCoeff = mainWing.getTotalC_D_rad(AoA, mainWing.getArea(), velocity, kineVisc, temp);
+
+	cout << endl << endl << endl;
+	cout << "kineVisc: " << kineVisc << endl;
+	cout << "velocity: " << velocity << endl;
+	cout << "temp: " << temp << endl << endl;
+
+	cout << "Re: " << Re << endl;
+	cout << "C_D: " << totalDragCoeff << endl;
+*/
 
 
 

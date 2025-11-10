@@ -4,26 +4,35 @@
 // Prob should add assignment operator at some point
 
 
-namespace aeroCoeff {
+namespace airplane {
 	class DragCoeff {
 	public:
 		DragCoeff();
-		DragCoeff(const airplane::Wing& inWing, const double inReferenceArea);
-		double calcTotalDragCoeff(const double AoA, const double velocity,
-			const double kinematicViscosity, const double temp);
+		DragCoeff(airplane::Wing& inWing, double inReferenceArea);
+
+		double calcTotalDragCoeff(double AoA, double velocity, double kinematicViscosity, double temp, double wetAreaRatio) const;
+		double calcTotalDragCoeff(double AoA, double Reynolds, double Mach) const;
+		double calcTotalDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const;
+
 
 	private:
 		double parasiteCoeff;          // Assuming no blunt body drag
 		double inducedCoeff;
-		double compressibCoeff;
+		double compressibilityCoeff;
 
-		const airplane::Wing* Wing;
+		airplane::Wing* Wing;
 		double referenceArea;
 		static constexpr double pi = 3.141592653589;
+		static constexpr double GAS_CONSTANT = 1716;
 
-		double calcParasiteCoeff(const double velocity, const double kinematicViscosity);
-		double calcInducedCoeff(const double AoA);
-		double calcCompressibCoeff(const double Mach);
+
+		double calcParasiteCoeff(double velocity, double kinematicViscosity, double wetAreaRatio) const;
+		double calcParasiteCoeff(double Renyolds) const;
+		double calcParasiteCoeff(double Renyolds, double wetAreaRatio) const;
+
+
+		double calcInducedCoeff(double AoA) const;
+		double calcCompressibilityCoeff(double Mach) const;
 	};
 }
 
