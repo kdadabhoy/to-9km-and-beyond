@@ -15,6 +15,8 @@ namespace airplane {
 		Airplane();
 		Airplane(Wing& inWing, Wing& inHT, Wing& inVT, TurboFan& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight);
 
+		double calcMach(double velocity, double temp) const;
+
 
 		//double calculateLift();
 		//double calculateDrag();
@@ -24,11 +26,13 @@ namespace airplane {
 		double getWeight() const;
 
 	private:
-		// memember variables
+		// member variables
 		double totalWeight;
 
 		double payLoadWeight;     
 		double fuelWeight;
+		static constexpr double GAS_CONSTANT = 1716;
+
 
 		Wing* HT;                // One Planform of Horizontal Tail (one side)
 		Wing* VT;                // One Planform of Vertical Tail (one side)

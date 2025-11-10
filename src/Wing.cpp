@@ -25,7 +25,6 @@ namespace airplane {
 		aspectRatio = 0;
 		weight = 0;
 		ellipEfficiency = 0;
-		wetAreaRatio = 0;
 	}
 
 
@@ -47,7 +46,6 @@ namespace airplane {
 		MAC = calcMAC(taperRatio);
 		aspectRatio = calcAspectRatio(area);
 		ellipEfficiency = calcEllipEfficiency(aspectRatio);
-		wetAreaRatio = this->calcWettedArea() / area;
 		calcCL3D();
 		
 		weight = calcWeight();
@@ -70,7 +68,6 @@ namespace airplane {
 		area = calcArea(taperRatio);
 		MAC = calcMAC(taperRatio);
 		aspectRatio = calcAspectRatio(area);
-		wetAreaRatio = this->calcWettedArea() / area;
 		calcCL3D();
 
 		weight = inWeight;
@@ -86,7 +83,6 @@ namespace airplane {
 		span = other.span;
 		taperRatio = other.taperRatio;
 		area = other.area;
-		wetAreaRatio = other.wetAreaRatio;
 		MAC = other.MAC;
 		aspectRatio = other.aspectRatio;
 		weight = other.weight;
@@ -179,11 +175,11 @@ namespace airplane {
 	}
 
 
-	double Wing::getTotalC_D_rad(double AoA, double referenceArea, double velocity, double kinematicViscosity, double temp) {
-		DragCoeff CD_Total(*this, referenceArea);
-		double Reynolds = this->calcReynolds(velocity, kinematicViscosity);
-		double Mach = velocity / sqrt(1.4 * GAS_CONSTANT * temp);
+	double Wing::getTotalC_D_rad(double AoA, double velocity, double Mach, double wetAreaRatio, double kinematicViscosity) {
 		assert(Mach <= .98);
+
+		DragCoeff CD_Total(*this);
+		double Reynolds = this->calcReynolds(velocity, kinematicViscosity);
 
 		return CD_Total.calcTotalDragCoeff(AoA, Reynolds, Mach, wetAreaRatio);
 	}

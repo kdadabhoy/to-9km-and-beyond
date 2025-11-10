@@ -21,8 +21,7 @@ namespace airplane {
 		double calcReynolds(double velocity, double kinematicViscosity) const;
 		double calcWettedArea() const;
 
-		double getTotalC_D_rad(double AoA, double referenceArea,			// AoA in rad, referenceArea in ft^2, velocity in ft/s, Imperial for temp and kinematicVisc
-			double velocity, double kinematicViscosity, double temp);       // Can't easily be const bc I need to pass *this 
+		double getTotalC_D_rad(double AoA, double velocity, double Mach, double wetAreaRatio, double kinematicViscosity);       // Can't easily be const bc I need to pass *this 
 
 
 
@@ -52,12 +51,11 @@ namespace airplane {
 
 
 		// Can calculate based on take ins:
-		double area;              // Stored in feet^2
-		double weight;            // Stored in lbms
-		double aspectRatio;       // unitless
-		double taperRatio;        // unitless
-		double MAC;               // stored in feet
-		double wetAreaRatio;      // Needed to make drag calculation more efficient
+		double area;                     // Stored in feet^2
+		double weight;                   // Stored in lbms
+		double aspectRatio;              // unitless
+		double taperRatio;				 // unitless
+		double MAC;						 // stored in feet
 		static constexpr double pi = 3.141592653589;
 		static constexpr double GAS_CONSTANT = 1716;
 

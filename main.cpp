@@ -116,7 +116,7 @@ int main() {
 	double temp = Cond.getTemperature();
 	double kineVisc = Cond.getKinematicVisc();
 	double velocity = 500;
-
+	double Mach = Airplane.calcMach(velocity, temp);
 
 	cout << "Area: " << mainWing.getArea() << endl;
 	cout << "AR: " << mainWing.getAspectRatio() << endl;
@@ -128,7 +128,8 @@ int main() {
 
 
 	double Re = mainWing.calcReynolds(velocity, kineVisc);
-	double totalDragCoeff = mainWing.getTotalC_D_rad(AoA, mainWing.getArea(), velocity, kineVisc, temp);
+	double wetAreaRatio = mainWing.calcWettedArea() / mainWing.getArea();
+	double totalDragCoeff = mainWing.getTotalC_D_rad(AoA, velocity, Mach, wetAreaRatio, kineVisc);
 
 	cout << endl << endl << endl;
 	cout << "kineVisc: " << kineVisc << endl;

@@ -8,11 +8,10 @@ namespace airplane {
 	class DragCoeff {
 	public:
 		DragCoeff();
-		DragCoeff(airplane::Wing& inWing, double inReferenceArea);
+		DragCoeff(airplane::Wing& inWing);
 
+		double calcTotalDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const;			// Use this one 9/10 times
 		double calcTotalDragCoeff(double AoA, double velocity, double kinematicViscosity, double temp, double wetAreaRatio) const;
-		double calcTotalDragCoeff(double AoA, double Reynolds, double Mach) const;
-		double calcTotalDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const;
 
 
 	private:
@@ -21,14 +20,11 @@ namespace airplane {
 		double compressibilityCoeff;
 
 		airplane::Wing* Wing;
-		double referenceArea;
 		static constexpr double pi = 3.141592653589;
 		static constexpr double GAS_CONSTANT = 1716;
 
-
-		double calcParasiteCoeff(double velocity, double kinematicViscosity, double wetAreaRatio) const;
-		double calcParasiteCoeff(double Renyolds) const;
 		double calcParasiteCoeff(double Renyolds, double wetAreaRatio) const;
+		double calcParasiteCoeff(double velocity, double kinematicViscosity, double wetAreaRatio) const;
 
 
 		double calcInducedCoeff(double AoA) const;

@@ -13,26 +13,22 @@ namespace airplane {
 		inducedCoeff = 0;
 		compressibilityCoeff = 0;
 		Wing = nullptr;
-		referenceArea = 0;
-
 	}
 	
 
 
 
-	DragCoeff::DragCoeff(airplane::Wing& inWing, double inReferenceArea) {
+	DragCoeff::DragCoeff(airplane::Wing& inWing) {
 		Wing = &inWing;
-		referenceArea = inReferenceArea;
 		parasiteCoeff = calcParasiteCoeff(0, 1.5723e-4);
 		inducedCoeff = calcInducedCoeff(0);
+		compressibilityCoeff = 0;
 	}
 
 
 
 
                  
-
-
 	// Total Drag Functions 
 
 	// Need
@@ -51,11 +47,6 @@ namespace airplane {
 
 	}
 
-
-	// Slightly inefficient
-	double DragCoeff::calcTotalDragCoeff(double AoA, double Reynolds, double Mach) const {
-		return calcParasiteCoeff(Reynolds) + calcCompressibilityCoeff(Mach) + calcInducedCoeff(AoA);
-	}
 
 
 	// Older one - works best for outside Wing Class implementations (?), honestly prob won't use
@@ -87,21 +78,6 @@ namespace airplane {
 		}
 	}
 
-
-
-	// Slightly inefficient
-	double DragCoeff::calcParasiteCoeff(double Reynolds) const {
-		assert(Wing != nullptr);
-		double wetAreaRatio = Wing->calcWettedArea() / Wing->getArea();
-
-		if (Reynolds >= 5e5) {
-			return wetAreaRatio * .455 / pow(log10(Reynolds), 2.58);
-		} else if (Reynolds > .001) {
-			return wetAreaRatio * 1.328 / sqrt(Reynolds);
-		} else {
-			return 0;
-		}
-	}
 
 
 

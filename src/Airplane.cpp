@@ -4,6 +4,7 @@
 #include "to-9km-and-beyond/TurboFan.h"
 #include "to-9km-and-beyond/Nacelle.h"
 #include <cassert>
+#include <cmath>
 using namespace std;
 
 // Prob should add assignment operator at some point
@@ -82,7 +83,11 @@ namespace airplane {
 	}
 
 
+	// Useful Functions:
 
+	double Airplane::calcMach(double velocity, double temp) const {
+		return velocity / sqrt(1.4 * GAS_CONSTANT * temp);
+	}
 
 
 
