@@ -7,9 +7,11 @@ namespace airplane {
 	public:
 		LiftCoeff();
 		LiftCoeff(double inCL_alpha, double inCL_knott);		// takes in radians
-
 		LiftCoeff(LiftCoeff& other);							// Copy Constructor
 		LiftCoeff& operator=(const LiftCoeff& other);			// Assignment Operator
+
+		// Useful Functions:
+		double calcLiftCoefficient(double alpha) const;       // Takes in radians
 
 
 		// Accessors:
@@ -19,9 +21,6 @@ namespace airplane {
 		// Mutators:
 		void setCL_Alpha(double inTerm);
 		void setCL_Knott(double inTerm);
-
-		// Useful Functions:
-		double get_CL_rad(double alpha) const;     // CL_alpha * alpha + CL_knott
 
 	private:
 		double CL_alpha;		// Stored in radians (whatever you put in is the sign)

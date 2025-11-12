@@ -84,7 +84,7 @@ namespace airplane {
 	// Induced Drag Function
 	double DragCoeff::calcInducedCoeff(double AoA) const {
 		assert(Wing != nullptr);
-		double CL = Wing->getC_L_rad(AoA);
+		double CL = Wing->calcLiftCoeff(AoA);
 		return (CL*CL) / (pi * Wing->getEllipticalEffic() * Wing->getAspectRatio());
 	}
 

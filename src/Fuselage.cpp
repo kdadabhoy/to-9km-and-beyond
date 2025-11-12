@@ -9,14 +9,28 @@ namespace airplane {
 	Fuselage::Fuselage() {
 		weight = 0;
 	}
+
+
+
+
+
+
 	Fuselage::Fuselage(double inWeight) {
 		weight = inWeight;
 	}
+
+
+
+
 
 	// Copy constrcutor
 	Fuselage::Fuselage(const Fuselage& other) {
 		weight = other.weight;
 	}
+
+
+
+
 
 	//Assignment Operator
 	Fuselage& Fuselage::operator=(const Fuselage& other) {
@@ -27,6 +41,10 @@ namespace airplane {
 			return *this;
 		}
 	}
+
+
+
+
 
 
 	//Useful Member functions
@@ -41,13 +59,9 @@ namespace airplane {
 
 
 
-
-
 	double Fuselage::calcLiftCoeff(double AoA) const {
 		return CL_alpha * AoA + CL_knott;
 	}
-
-
 
 
 

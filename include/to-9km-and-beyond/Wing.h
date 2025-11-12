@@ -21,7 +21,8 @@ namespace airplane {
 		double calcReynolds(double velocity, double kinematicViscosity) const;
 		double calcWettedArea() const;
 		double calcWetRatio(double referenceArea) const;
-		double calcDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio);       // Can't easily be const bc I need to pass *this 
+		double calcDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio);       // AoA passed in as radians
+		double calcLiftCoeff(double AoA) const;							                           // AoA passed in as radians
 
 
 
@@ -31,8 +32,7 @@ namespace airplane {
 		double getTaperRatio() const;
 		double getAspectRatio() const;
 		double getWeight() const;
-		double getEllipticalEffic() const;								 // Just calling this .8 for now
-		double getC_L_rad(double AoA) const;							 // AoA passed in as radians
+		double getEllipticalEffic() const;
 		double getSweepAngle() const;
 		double getLeadingEdgeSweep() const;                             // Technically not an accessor.. but will treat it as one
 

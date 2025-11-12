@@ -134,12 +134,10 @@ namespace airplane {
 		double leadingEdgeSweep = 0;
 		double sweepAngleRad = sweepAngle * pi / 180;
 		leadingEdgeSweep = atan(tan(sweepAngleRad) + ((.25 * (1 - taperRatio)) / (aspectRatio * (1 + taperRatio))));
-		cout << "LE Sweep " << leadingEdgeSweep * 180 / pi << endl; // delete
 
 		if (leadingEdgeSweep < .001 && leadingEdgeSweep > -.001 && aspectRatio > 3.9 && aspectRatio < 10.1) {
 			// Emperical formula for unswept Wings
 			effic = (1.78 * (1 - (.045 * pow(aspectRatio, 0.68)))) - 0.65;
-			cout << " 1 I am executing" << endl; // delete
 			assert(effic <= 1 && effic >= .65);
 			return effic;
 		} else {
@@ -155,7 +153,6 @@ namespace airplane {
 
 		else if (leadingEdgeSweep > (29 * pi / 180) && leadingEdgeSweep < (46 * pi / 180) && aspectRatio > 5.9 && aspectRatio < 11.1) {
 			// Emperical formula for Swept Wings w/ LE angle > 29
-			cout << " 2 I am executing" << endl; // delete
 			effic = (4.61 * (1 - (.045 * pow(aspectRatio, 0.68)))) * pow(cos(leadingEdgeSweep), 0.15) - 3.1;
 			assert(effic <= 1 && effic >= .65);
 			return effic;
@@ -224,14 +221,30 @@ namespace airplane {
 	}
 
 
+
+
+
+
+
 	double Wing::calcWettedArea() const {
 		return 2 * area * 1.02;
 	}
+
+
+
+
+
+
 
 	double Wing::calcWetRatio(double referenceArea) const {
 		// WetArea divided by referenceArea
 		return (2 * area * 1.02) / referenceArea;
 	}
+
+
+
+
+
 
 
 
@@ -243,6 +256,13 @@ namespace airplane {
 
 
 
+
+
+
+
+	double Wing::calcLiftCoeff(double AoA) const {
+		return CL3D.calcLiftCoefficient(AoA);
+	}
 
 
 
@@ -279,10 +299,6 @@ namespace airplane {
 
 	double Wing::getEllipticalEffic() const {
 		return ellipEfficiency;
-	}
-
-	double Wing::getC_L_rad(double AoA) const {
-		return CL3D.get_CL_rad(AoA);
 	}
 
 	double Wing::getSweepAngle() const {

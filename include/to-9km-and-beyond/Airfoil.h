@@ -4,7 +4,10 @@
 #include <string>
 // Intended to work with 4 series NACA airfoils
 	// Assumes slope of 2D Cl = 2*pi
+
 // Prob should add assignment operator at some point
+
+// Can think about refactoring without using LiftCoeff (efficiency purposes)
 
 /* Takeaways:
 		I only really care about 

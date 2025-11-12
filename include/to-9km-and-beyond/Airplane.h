@@ -16,36 +16,30 @@ namespace airplane {
 		Airplane();
 		Airplane(Wing& inWing, Wing& inHT, Wing& inVT, TurboFan& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight);
 
+		// Useful Functions
 		double calcMach(double velocity, double temp) const;
 		double calcDragCoeff(double AoA, double velocity, double Mach, double kinematicViscosity) const;
+		double calcLiftCoeff(double AoA) const;
 
 
-		//double calculateLift();
-		//double calculateDrag();
-
-	
 		// Accessors:
 		double getWeight() const;
 
 	private:
-		// member variables
-		double totalWeight;
-
-		double payLoadWeight;     
-		double fuelWeight;
+		double totalWeight;      // Class calculates this
+		double referenceArea;    // Class assigns this the area of the main wing
+		Wing* HT;                // Full HT (Full Span / Planform)
+		Wing* VT;                // Full VT (Full Span / Planform)
+		Wing* mainWing;          // Full mainWing (Full Span / Planform)
+		TurboFan* engine;        // One engine (Class assumes plane has 2 identical engines)
+		Nacelle* nacelle;        // One nacelle (Class assumes plane has 2 identical nacelles)
+		Fuselage* fuselage;      // One fuselage
+		double payLoadWeight;    //
+		double fuelWeight;       // Weight of Fuel
 		static constexpr double GAS_CONSTANT = 1716;
 
-
-		Wing* HT;                // One Planform of Horizontal Tail (one side)
-		Wing* VT;                // One Planform of Vertical Tail (one side)
-		Wing* mainWing;          // One Planform of Main Wing (one side)
-		TurboFan* engine;        // Assumption that 2 engines are both with same propertities and that they are turbofans
-		Nacelle* nacelle;        // Assumption that 2 nacelles, both with same propertities
-		Fuselage* fuselage; 
-
-
-
 		double calcTotalWeight() const;
+
 	};
 
 

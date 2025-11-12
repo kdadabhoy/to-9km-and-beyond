@@ -97,22 +97,6 @@ int main() {
 
 
 
-	cout << "HT: " << endl;
-	cout << "Area: " << HT.getArea() << endl;
-	cout << "AR: " << HT.getAspectRatio() << endl;
-	cout << "e: " << HT.getEllipticalEffic() << endl;
-	cout << "Sweep: " << HT.getSweepAngle() << endl;
-
-	cout << endl << endl << endl;
-	cout << "VT: " << endl;
-	cout << "Area: " << VT.getArea() << endl;
-	cout << "AR: " << VT.getAspectRatio() << endl;
-	cout << "e: " << VT.getEllipticalEffic() << endl;
-	cout << "Sweep: " << VT.getSweepAngle() << endl;
-
-
-
-	cout << endl << endl << endl;
 	cout << "Main Wing: " << endl;
 	cout << "Area: " << mainWing.getArea() << endl;
 	cout << "AR: " << mainWing.getAspectRatio() << endl;
@@ -120,13 +104,25 @@ int main() {
 	cout << "Sweep: " << mainSweepAngle << endl;
 	cout << "MAC: " << mainWing.getMAC() << endl;
 	cout << "AoA rad: " << AoA << endl;
-	cout << "CL3D Wing total: " << mainWing.getC_L_rad(AoA) << endl;
+	cout << "CL3D Wing total: " << mainWing.calcLiftCoeff(AoA) << endl;
+
+
+	cout << endl << endl << endl;
+	cout << "HT: " << endl;
+	cout << "Area: " << HT.getArea() << endl;
+	cout << "AR: " << HT.getAspectRatio() << endl;
+	cout << "e: " << HT.getEllipticalEffic() << endl;
+	cout << "Sweep: " << HT.getSweepAngle() << endl;
+	cout << "CL3D HT total: " << HT.calcLiftCoeff(AoA) << endl;
+
+	cout << endl << endl << endl;
+	cout << "Fuselage Lift: " << fuselage.calcLiftCoeff(AoA) << endl;
 
 	cout << endl << endl;
 
 	cout << "Mach: " << Mach << endl;
 	cout << "AoA " << AoA * 180 / 3.1415 << endl;
-	cout << "Airplane Drag Coeff: " << Airplane.calcDragCoeff(AoA, velocity, Mach, kineVisc) << endl;
+	cout << "Airplane Lift Coeff: " << Airplane.calcLiftCoeff(AoA) << endl;
 
 
 

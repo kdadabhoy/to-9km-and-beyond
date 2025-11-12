@@ -68,8 +68,9 @@ namespace airplane {
 
 
 
+
 	// Useful Functions:
-	double LiftCoeff::get_CL_rad(double alpha) const {
+	double LiftCoeff::calcLiftCoefficient(double alpha) const {
 		return (CL_alpha * alpha) + CL_knott;
 	}
 

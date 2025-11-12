@@ -40,6 +40,8 @@ Thumbs.db
 # If you want to keep Filters in Git, comment out the line below
 *.filters
 
+test_main.cpp
+
 # ============================
 # Track your source & headers
 # ============================

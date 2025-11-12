@@ -6,6 +6,7 @@
 #include <cassert>
 #include <cmath>
 using namespace std;
+
 // Assumes we are passing in the full span of the Wing and HT (in other words they are symmetrical)
 	// In other, other words, the Wing objects represent the full main wing and full HT 
 // Prob should add assignment operator at some point
@@ -22,9 +23,16 @@ namespace airplane {
 		fuselage = nullptr;
 		fuelWeight = 0; 
 		payLoadWeight = 0; 
-
+		referenceArea = 0;
 		totalWeight = calcTotalWeight();
 	}
+
+
+
+
+
+
+
 
 	// don't do const Class& object, because I might want to modify the object in this class...
 	// If I decide none of the objects get modified in this class, then add const here and the pointer won't
@@ -37,9 +45,11 @@ namespace airplane {
 		engine = &inEngine;
 		nacelle = &inNacelle;
 		fuselage = &inFuselage;
-		fuelWeight = inFuelWeight;         // lbm
-		payLoadWeight = inPayLoadWeight;     // lbm
+		fuelWeight = inFuelWeight;
+		payLoadWeight = inPayLoadWeight; 
 		totalWeight = calcTotalWeight();
+		assert(mainWing != nullptr);
+		referenceArea = mainWing->getArea();
 	}
 
 
@@ -95,7 +105,6 @@ namespace airplane {
 
 	double Airplane::calcDragCoeff(double AoA, double velocity, double Mach, double kinematicViscosity) const {
 		double totalDrag = 0;
-		double referenceArea = mainWing->getArea();
 
 		totalDrag += mainWing->calcDragCoeff(AoA, mainWing->calcReynolds(velocity, kinematicViscosity), Mach, mainWing->calcWetRatio(referenceArea));
 		totalDrag += HT->calcDragCoeff(AoA, HT->calcReynolds(velocity, kinematicViscosity), Mach, HT->calcWetRatio(referenceArea));
@@ -106,7 +115,16 @@ namespace airplane {
 	}
 
 
+	double Airplane::calcLiftCoeff(double AoA) const {
+		double totalLift = 0;
 
+		totalLift += mainWing->calcLiftCoeff(AoA);
+		totalLift += HT->calcLiftCoeff(AoA);
+		totalLift += fuselage->calcLiftCoeff(AoA);
+		// Assume VT contributes negligble lift.
+
+		return totalLift;
+	}
 
 
 }

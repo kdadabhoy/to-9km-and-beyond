@@ -77,13 +77,13 @@ namespace airplane {
 	// Helpful Functions
 	double Airfoil::getCl_deg(double inAlphaDeg) const {
 		double alphaRad = inAlphaDeg * (pi / 180);
-		return Cl.get_CL_rad(alphaRad);
+		return Cl.calcLiftCoefficient(alphaRad);
 	}
 
 
 
 	double Airfoil::getCl_rad(double inAlphaRad) const {
-		return Cl.get_CL_rad(inAlphaRad);
+		return Cl.calcLiftCoefficient(inAlphaRad);
 	}
 
 
