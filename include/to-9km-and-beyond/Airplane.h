@@ -8,6 +8,7 @@
 
 
 // Assumes that plane is symmetric and has 2 engines (wings are symmetrical)
+// Assumes VT makes negligible lift a 
 
 namespace airplane {
 	class Airplane {
@@ -21,7 +22,7 @@ namespace airplane {
 		//double calculateLift();
 		//double calculateDrag();
 
-
+	
 		// Accessors:
 		double getWeight() const;
 

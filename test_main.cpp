@@ -1,3 +1,6 @@
+// Test main
+
+
 #include <iostream>
 #include <string>
 
@@ -70,7 +73,7 @@ using namespace airplane;
 
 
 
-
+/*
 
 // Useful main
 int main() {
@@ -145,7 +148,7 @@ int main() {
 
 
 
-
+*/
 
 
 

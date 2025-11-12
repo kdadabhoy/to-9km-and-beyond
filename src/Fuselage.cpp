@@ -1,5 +1,6 @@
 #include <iostream>
 #include "to-9km-and-beyond/Fuselage.h"
+#include "to-9km-and-beyond/DragCoeff.h"
 using namespace std;
 
 namespace airplane {
@@ -27,10 +28,36 @@ namespace airplane {
 	}
 
 
+	//Useful Member functions
+
+	double Fuselage::getLift_rad(double AoA) const {
+		return CL_alpha * AoA + CL_knott;
+	}
+
+
+	double Fuselage::getDrag_rad(double AoA) const {
+		DragCoeff CD(*this);
+
+		return 1;
+	}
+
+
+
+
+
+	// Accessors
 	double Fuselage::getWeight() const {
 		return weight;
 	}
 
+	double Fuselage::getFormFactor() const {
+		return formFactor;
+	}
+
+
+
+
+	// Mutators
 	void Fuselage::setWeight(double inWeight) {
 		weight = inWeight;
 	}

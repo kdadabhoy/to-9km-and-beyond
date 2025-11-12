@@ -9,7 +9,17 @@ namespace airplane {
 		Fuselage(double inWeight);
 		Fuselage(const Fuselage& other); // Copy Constructor
 		Fuselage& operator=(const Fuselage& other);
+
+		// Helpful Functions
+		double getLift_rad(double AoA) const;         // Takes in AoA in radian
+		double getDrag_rad(double AoA) const;         // Takes in AoA in radian
+		
+
+		//Accessors:
 		double getWeight() const;
+		double getFormFactor() const;
+
+		// Mutators:
 		void setWeight(double inWeight);
 
 
@@ -17,10 +27,17 @@ namespace airplane {
 		// memember variables
 		//double area;                 // Probably ignoring it's lift affects
 		double weight;
+
+
+		//Probably take these in as Parameters in constructor later.
+		double formFactor = 1.2;       // formFactor is ~1.2-1.5
+		double CL_alpha = .2;          // CL_alpha ~.1-.3
+		double CL_knott = 0;           // CL_knott ~ 0... 
+		double wettedArea = 811.55;    // Stored in ft^2
 	};
 
 
-
+	
 
 }
 
