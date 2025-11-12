@@ -68,6 +68,7 @@ namespace airplane {
 		area = calcArea(taperRatio);
 		MAC = calcMAC(taperRatio);
 		aspectRatio = calcAspectRatio(area);
+		ellipEfficiency = calcEllipEfficiency(aspectRatio);
 		calcCL3D();
 
 		weight = inWeight;

@@ -92,12 +92,16 @@ namespace airplane {
 
 
 
-	double Airplane::calcDragCoeff(double AoA, double velocity, double Mach, double referenceArea, double kinematicViscosity) const {
+	double Airplane::calcDragCoeff(double AoA, double velocity, double Mach, double kinematicViscosity) const {
 		double totalDrag = 0;
+		double referenceArea = mainWing->getArea();
 
-		totalDrag += (2 * mainWing->calcDragCoeff(AoA, mainWing->calcReynolds(velocity, kinematicViscosity), Mach, mainWing->calcWetRatio(referenceArea)));
+		//cout << "reference Area: " << referenceArea << endl;  // delete
+		//cout << "Reynolds test: " << HT->calcReynolds(velocity, kinematicViscosity) << endl; // delete
+
+		//totalDrag += (2 * mainWing->calcDragCoeff(AoA, mainWing->calcReynolds(velocity, kinematicViscosity), Mach, mainWing->calcWetRatio(referenceArea)));
 		totalDrag += (2 * HT->calcDragCoeff(AoA, HT->calcReynolds(velocity, kinematicViscosity), Mach, HT->calcWetRatio(referenceArea)));
-		totalDrag += fuselage->calcDragCoeff(AoA, fuselage->calcReynolds(velocity, kinematicViscosity), Mach, fuselage->calcWetRatio(referenceArea));
+		//totalDrag += fuselage->calcDragCoeff(AoA, fuselage->calcReynolds(velocity, kinematicViscosity), Mach, fuselage->calcWetRatio(referenceArea));
 
 		return totalDrag;
 	}

@@ -35,10 +35,6 @@ using namespace airplane;
 			- And need to be able to tell me the speed that will have the max excess power
 			- Prob a main() function
 
-	- In Fuselage class:
-		- Need to calculate parasitic drag from fuselage
-		- Need to calculate lift from fuselage
-
 
 	-In the Airplane Class
 		- Need to get my total Lift and total Drag given a velocity by calling on Wing Drag/Lift functions
@@ -74,13 +70,7 @@ using namespace airplane;
 
 // Useful main
 int main() {
-	// Airfoil characteristics for my HT and VT:
-	// Let's use a NACA 2412 for starters.. 
-		// bc need to implement 2D zero alpha
-	//LiftCoeff Cl_NACA2412(.178, 6.25);
 	Airfoil NACA2412("2412", -.0349);
-
-
 
 	// Other Variables
 	double currentHeight = 0;
@@ -124,20 +114,13 @@ int main() {
 	cout << "Sweep: " << mainSweepAngle << endl;
 	cout << "MAC: " << mainWing.getMAC() << endl;
 	cout << "AoA rad: " << AoA << endl;
-	cout << "CL3D total: " << mainWing.getC_L_rad(AoA) << endl;
+	cout << "CL3D Wing total: " << mainWing.getC_L_rad(AoA) << endl;
 
+	cout << endl << endl;
 
-	double Re = mainWing.calcReynolds(velocity, kineVisc);
-	double wetAreaRatio = mainWing.calcWettedArea() / mainWing.getArea();
-	double totalDragCoeff = mainWing.getTotalC_D_rad(AoA, velocity, Mach, wetAreaRatio, kineVisc);
+	cout << "Mach: " << Mach << endl;
+	cout << "Airplane Drag Coeff: " << Airplane.calcDragCoeff(AoA, velocity, Mach, kineVisc) << endl;
 
-	cout << endl << endl << endl;
-	cout << "kineVisc: " << kineVisc << endl;
-	cout << "velocity: " << velocity << endl;
-	cout << "temp: " << temp << endl << endl;
-
-	cout << "Re: " << Re << endl;
-	cout << "C_D: " << totalDragCoeff << endl;
 
 
 	return 0;
