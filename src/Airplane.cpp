@@ -6,7 +6,8 @@
 #include <cassert>
 #include <cmath>
 using namespace std;
-
+// Assumes we are passing in the full span of the Wing and HT (in other words they are symmetrical)
+	// In other, other words, the Wing objects represent the full main wing and full HT 
 // Prob should add assignment operator at some point
 
 
@@ -96,12 +97,10 @@ namespace airplane {
 		double totalDrag = 0;
 		double referenceArea = mainWing->getArea();
 
-		//cout << "reference Area: " << referenceArea << endl;  // delete
-		//cout << "Reynolds test: " << HT->calcReynolds(velocity, kinematicViscosity) << endl; // delete
-
-		//totalDrag += (2 * mainWing->calcDragCoeff(AoA, mainWing->calcReynolds(velocity, kinematicViscosity), Mach, mainWing->calcWetRatio(referenceArea)));
-		totalDrag += (2 * HT->calcDragCoeff(AoA, HT->calcReynolds(velocity, kinematicViscosity), Mach, HT->calcWetRatio(referenceArea)));
-		//totalDrag += fuselage->calcDragCoeff(AoA, fuselage->calcReynolds(velocity, kinematicViscosity), Mach, fuselage->calcWetRatio(referenceArea));
+		totalDrag += mainWing->calcDragCoeff(AoA, mainWing->calcReynolds(velocity, kinematicViscosity), Mach, mainWing->calcWetRatio(referenceArea));
+		cout << "Total Drag Wing: " << totalDrag << endl; // delete
+		totalDrag += HT->calcDragCoeff(AoA, HT->calcReynolds(velocity, kinematicViscosity), Mach, HT->calcWetRatio(referenceArea));
+		totalDrag += fuselage->calcDragCoeff(AoA, fuselage->calcReynolds(velocity, kinematicViscosity), Mach, fuselage->calcWetRatio(referenceArea));
 
 		return totalDrag;
 	}
