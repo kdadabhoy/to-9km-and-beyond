@@ -9,8 +9,8 @@ namespace airplane {
 	class DragCoeff {
 	public:
 		DragCoeff();
-		DragCoeff(airplane::Wing& inWing);
-		DragCoeff(airplane::Fuselage& inFuselage);
+		DragCoeff(const airplane::Wing& inWing);
+		DragCoeff(const airplane::Fuselage& inFuselage);
 
 
 		double calcTotalDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const;			// Use this one 9/10 times
@@ -19,8 +19,8 @@ namespace airplane {
 
 
 	private:
-		airplane::Wing* Wing;
-		airplane::Fuselage* Fuselage;
+		const airplane::Wing* Wing;
+		const airplane::Fuselage* Fuselage;
 
 		static constexpr double pi = 3.141592653589;
 		static constexpr double GAS_CONSTANT = 1716;

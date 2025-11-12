@@ -21,7 +21,7 @@ namespace airplane {
 
 
 
-	DragCoeff::DragCoeff(airplane::Wing& inWing) {
+	DragCoeff::DragCoeff(const airplane::Wing& inWing) {
 		Wing = &inWing;
 		Fuselage = nullptr;
 
@@ -35,7 +35,7 @@ namespace airplane {
 
 
 
-	DragCoeff::DragCoeff(airplane::Fuselage& inFuselage) {
+	DragCoeff::DragCoeff(const airplane::Fuselage& inFuselage) {
 		Fuselage = &inFuselage;
 		Wing = nullptr;
 		//parasiteCoeff = calcParasiteCoeff(0, 1.5723e-4);
@@ -50,16 +50,8 @@ namespace airplane {
 
 
 
-
-
-	double DragCoeff::calcFormDragCoeff(double Cf) const {
-		// Could implement this by passing in nothing and calling
-		// Parasite function or getting it from member varibale instead
-		return Fuselage->getFormFactor() * Cf;
-	}
-
-
                  
+
 	// Total Drag Functions 
 
 	// Need
@@ -69,7 +61,6 @@ namespace airplane {
 	// velocity    
 
 	// Prob also need Mach Critical Crest (have a wing function for this
-
 
 
 
@@ -168,6 +159,16 @@ namespace airplane {
 			// Need to implement digitized CDC graph
 			return 0;
 		}
+	}
+
+
+
+
+
+	double DragCoeff::calcFormDragCoeff(double Cf) const {
+		// Could implement this by passing in nothing and calling
+		// Parasite function or getting it from member varibale instead
+		return Fuselage->getFormFactor() * Cf;
 	}
 
 

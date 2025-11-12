@@ -35,13 +35,17 @@ namespace airplane {
 	}
 
 
-	double Fuselage::getDrag_rad(double AoA) const {
+	double Fuselage::getDrag_rad(double AoA, double Reynolds, double Mach, double wetAreaRatio) const {
 		DragCoeff CD(*this);
-
-		return 1;
+		return CD.calcTotalDragCoeff(AoA, Reynolds, Mach, wetAreaRatio);
 	}
 
 
+
+
+	double Fuselage::calcReynolds(double velocity, double kinematicViscosity) const {
+		return ((velocity * length) / kinematicViscosity);
+	}
 
 
 
@@ -53,6 +57,11 @@ namespace airplane {
 	double Fuselage::getFormFactor() const {
 		return formFactor;
 	}
+
+	double Fuselage::getWettedArea() const {
+		return wettedArea;
+	}
+
 
 
 
