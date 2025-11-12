@@ -1,6 +1,7 @@
 #include <iostream>
 #include "to-9km-and-beyond/Fuselage.h"
 #include "to-9km-and-beyond/DragCoeff.h"
+#include <cassert>
 using namespace std;
 
 namespace airplane {
@@ -29,16 +30,35 @@ namespace airplane {
 
 
 	//Useful Member functions
+	double Fuselage::calcWetRatio(double referenceArea) const {
+		// WetArea divided by referenceArea
+		return  wettedArea / referenceArea;
+	}
 
-	double Fuselage::getLift_rad(double AoA) const {
+
+
+
+
+
+
+
+
+	double Fuselage::calcLiftCoeff(double AoA) const {
 		return CL_alpha * AoA + CL_knott;
 	}
 
 
-	double Fuselage::getDrag_rad(double AoA, double Reynolds, double Mach, double wetAreaRatio) const {
+
+
+
+
+	double Fuselage::calcDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const {
+		assert(Mach <= .98);
 		DragCoeff CD(*this);
 		return CD.calcTotalDragCoeff(AoA, Reynolds, Mach, wetAreaRatio);
 	}
+
+
 
 
 

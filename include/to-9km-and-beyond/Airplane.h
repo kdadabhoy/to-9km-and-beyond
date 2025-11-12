@@ -17,6 +17,7 @@ namespace airplane {
 		Airplane(Wing& inWing, Wing& inHT, Wing& inVT, TurboFan& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight);
 
 		double calcMach(double velocity, double temp) const;
+		double calcDragCoeff(double AoA, double velocity, double Mach, double referenceArea, double kinematicViscosity) const;
 
 
 		//double calculateLift();

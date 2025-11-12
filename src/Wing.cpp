@@ -95,9 +95,15 @@ namespace airplane {
 
 
 
+
+
+
 	double Wing::calcArea(double inTaperRatio) const {
 		return (0.5 * rootChord * span * (inTaperRatio + 1));
 	}
+
+
+
 
 
 	double Wing::calcMAC(double inTaperRatio) const {
@@ -105,9 +111,17 @@ namespace airplane {
 	}
 
 
+
+
+
 	double Wing::calcAspectRatio(double inArea) const {
 		return (span * span) / inArea;
 	}
+
+
+
+
+
 
 
 	// I am not convinced by this emperical equation
@@ -127,6 +141,10 @@ namespace airplane {
 
 
 
+
+
+
+
 	//Weight Calc
 
 	double Wing::calcWeight() const {
@@ -134,6 +152,9 @@ namespace airplane {
 		// Need to figure out approx
 		return weight;
 	}
+
+
+
 
 
 
@@ -162,7 +183,15 @@ namespace airplane {
 
 
 
-	// Semi-Related Calculations
+
+
+
+
+
+
+
+
+	// Useful Calcs
 
 	double Wing::calcReynolds(double velocity, double kinematicViscosity) const {
 
@@ -174,15 +203,30 @@ namespace airplane {
 		return 2 * area * 1.02;
 	}
 
+	double Wing::calcWetRatio(double referenceArea) const {
+		// WetArea divided by referenceArea
+		return (2 * area * 1.02) / referenceArea;
+	}
 
-	double Wing::getTotalC_D_rad(double AoA, double velocity, double Mach, double wetAreaRatio, double kinematicViscosity) {
+
+
+	double Wing::calcDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) {
 		assert(Mach <= .98);
-
 		DragCoeff CD_Total(*this);
-		double Reynolds = this->calcReynolds(velocity, kinematicViscosity);
-
 		return CD_Total.calcTotalDragCoeff(AoA, Reynolds, Mach, wetAreaRatio);
 	}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -140,6 +140,7 @@ namespace airplane {
 
 
 
+
 	// Induced Drag Functions:
 	double DragCoeff::calcInducedCoeff(double AoA) const {
 		assert(Wing != nullptr);

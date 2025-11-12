@@ -20,8 +20,8 @@ namespace airplane {
 		// Useful Functions
 		double calcReynolds(double velocity, double kinematicViscosity) const;
 		double calcWettedArea() const;
-
-		double getTotalC_D_rad(double AoA, double velocity, double Mach, double wetAreaRatio, double kinematicViscosity);       // Can't easily be const bc I need to pass *this 
+		double calcWetRatio(double referenceArea) const;
+		double calcDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio);       // Can't easily be const bc I need to pass *this 
 
 
 

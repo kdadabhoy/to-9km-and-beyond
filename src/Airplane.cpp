@@ -92,6 +92,15 @@ namespace airplane {
 
 
 
+	double Airplane::calcDragCoeff(double AoA, double velocity, double Mach, double referenceArea, double kinematicViscosity) const {
+		double totalDrag = 0;
+
+		totalDrag += (2 * mainWing->calcDragCoeff(AoA, mainWing->calcReynolds(velocity, kinematicViscosity), Mach, mainWing->calcWetRatio(referenceArea)));
+		totalDrag += (2 * HT->calcDragCoeff(AoA, HT->calcReynolds(velocity, kinematicViscosity), Mach, HT->calcWetRatio(referenceArea)));
+		totalDrag += fuselage->calcDragCoeff(AoA, fuselage->calcReynolds(velocity, kinematicViscosity), Mach, fuselage->calcWetRatio(referenceArea));
+
+		return totalDrag;
+	}
 
 
 

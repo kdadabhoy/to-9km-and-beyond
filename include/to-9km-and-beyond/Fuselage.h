@@ -12,8 +12,9 @@ namespace airplane {
 
 		// Helpful Functions
 		double calcReynolds(double velocity, double kinematicViscosity) const;
-		double getLift_rad(double AoA) const;														 // Takes in AoA in radian
-		double getDrag_rad(double AoA, double Reynolds, double Mach, double wetAreaRatio) const;     // Takes in AoA in radian
+		double calcWetRatio(double referenceArea) const;
+		double calcLiftCoeff(double AoA) const;														 // Takes in AoA in radian
+		double calcDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const;     // Takes in AoA in radian
 
 
 		//Accessors:
