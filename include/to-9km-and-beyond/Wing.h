@@ -25,7 +25,6 @@ namespace airplane {
 
 
 
-
 		// Accessors
 		double getArea() const;
 		double getMAC() const;
@@ -34,7 +33,8 @@ namespace airplane {
 		double getWeight() const;
 		double getEllipticalEffic() const;								 // Just calling this .8 for now
 		double getC_L_rad(double AoA) const;							 // AoA passed in as radians
-
+		double getSweepAngle() const;
+		double getLeadingEdgeSweep() const;                             // Technically not an accessor.. but will treat it as one
 
 
 
@@ -45,7 +45,7 @@ namespace airplane {
 		double tipChord;		// Stored in feet
 		double rootChord;		// Stored in feet
 		double span;			// Stored in feet
-		double sweepAngle;		// Stored in degrees
+		double sweepAngle;		// Stored in degrees (quarter chord)
 		double ellipEfficiency; // Not sure if the equation we used is valid... but :)
 		// double dihedralAngle;            // ignoring for now
 
@@ -68,7 +68,7 @@ namespace airplane {
 		double calcArea(double inTaperRatio) const;                     // Assumes Trapezodial Wing, Needs rootChord, span to be defined
 		double calcMAC(double inTaperRatio) const;                      // Assumes Trapezodial Wing, Needs area, rootChord, taperRatio
 		double calcAspectRatio(double inArea) const;
-		double calcEllipEfficiency(double inAspectRatio) const;
+		double calcEllipEfficiency() const;                             // Needs aspectRatio, taperRatio, and sweepAngle to be defined
 
 
 		double calcWeight() const;                                            // Need to figure out how to approx this

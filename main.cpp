@@ -78,10 +78,10 @@ int main() {
 	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
-	double mainSpan = 1409;
-	double mainRootChord = 162;
-	double mainTipChord = 42;
-	double mainSweepAngle = 15;
+	double mainSpan = 1176;
+	double mainRootChord = 186.7;
+	double mainTipChord = 74.7;
+	double mainSweepAngle = 20;
 	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);
 
 	// Airplane we have with everything
@@ -95,6 +95,25 @@ int main() {
 	double velocity = 500;
 	double Mach = Airplane.calcMach(velocity, temp);
 
+
+
+	cout << "HT: " << endl;
+	cout << "Area: " << HT.getArea() << endl;
+	cout << "AR: " << HT.getAspectRatio() << endl;
+	cout << "e: " << HT.getEllipticalEffic() << endl;
+	cout << "Sweep: " << HT.getSweepAngle() << endl;
+
+	cout << endl << endl << endl;
+	cout << "VT: " << endl;
+	cout << "Area: " << VT.getArea() << endl;
+	cout << "AR: " << VT.getAspectRatio() << endl;
+	cout << "e: " << VT.getEllipticalEffic() << endl;
+	cout << "Sweep: " << VT.getSweepAngle() << endl;
+
+
+
+	cout << endl << endl << endl;
+	cout << "Main Wing: " << endl;
 	cout << "Area: " << mainWing.getArea() << endl;
 	cout << "AR: " << mainWing.getAspectRatio() << endl;
 	cout << "e: " << mainWing.getEllipticalEffic() << endl;

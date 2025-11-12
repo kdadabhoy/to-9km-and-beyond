@@ -98,9 +98,9 @@ namespace airplane {
 		double referenceArea = mainWing->getArea();
 
 		totalDrag += mainWing->calcDragCoeff(AoA, mainWing->calcReynolds(velocity, kinematicViscosity), Mach, mainWing->calcWetRatio(referenceArea));
-		cout << "Total Drag Wing: " << totalDrag << endl; // delete
 		totalDrag += HT->calcDragCoeff(AoA, HT->calcReynolds(velocity, kinematicViscosity), Mach, HT->calcWetRatio(referenceArea));
 		totalDrag += fuselage->calcDragCoeff(AoA, fuselage->calcReynolds(velocity, kinematicViscosity), Mach, fuselage->calcWetRatio(referenceArea));
+		// Might need to add drag for VT, but just the parasite drag (inducded drag acts horizontally?)
 
 		return totalDrag;
 	}

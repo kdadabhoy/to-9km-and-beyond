@@ -45,7 +45,7 @@ namespace airplane {
 		area = calcArea(taperRatio);
 		MAC = calcMAC(taperRatio);
 		aspectRatio = calcAspectRatio(area);
-		ellipEfficiency = calcEllipEfficiency(aspectRatio);
+		ellipEfficiency = calcEllipEfficiency();
 		calcCL3D();
 		
 		weight = calcWeight();
@@ -68,7 +68,7 @@ namespace airplane {
 		area = calcArea(taperRatio);
 		MAC = calcMAC(taperRatio);
 		aspectRatio = calcAspectRatio(area);
-		ellipEfficiency = calcEllipEfficiency(aspectRatio);
+		ellipEfficiency = calcEllipEfficiency();
 		calcCL3D();
 
 		weight = inWeight;
@@ -125,17 +125,41 @@ namespace airplane {
 
 
 
-	// I am not convinced by this emperical equation
-	// This emperical equation says that in the real world e goes down as AR goes up
-	double Wing::calcEllipEfficiency(double inAspectRatio) const {
+
+
+
+
+	double Wing::calcEllipEfficiency() const {
 		double effic;
-		if(inAspectRatio >= 4  && inAspectRatio <= 11){
-			effic = (1.78 * (1 - (.045 * pow(inAspectRatio, 0.68)))) - 0.65;
+		double leadingEdgeSweep = 0;
+		double sweepAngleRad = sweepAngle * pi / 180;
+		leadingEdgeSweep = atan(tan(sweepAngleRad) + ((.25 * (1 - taperRatio)) / (aspectRatio * (1 + taperRatio))));
+		cout << "LE Sweep " << leadingEdgeSweep * 180 / pi << endl; // delete
+
+		if (leadingEdgeSweep < .001 && leadingEdgeSweep > -.001 && aspectRatio > 3.9 && aspectRatio < 10.1) {
+			// Emperical formula for unswept Wings
+			effic = (1.78 * (1 - (.045 * pow(aspectRatio, 0.68)))) - 0.65;
+			cout << " 1 I am executing" << endl; // delete
+			assert(effic <= 1 && effic >= .65);
+			return effic;
 		} else {
-			effic = .80;
+			// Good assumption if none of the others apply
+			return effic = .8;
 		}
 
-		return effic;
+
+		/*
+			// This is the emperical equation for swept wings with LE sweep > 30 
+			// but it really only gives e below .7 (and sometimes much lower) 
+			// which doesn't seem accurate
+
+		else if (leadingEdgeSweep > (29 * pi / 180) && leadingEdgeSweep < (46 * pi / 180) && aspectRatio > 5.9 && aspectRatio < 11.1) {
+			// Emperical formula for Swept Wings w/ LE angle > 29
+			cout << " 2 I am executing" << endl; // delete
+			effic = (4.61 * (1 - (.045 * pow(aspectRatio, 0.68)))) * pow(cos(leadingEdgeSweep), 0.15) - 3.1;
+			assert(effic <= 1 && effic >= .65);
+			return effic;
+		*/
 	}
 
 
@@ -261,5 +285,13 @@ namespace airplane {
 		return CL3D.get_CL_rad(AoA);
 	}
 
+	double Wing::getSweepAngle() const {
+		return sweepAngle;
+	}
+
+	double Wing::getLeadingEdgeSweep() const {
+		double sweepAngleRad = sweepAngle * pi / 180;
+		return atan(tan(sweepAngleRad) + ((.25 * (1 - taperRatio)) / (aspectRatio * (1 + taperRatio))));
+	}
 
 }
