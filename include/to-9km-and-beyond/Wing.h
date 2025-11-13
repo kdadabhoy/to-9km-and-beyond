@@ -35,7 +35,8 @@ namespace airplane {
 		double getEllipticalEffic() const;
 		double getSweepAngle() const;
 		double getLeadingEdgeSweep() const;                             // Technically not an accessor.. but will treat it as one
-
+		double getCL_Alpha() const;										// This returns the 3D CL_Alpha for CL = CL_Alpha * alpha + CL_Knott
+		double getCL_Knott() const;										// This returns the 3D CL_Knott for CL = CL_Alpha * alpha + CL_Knott
 
 
 

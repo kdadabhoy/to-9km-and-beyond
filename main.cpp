@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-
 #include "to-9km-and-beyond/Airplane.h"
 #include "to-9km-and-beyond/AtmosphereProperties.h"
 #include "to-9km-and-beyond/Wing.h"
@@ -8,7 +7,6 @@
 #include "to-9km-and-beyond/Nacelle.h"
 #include "to-9km-and-beyond/Fuselage.h"
 #include "to-9km-and-beyond/CF34_3B1.h"
-#include "to-9km-and-beyond/LiftCoeff.h"
 
 
 
@@ -37,7 +35,6 @@ using namespace airplane;
 
 
 	-In the Airplane Class
-		- Need to get my total Lift and total Drag given a velocity by calling on Wing Drag/Lift functions
 		- Need to write a getWeight function that takes in a time and gets my weight, which will use the enginge stuff
 		- Probably need a gamma calc to get Max RoC
 
@@ -87,23 +84,33 @@ int main() {
 	// Airplane we have with everything
 	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 
+
+
+
 	// Testing CL3D Wing
-	double AoA = 5 * 3.1415 / 180;
 	AtmosphereProperties Cond(0);
 	double temp = Cond.getTemperature();
 	double kineVisc = Cond.getKinematicVisc();
-	double velocity = 500;
+	double density = Cond.getDensity();
+
+
+
+	double gamma = 7.5; // Deg
+	double velocity = 1050;
+
+
 	double Mach = Airplane.calcMach(velocity, temp);
+	double AoA = Airplane.calcSteadyClimbAoA(gamma, velocity, density);
 
 
 
+	/*
 	cout << "Main Wing: " << endl;
 	cout << "Area: " << mainWing.getArea() << endl;
 	cout << "AR: " << mainWing.getAspectRatio() << endl;
 	cout << "e: " << mainWing.getEllipticalEffic() << endl;
 	cout << "Sweep: " << mainSweepAngle << endl;
 	cout << "MAC: " << mainWing.getMAC() << endl;
-	cout << "AoA rad: " << AoA << endl;
 	cout << "CL3D Wing total: " << mainWing.calcLiftCoeff(AoA) << endl;
 
 
@@ -119,13 +126,29 @@ int main() {
 	cout << "Fuselage Lift: " << fuselage.calcLiftCoeff(AoA) << endl;
 
 	cout << endl << endl;
+	*/
 
+
+	cout << "Gamma: " << gamma << endl;
 	cout << "Mach: " << Mach << endl;
-	cout << "AoA " << AoA * 180 / 3.1415 << endl;
-	cout << "Airplane Lift Coeff: " << Airplane.calcLiftCoeff(AoA) << endl;
+	cout << "AoA Required " << AoA * 180 / 3.1415 << endl;
+	cout << "Airplane Drag Coeff: " << Airplane.calcDragCoeff(AoA, velocity, Mach, kineVisc) << endl;
+	cout << "Airplane Drag: " << Airplane.calcDrag(AoA, velocity, Mach, kineVisc, density) << endl;
+
+
 
 
 
 	return 0;
 }
+
+
+
+
+
+
+
+
+
+
 

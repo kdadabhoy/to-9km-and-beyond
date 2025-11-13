@@ -83,6 +83,17 @@ namespace airplane {
 
 
 
+
+
+	// Mutators
+	void Fuselage::setWeight(double inWeight) {
+		weight = inWeight;
+	}
+
+
+
+
+
 	// Accessors
 	double Fuselage::getWeight() const {
 		return weight;
@@ -96,12 +107,14 @@ namespace airplane {
 		return wettedArea;
 	}
 
-
-
-
-
-	// Mutators
-	void Fuselage::setWeight(double inWeight) {
-		weight = inWeight;
+	double Fuselage::getCL_Alpha() const {
+		return CL_alpha;
 	}
+
+	double Fuselage::getCL_Knott() const {
+		return CL_knott;
+	}
+
+
+
 }

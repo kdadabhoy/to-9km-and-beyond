@@ -8,6 +8,7 @@ namespace airplane {
 		LiftCoeff();
 		LiftCoeff(double inCL_alpha, double inCL_knott);		// takes in radians
 		LiftCoeff(LiftCoeff& other);							// Copy Constructor
+
 		LiftCoeff& operator=(const LiftCoeff& other);			// Assignment Operator
 
 		// Useful Functions:

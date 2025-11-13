@@ -249,13 +249,10 @@ namespace airplane {
 
 
 	double Wing::calcDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) {
-		assert(Mach <= .98);
+		assert(Mach <= .99);
 		DragCoeff CD_Total(*this);
 		return CD_Total.calcTotalDragCoeff(AoA, Reynolds, Mach, wetAreaRatio);
 	}
-
-
-
 
 
 
@@ -308,6 +305,15 @@ namespace airplane {
 	double Wing::getLeadingEdgeSweep() const {
 		double sweepAngleRad = sweepAngle * pi / 180;
 		return atan(tan(sweepAngleRad) + ((.25 * (1 - taperRatio)) / (aspectRatio * (1 + taperRatio))));
+	}
+
+
+	double Wing::getCL_Alpha() const {
+		return CL3D.getCL_Alpha();
+	}
+
+	double Wing::getCL_Knott() const {
+		return CL3D.getCL_Knott();
 	}
 
 }

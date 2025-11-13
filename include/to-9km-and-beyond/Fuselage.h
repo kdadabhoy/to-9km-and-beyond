@@ -21,6 +21,8 @@ namespace airplane {
 		double getWeight() const;
 		double getFormFactor() const;
 		double getWettedArea() const;
+		double getCL_Alpha() const;
+		double getCL_Knott() const;
 
 		// Mutators:
 		void setWeight(double inWeight);
