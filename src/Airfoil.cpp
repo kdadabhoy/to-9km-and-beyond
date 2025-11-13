@@ -102,8 +102,16 @@ namespace airplane {
 		return Cl.getCL_Knott();
 	}
 
+	double Airfoil::getThicknessRatio() const {
+		return maxThickness;
+	}
+
 	void Airfoil::printName() const {
 		std::cout << "NACA: " << NACA << std::endl;
+	}
+
+	std::string Airfoil::getName() const {
+		return NACA;
 	}
 
 

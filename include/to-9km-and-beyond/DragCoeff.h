@@ -21,7 +21,7 @@ namespace airplane {
 
 		double calcParasiteCoeff(double Renyolds, double wetAreaRatio) const;	// For Wing and Fuselage
 		double calcInducedCoeff(double AoA) const;								// For Wings only
-		double calcCompressibilityCoeff(double Mach) const;						// For Wings only (for now)
+		double calcCompressibilityCoeff(double Mach, double AoA) const;						// For Wings only (for now)
 		double calcFormDragCoeff(double Cf) const;								// For fuselage only
 
 

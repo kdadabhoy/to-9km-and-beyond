@@ -52,15 +52,15 @@ namespace airplane {
 		payLoadWeight = inPayLoadWeight; 
 		assert(mainWing != nullptr);
 		referenceArea = mainWing->getArea();
-		computeAndSetLiftCoeff();
-		computeAndSetTotalWeight();
+		calcAndSetLiftCoeff();
+		calcAndSetTotalWeight();
 	}
 
 
 
 
 
-	void Airplane::computeAndSetTotalWeight() {
+	void Airplane::calcAndSetTotalWeight() {
 		double total = 0.0;
 
 		if (mainWing) {
@@ -94,7 +94,7 @@ namespace airplane {
 
 
 	// Can make this safer by mimicing totalWeight function's if statements
-	void Airplane::computeAndSetLiftCoeff() {
+	void Airplane::calcAndSetLiftCoeff() {
 		double alphaTerm = 0;
 		double knottTerm = 0;
 

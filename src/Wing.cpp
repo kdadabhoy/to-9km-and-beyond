@@ -36,7 +36,7 @@ namespace airplane {
 	Wing::Wing(Airfoil& inAirfoil, double inSpan, double inTipChord, double inRootChord, double inSweepAngle) {
 		tipChord = inTipChord / 12;
 		rootChord = inRootChord / 12;
-		sweepAngle = inSweepAngle;
+		sweepAngle = inSweepAngle * pi / 180;
 		span = inSpan / 12;
 		airfoil = &inAirfoil;
 
@@ -46,7 +46,7 @@ namespace airplane {
 		MAC = calcMAC(taperRatio);
 		aspectRatio = calcAspectRatio(area);
 		ellipEfficiency = calcEllipEfficiency();
-		calcCL3D();
+		calcAndSetCL3D();
 		
 		weight = calcWeight();
 	}
@@ -59,7 +59,7 @@ namespace airplane {
 	Wing::Wing(Airfoil& inAirfoil, double inSpan, double inTipChord, double inRootChord, double inSweepAngle, double inWeight) {
 		tipChord = inTipChord / 12;
 		rootChord = inRootChord / 12;
-		sweepAngle = inSweepAngle;
+		sweepAngle = inSweepAngle * pi / 180;
 		span = inSpan / 12;
 		airfoil = &inAirfoil;
 
@@ -69,7 +69,7 @@ namespace airplane {
 		MAC = calcMAC(taperRatio);
 		aspectRatio = calcAspectRatio(area);
 		ellipEfficiency = calcEllipEfficiency();
-		calcCL3D();
+		calcAndSetCL3D();
 
 		weight = inWeight;
 	}
@@ -132,8 +132,7 @@ namespace airplane {
 	double Wing::calcEllipEfficiency() const {
 		double effic;
 		double leadingEdgeSweep = 0;
-		double sweepAngleRad = sweepAngle * pi / 180;
-		leadingEdgeSweep = atan(tan(sweepAngleRad) + ((.25 * (1 - taperRatio)) / (aspectRatio * (1 + taperRatio))));
+		leadingEdgeSweep = atan(tan(sweepAngle) + ((.25 * (1 - taperRatio)) / (aspectRatio * (1 + taperRatio))));
 
 		if (leadingEdgeSweep < .001 && leadingEdgeSweep > -.001 && aspectRatio > 3.9 && aspectRatio < 10.1) {
 			// Emperical formula for unswept Wings
@@ -183,18 +182,18 @@ namespace airplane {
 
 
 	// CL 3D Calc
-	void Wing::calcCL3D() {
+	void Wing::calcAndSetCL3D() {
 		double Cl2D_alphaTerm = airfoil->getCl_AlphaTerm();						// This is gunna be 2pi always
 		double Cl2D_alphaZeroLift = airfoil->getCl_alphaZeroLift();				// This differs by airfoil
 		double knottTerm;
 		double alphaTerm;
 		double a0 = 0;
-		double radSweepAngle = sweepAngle * pi / 180;
 
 		//a0 = Cl2D_alphaTerm / (1 + (Cl2D_alphaTerm / (pi * ellipEfficiency * aspectRatio)));      // Different formula that uses efficiency
 
-		assert(sweepAngle <= 89.0);
-		a0 = (pi * aspectRatio) / (1 + sqrt(1 + pow((pi * aspectRatio) / (Cl2D_alphaTerm * cos(radSweepAngle)), 2)));        // Accounts for Sweep Angle
+		assert(sweepAngle <= (89.0 * pi / 180));
+		double insideSqrtTerm = (pi * aspectRatio) / (Cl2D_alphaTerm * cos(sweepAngle));
+		a0 = (pi * aspectRatio) / (1 + sqrt(1 + (insideSqrtTerm*insideSqrtTerm)));        // Accounts for Sweep Angle
 
 		knottTerm = Cl2D_alphaZeroLift * -1 * a0;								// CL = a0(alpha - zeroLiftalpha)
 		alphaTerm = a0;
@@ -257,6 +256,10 @@ namespace airplane {
 
 
 
+
+
+
+
 	double Wing::calcLiftCoeff(double AoA) const {
 		return CL3D.calcLiftCoefficient(AoA);
 	}
@@ -266,6 +269,109 @@ namespace airplane {
 
 
 
+
+
+	double Wing::calcMcc(double AoA) const {
+		// Mcc = Mcc0 / (cos(sweep))^m
+		return calcMccZeroSweep(AoA) / pow(cos(sweepAngle), calcSweptMExponent(AoA));
+	}
+
+
+
+
+
+
+
+
+
+	// Incomplete - Need to finish digitalization
+	double Wing::calcMccZeroSweep(double AoA) const {
+		double CL = fabs(CL3D.calcLiftCoefficient(AoA));	// NOT SURE IF THIS WORKS, NEEDED BC SOMETIMES HAVE NEGATIVE CL
+		double TR = airfoil->getThicknessRatio();           // thickness ratio, called TR for simplicity
+		double Mcc = 0;
+		double ferror = .01;                                // Error for comparisons of doubles
+		assert(CL > 0 && TR > .06 - ferror);
+
+		// Currently implemented with no interpolation (anything in between gets rounded up)
+		// which is a conservative approach.. and fairly accurate
+
+		if (CL < ferror) {
+			// CL = 0 Case, Mcc = 0.972 + -2.2x + 4.46x^2
+			assert(TR > .08 - ferror);							// Might want to comment this out or make a special exception for this case
+			Mcc = 0.972 + (-2.2 * TR) + (4.46 * TR * TR);
+			return Mcc;
+		} else{
+			// Very optimistic rn.. bc didnt digitize the rest lol
+			Mcc = 0.911 + (-1.48 * TR) + (1.79 * TR * TR);
+			return Mcc;
+		}
+
+
+
+	/*
+		//Implement the rest once we digitized the whole plot
+
+		}else if (CL <= .20 + ferror) {
+			// CL <= .20 case, Mcc = 0.911 + -1.48x + 1.79x^2
+			Mcc = 0.911 + (-1.48 * TR) + (1.79 * TR * TR);
+			return Mcc;
+		}
+
+		} else if (CL <= .25 + ferror) {
+			// CL <=  to .25 case, 
+
+			return Mcc;
+		} else if (CL <= .30 + ferror) {
+			// CL <=  to .30 case
+
+			return Mcc;
+		} else if (CL <= .35 + ferror) {
+			// CL <=  to .35 case
+
+			return Mcc;
+		} else if (CL <= .40 + ferror) {
+			// CL <=  to .40 case
+
+			return Mcc;
+		} else if (CL <= .45 + ferror) {
+			// CL <=  to .45 case
+
+			return Mcc;
+		} else if (CL <= .50 + ferror) {
+			// CL <=  to .50 case
+
+			return Mcc;
+		} else if (CL <= .55 + ferror) {
+			// CL <=  to .55 case
+
+			return Mcc;
+		} else if (CL <= .60 + ferror) {
+			// CL <= .60 case
+
+			return Mcc;
+		} else {
+			// Error case
+			cout << "CL for Mcc0 > .60. Approx only goes to .60" << endl;
+			return 0;
+		}
+
+	*/
+
+
+	}
+
+
+
+
+
+
+
+	double Wing::calcSweptMExponent(double AoA) const {
+		double CL = fabs(CL3D.calcLiftCoefficient(AoA));       // AGAIN NOT SURE IF FABS WORKS FOR THIS CL PLOT... but worst case just say we assume symmetric airfoil
+		assert(CL > 0 && CL <= .6001); 
+		//m = 0.823 + -0.57x + 0.101x^2
+		return 0.823 + (-.57 * CL) + (0.101 * CL * CL);
+	}
 
 
 
@@ -299,12 +405,15 @@ namespace airplane {
 	}
 
 	double Wing::getSweepAngle() const {
+		return sweepAngle * 180 / pi;
+	}
+
+	double Wing::getSweepAngleRad() const {
 		return sweepAngle;
 	}
 
 	double Wing::getLeadingEdgeSweep() const {
-		double sweepAngleRad = sweepAngle * pi / 180;
-		return atan(tan(sweepAngleRad) + ((.25 * (1 - taperRatio)) / (aspectRatio * (1 + taperRatio))));
+		return atan(tan(sweepAngle) + ((.25 * (1 - taperRatio)) / (aspectRatio * (1 + taperRatio))));
 	}
 
 

@@ -96,8 +96,7 @@ int main() {
 
 
 	double gamma = 7.5; // Deg
-	double velocity = 1050;
-
+	double velocity = 1004.669673; // ft/s
 
 	double Mach = Airplane.calcMach(velocity, temp);
 	double AoA = Airplane.calcSteadyClimbAoA(gamma, velocity, density);

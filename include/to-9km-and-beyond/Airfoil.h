@@ -26,9 +26,12 @@ namespace airplane {
 		double getCl_deg(double inAlphaDeg) const;
 		double getCl_rad(double inAlphaRad) const;
 
+		// Accesors
 		double getCl_AlphaTerm() const;				// Radians
 		double getCl_KnottTerm() const;             // No one really cares about this
 		double getCl_alphaZeroLift() const;			// Radians
+		double getThicknessRatio() const;           // Returns t/c as a fraction
+		std::string getName() const;
 		void printName() const;
 
 
@@ -37,20 +40,23 @@ namespace airplane {
 		std::string NACA;               
 		double maxCamber;									// Maximum camber (% of chord), 1st digit
 		double posMaxCamber;								// Location of maximum camber (% of chord), 2nd digit
-		double maxThickness;								// maximum thickness (% of chord), last 2 digits
+		double maxThickness;								// This is t/c; maximum thickness (% of chord), last 2 digits
 		LiftCoeff Cl;										// Stored in radians
 		double alphaZeroLift;                               // Stored in radians
 		static constexpr double pi = 3.141592653589;
 		static constexpr double Cl_2D_SLOPE = 2*pi;			// We will approx that every airfoil has this slope (everyone assumes this)
 
 
-		// Member Functions
+
 		double calcalphaZeroLift() const;					// returns alphaZeroLift in radians
+
+
+
+
+
+
 		// double calcCl0() const;							// Returns Cl0, kinda irrelvant
-
-
 	};
-
 }
 
 	/*

@@ -53,8 +53,8 @@ namespace airplane {
 
 
 		// computeAndSet Functions:
-		void computeAndSetTotalWeight();
-		void computeAndSetLiftCoeff();													 // Needed for SteadyClimbAoA... sets Cl
+		void calcAndSetTotalWeight();
+		void calcAndSetLiftCoeff();													 // Needed for SteadyClimbAoA... sets Cl
 
 
 		// Climb Functions
