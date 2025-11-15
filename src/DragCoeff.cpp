@@ -112,8 +112,25 @@ namespace airplane {
 
 		if (r < .75) {
 			// Assuming compressibility negligible bc Shevell graph doesn't cover it
-			return 0;	
+			return 0;
+		} else {
+			assert(r >= .75 && r <= 1.5);
+			double Cdc = 0;
+			double sweepCosine = cos(Wing->getSweepAngleRad());
 
+			// y = (7.05*10^-11)*e^(17x)
+			Cdc = (7.05e-11) * exp(17 * r);
+			Cdc = Cdc / (sweepCosine * sweepCosine * sweepCosine);
+			return Cdc;
+		}
+
+
+
+
+		// Eliminating this gives a more continous Power Required Curve
+		// The Cdc = .025 was messing it up...
+
+	/*
 		} else if (r <= 1.08) {
 			assert(r >= .75 && r <= 1.08); // This function only works if r >= .75 or <= 1.08
 			double Cdc = 0;
@@ -134,6 +151,9 @@ namespace airplane {
 			Cdc = Cdc / (sweepCosine * sweepCosine * sweepCosine);
 			return Cdc;
 		}
+	*/
+
+
 	}
 
 
