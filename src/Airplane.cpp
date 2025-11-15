@@ -84,7 +84,7 @@ namespace airplane {
 		}
 
 		if (engine) {
-			total += (engine->getWeight() * 2);
+			total += (engine->getWeight() * numEngines);
 		}
 
 		if (nacelle) {
@@ -158,12 +158,16 @@ namespace airplane {
 		return CL.calcLiftCoefficient(AoA);
 	}
 
+	
+
+
+
+
+
 
 	double Airplane::calcLift(double AoA, double velocity, double density) const {
 		return  0.5 * density * velocity * velocity * referenceArea * CL.calcLiftCoefficient(AoA);
 	}
-
-
 
 
 
@@ -209,6 +213,9 @@ namespace airplane {
 
 
 
+
+
+
 	// Calc Alpha needed for Steady Level Climb at a Gamma
 		// L = W*cos(gamma)
 	double Airplane::calcSteadyClimbAoA(double gamma, double velocity, double density) const {
@@ -224,6 +231,8 @@ namespace airplane {
 
 		return AoA_needed;
 	}
+
+
 
 
 
@@ -254,17 +263,8 @@ namespace airplane {
 
 
 
-
-
-
-
-
 	// Power Curve Functions
 	vector<double> Airplane::calcDragPowerCurveYData(double gamma, double height) const {
-		double steps = 1000;
-		double xmin = .01;
-		double xmax = .97;
-
 		AtmosphereProperties Cond(height);
 		vector<double> data;
 
@@ -290,10 +290,6 @@ namespace airplane {
 
 
 	vector<double> Airplane::calcDragPowerCurveXDataMach() const {
-		double steps = 1000;
-		double xmin = .01;
-		double xmax = .97;
-
 		vector<double> data;
 
 		double dx = (xmax - xmin) / steps;            // 1000 even steps between mach~=0 and mach~=1
@@ -311,9 +307,6 @@ namespace airplane {
 
 
 	vector<double> Airplane::calcDragPowerCurveXDataVel(double height) const {
-		double steps = 1000;
-		double xmin = .01;
-		double xmax = .97;
 		vector<double> data;
 
 		AtmosphereProperties Cond(height);
@@ -355,13 +348,12 @@ namespace airplane {
 		for (int i = 0; i < xdata.size(); i++) {
 			double xtemp = xdata[i] / (sqrt(1.4 * GAS_CONSTANT * temp));
 			double y2temp = evaluateFunction(powerCurve, x2data[i]);
-			y2temp = y2temp * 2 * SLSThrust * xdata[i];
+			y2temp = y2temp * numEngines * SLSThrust * xdata[i];
 			y2data.push_back(y2temp);
 		}
 
 		saveVectorsToCSV(xdata, y1data, y2data, fileName);
 	}
-
 }
 
 

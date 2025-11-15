@@ -23,19 +23,9 @@ using namespace kaden_math;
 /*
 	To Do List:
 
-	- In Wing Class
-		- Need to add a C_DC function
-			- This requires a Mach Critical Crest #
-			- This requires digitizing plots 	
-
-
-
 	- In TurboFan class:
 		- Need to digitalize my plots
 		- Need to write the fuel consumption / Thrust and mach number curve stuff into my engine class
-		- Need to have a Power vs Speed curve for all atmospheres
-			- And need to be able to tell me the speed that will have the max excess power
-			- Prob a main() function
 
 
 	-In the Airplane Class

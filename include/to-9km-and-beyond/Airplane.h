@@ -54,8 +54,16 @@ namespace airplane {
 		double payLoadWeight;    //
 		double fuelWeight;       // Weight of Fuel
 		LiftCoeff CL;           // One CL for the whole plane
+
+		const static int numEngines = 2;
+
 		static constexpr double GAS_CONSTANT = 1716;
 		static constexpr double pi = 3.141592653589;
+
+		// Power Function's Curve Constants
+		static constexpr double xmin = .005;
+		static constexpr double xmax = .975;
+		const static int steps = 1000;
 
 
 
