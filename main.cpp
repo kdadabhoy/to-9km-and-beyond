@@ -83,7 +83,7 @@ int main() {
 
 	double gamma = 7.5; // Deg
 	double height = 0;  // ft
-	string fileName = "DragCurve.csv";
+	string fileName = "DragCurve2.csv";
 
 
 	Airplane.getPowerCurveCSV(gamma, height, fileName);

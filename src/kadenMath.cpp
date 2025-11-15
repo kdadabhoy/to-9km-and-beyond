@@ -3,6 +3,7 @@
 #include <vector>
 #include <cmath>
 #include <fstream>
+#include <iomanip>
 #include <string>
 using std::string;
 using std::vector;
@@ -137,6 +138,15 @@ namespace kaden_math {
 		vector<double> result = { maxLocation, maxDistance };
 		return result;
 	}
+	
+
+
+
+
+
+
+
+
 
 
 	void saveVectorsToCSV(const vector<double>& x, const vector<double>& y, const string& filename) {
@@ -152,6 +162,7 @@ namespace kaden_math {
 			return;
 		}
 
+		file << std::fixed << std::setprecision(6);
 
 		for (int i = 0; i < x.size(); i++) {
 			file << x[i] << ", " << y[i] << "\n";
@@ -161,6 +172,14 @@ namespace kaden_math {
 		cout << "Data is saved to: " << filename << endl;
 		return;
 	}
+
+
+
+
+
+
+
+
 
 
 
@@ -178,6 +197,8 @@ namespace kaden_math {
 			return;
 		}
 
+
+		file << std::fixed << std::setprecision(6);
 
 		for (int i = 0; i < x.size(); i++) {
 			file << x[i] << ", " << y1[i] << ", " << y2[i] << "\n";

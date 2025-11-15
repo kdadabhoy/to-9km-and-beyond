@@ -328,6 +328,14 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
+
 	// Slightly inefficent bc creating an Atmosphere property within functions bc of height
 	void Airplane::getPowerCurveCSV(double gamma, double height, string fileName) const {
 		vector<double> xdata;
@@ -340,20 +348,30 @@ namespace airplane {
 		y1data = calcDragPowerCurveYData(gamma, height);		// Drag for Power Curve
 
 		AtmosphereProperties Cond(height);
-		double temp = Cond.getTemperature();
+		double tempature = Cond.getTemperature();
 		double SLSThrust = engine->getSLSThrust();
 		powerCurve = engine->getPowerCurveFunction(height);
-		x2data = calcDragPowerCurveXDataMach();
 
 		for (int i = 0; i < xdata.size(); i++) {
-			double xtemp = xdata[i] / (sqrt(1.4 * GAS_CONSTANT * temp));
-			double y2temp = evaluateFunction(powerCurve, x2data[i]);
+			double xtemp = xdata[i] / (sqrt(1.4 * GAS_CONSTANT * tempature));
+			double y2temp = evaluateFunction(powerCurve, xtemp);
 			y2temp = y2temp * numEngines * SLSThrust * xdata[i];
 			y2data.push_back(y2temp);
 		}
 
 		saveVectorsToCSV(xdata, y1data, y2data, fileName);
 	}
+
+
+
+
+
+
+
+
+
+
+
 }
 
 
