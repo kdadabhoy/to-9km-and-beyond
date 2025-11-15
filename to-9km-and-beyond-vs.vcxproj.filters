@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="test_main.cpp" />
+    <ClCompile Include="src\Airfoil.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Airplane.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AtmosphereProperties.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CF34_3B1.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DragCoeff.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Fuselage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kadenMath.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LiftCoeff.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Nacelle.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TurboFan.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wing.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\to-9km-and-beyond\Airfoil.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\to-9km-and-beyond\Airplane.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\to-9km-and-beyond\Wing.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\to-9km-and-beyond\Nacelle.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\to-9km-and-beyond\TurboFan.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\to-9km-and-beyond\LiftCoeff.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\to-9km-and-beyond\kadenMath.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\to-9km-and-beyond\DragCoeff.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\to-9km-and-beyond\CF34_3B1.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\to-9km-and-beyond\AtmosphereProperties.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\to-9km-and-beyond\Fuselage.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{195351ed-e0d0-4ad4-ab2f-b29fa2803e98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{db537dd9-7394-420a-956a-4abd17fac89d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

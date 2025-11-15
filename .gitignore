@@ -40,8 +40,8 @@ Thumbs.db
 # Optional: Filters file
 # ============================
 # If you want to keep Filters in Git, comment out the line below
-*.filters
 
+#*.filters
 # test_main.cpp
 
 # ============================
