@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 #include "to-9km-and-beyond/Airplane.h"
 #include "to-9km-and-beyond/AtmosphereProperties.h"
 #include "to-9km-and-beyond/Wing.h"
@@ -7,12 +8,14 @@
 #include "to-9km-and-beyond/Nacelle.h"
 #include "to-9km-and-beyond/Fuselage.h"
 #include "to-9km-and-beyond/CF34_3B1.h"
+#include "to-9km-and-beyond/kadenMath.h"
 
 
 
 using namespace std;
 using namespace atmosphere_properties;
 using namespace airplane;
+using namespace kaden_math;
 
 
 
@@ -125,7 +128,7 @@ int main() {
 	cout << "Fuselage Lift: " << fuselage.calcLiftCoeff(AoA) << endl;
 
 	cout << endl << endl;
-	*/
+
 
 
 	cout << "Gamma: " << gamma << endl;
@@ -133,6 +136,26 @@ int main() {
 	cout << "AoA Required " << AoA * 180 / 3.1415 << endl;
 	cout << "Airplane Drag Coeff: " << Airplane.calcDragCoeff(AoA, velocity, Mach, kineVisc) << endl;
 	cout << "Airplane Drag: " << Airplane.calcDrag(AoA, velocity, Mach, kineVisc, density) << endl;
+	*/
+
+
+
+	// Testing kadenMath
+	vector<double> func1 = { 2,-1, -4 }; // 2x^2 - x - 4
+	vector<double> func2 = { 1,-2 };  // x - 2
+	vector<double> intersections;
+
+	intersections = curveIntersection(func1, func2, -10, 10, 1000);
+	cout << "Intersections at" << endl;
+	for (int i = 0; i < intersections.size(); i++) {
+		cout << "x = " << intersections[i] << endl;
+	}
+
+	
+	vector<double> maxDistance;
+	maxDistance = maxDistBetweenFunctions(func1, func2, intersections[0], intersections[intersections.size() - 1]);
+	cout << "Max Distance " << maxDistance[1] << " at x = " << maxDistance[0] << endl;
+
 
 
 

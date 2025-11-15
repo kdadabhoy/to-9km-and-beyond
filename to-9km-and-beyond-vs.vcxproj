@@ -132,6 +132,7 @@
     <ClCompile Include="src\CF34_3B1.cpp" />
     <ClCompile Include="src\DragCoeff.cpp" />
     <ClCompile Include="src\Fuselage.cpp" />
+    <ClCompile Include="src\kadenMath.cpp" />
     <ClCompile Include="src\LiftCoeff.cpp" />
     <ClCompile Include="src\Nacelle.cpp" />
     <ClCompile Include="src\TurboFan.cpp" />
@@ -145,6 +146,7 @@
     <ClInclude Include="include\to-9km-and-beyond\CF34_3B1.h" />
     <ClInclude Include="include\to-9km-and-beyond\DragCoeff.h" />
     <ClInclude Include="include\to-9km-and-beyond\Fuselage.h" />
+    <ClInclude Include="include\to-9km-and-beyond\kadenMath.h" />
     <ClInclude Include="include\to-9km-and-beyond\LiftCoeff.h" />
     <ClInclude Include="include\to-9km-and-beyond\Nacelle.h" />
     <ClInclude Include="include\to-9km-and-beyond\TurboFan.h" />
