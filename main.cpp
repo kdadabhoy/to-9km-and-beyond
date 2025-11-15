@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <fstream>
 #include "to-9km-and-beyond/Airplane.h"
 #include "to-9km-and-beyond/AtmosphereProperties.h"
 #include "to-9km-and-beyond/Wing.h"
@@ -10,8 +9,6 @@
 #include "to-9km-and-beyond/Fuselage.h"
 #include "to-9km-and-beyond/CF34_3B1.h"
 #include "to-9km-and-beyond/kadenMath.h"
-
-
 
 using namespace std;
 using namespace atmosphere_properties;

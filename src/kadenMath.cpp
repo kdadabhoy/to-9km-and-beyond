@@ -9,9 +9,13 @@ using std::string;
 using std::vector;
 using std::cout;
 using std::endl;
+using std::fabs;
 
 
 namespace kaden_math {
+
+// Polynomial Math:
+
 	double evaluateFunction(const vector<double>& func, double x) {
 		// Using Horner's method for efficiency
 		double result = 0;
@@ -103,8 +107,7 @@ namespace kaden_math {
 				maxDistance = distance;
 			}
 		}
-		vector<double> result = { maxLocation, maxDistance };
-		return result;
+		return { maxLocation, maxDistance };
 	}
 
 
@@ -135,10 +138,41 @@ namespace kaden_math {
 				maxDistance = distance;
 			}
 		}
-		vector<double> result = { maxLocation, maxDistance };
-		return result;
+		return { maxLocation, maxDistance };
 	}
 	
+
+
+
+
+
+
+
+
+// Vector Math and Functions
+
+
+	vector<double> maxDistBetweenCurves(const vector<double>& xdata, const vector<double>& y1data, const vector<double>& y2data) {
+
+		if (y1data.size() != y2data.size() || xdata.size() != y1data.size()) {
+			cout << "Error: Data set sizes do no match" << endl;
+			return {};
+		} 
+
+		double maxLocation = xdata[0];
+		double maxDistance = fabs(y1data[0] - y2data[0]);
+
+		for (int i = 0; i < xdata.size(); i++) {
+			double difference = fabs(y1data[i] - y2data[i]);
+			if (difference > maxDistance) {
+				maxLocation = xdata[i];
+				maxDistance = difference;
+			}
+		}
+		return { maxLocation, maxDistance };
+	}
+
+
 
 
 
@@ -172,7 +206,6 @@ namespace kaden_math {
 		cout << "Data is saved to: " << filename << endl;
 		return;
 	}
-
 
 
 

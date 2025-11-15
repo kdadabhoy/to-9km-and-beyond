@@ -12,6 +12,7 @@ using std::string;
 #include "to-9km-and-beyond/kadenMath.h"
 using kaden_math::saveVectorsToCSV;
 using kaden_math::evaluateFunction;
+using kaden_math::maxDistBetweenCurves;
 
 
 using namespace std;
@@ -119,7 +120,7 @@ namespace airplane {
 
 
 
-	// Drag Functions
+// Drag Functions
 	double Airplane::calcDragCoeff(double AoA, double velocity, double Mach, double kinematicViscosity) const {
 		double totalDrag = 0;
 
@@ -153,7 +154,7 @@ namespace airplane {
 
 
 
-	// Lift Functions:
+// Lift Functions:
 	double Airplane::calcLiftCoeff(double AoA) const {
 		return CL.calcLiftCoefficient(AoA);
 	}
@@ -176,7 +177,7 @@ namespace airplane {
 
 
 
-	// Useful Functions:
+// Useful Functions:
 
 	double Airplane::calcMach(double velocity, double temp) const {
 		return velocity / sqrt(1.4 * GAS_CONSTANT * temp);
@@ -263,36 +264,13 @@ namespace airplane {
 
 
 
-	// Power Curve Functions
-	vector<double> Airplane::calcDragPowerCurveYData(double gamma, double height) const {
-		AtmosphereProperties Cond(height);
+// Power Curve Functions
+
+
+	vector<double> Airplane::calcPowerCurveMachData() const {
 		vector<double> data;
 
-		double density = Cond.getDensity();
-		double kineVisc = Cond.getKinematicVisc();
-		double temp = Cond.getTemperature();
-
-		double dx = (xmax - xmin) / steps;            // 1000 even steps between mach~=0 and mach~=1
-		for (int i = 0; i < steps; i++) {
-			double Mach = (i * dx) + xmin;
-			double velocity = Mach * sqrt(1.4 * GAS_CONSTANT * temp);
-			double AoA = calcSteadyClimbAoA(1.4, velocity, density);
-			data.push_back(calcDrag(AoA, velocity, Mach, kineVisc, density) * velocity);
-		}
-		return data;
-	}
-
-
-
-
-
-
-
-
-	vector<double> Airplane::calcDragPowerCurveXDataMach() const {
-		vector<double> data;
-
-		double dx = (xmax - xmin) / steps;            // 1000 even steps between mach~=0 and mach~=1
+		double dx = (xmax - xmin) / steps;   // 1000 steps between mach~=0 and mach~=1
 		for (int i = 0; i < steps; i++) {
 			double Mach = (i * dx) + xmin;
 			data.push_back(Mach);
@@ -306,13 +284,12 @@ namespace airplane {
 
 
 
-	vector<double> Airplane::calcDragPowerCurveXDataVel(double height) const {
+	vector<double> Airplane::calcPowerCurveVelocityData(double height) const {
 		vector<double> data;
-
 		AtmosphereProperties Cond(height);
 		double temp = Cond.getTemperature();
 
-		double dx = (xmax - xmin) / steps;            // 1000 even steps between mach~=0 and mach~=1
+		double dx = (xmax - xmin) / steps;   // 1000 steps between mach~=0 and mach~=1
 		for (int i = 0; i < steps; i++) {
 			double Mach = (i * dx) + xmin;
 			double velocity = Mach * sqrt(1.4 * GAS_CONSTANT * temp);
@@ -329,6 +306,22 @@ namespace airplane {
 
 
 
+	vector<double> Airplane::calcDragPowerData(double gamma, double height) const {
+		AtmosphereProperties Cond(height);
+		vector<double> data;
+		double density = Cond.getDensity();
+		double kineVisc = Cond.getKinematicVisc();
+		double temp = Cond.getTemperature();
+
+		double dx = (xmax - xmin) / steps;     // 1000 steps between mach~=0 and mach~=1
+		for (int i = 0; i < steps; i++) {
+			double Mach = (i * dx) + xmin;
+			double velocity = Mach * sqrt(1.4 * GAS_CONSTANT * temp);
+			double AoA = calcSteadyClimbAoA(1.4, velocity, density);
+			data.push_back(calcDrag(AoA, velocity, Mach, kineVisc, density) * velocity);
+		}
+		return data;
+	}
 
 
 
@@ -336,30 +329,41 @@ namespace airplane {
 
 
 
-	// Slightly inefficent bc creating an Atmosphere property within functions bc of height
-	void Airplane::getPowerCurveCSV(double gamma, double height, string fileName) const {
-		vector<double> xdata;
-		vector<double> x2data;
-		vector<double> y1data;
-		vector<double> y2data;
-		vector<double> powerCurve;
 
-		xdata = calcDragPowerCurveXDataVel(height);			// Vel for Power Curve
-		y1data = calcDragPowerCurveYData(gamma, height);		// Drag for Power Curve
 
+
+	vector<double> Airplane::calcPowerAvailableData(double height) const {
+		vector<double> xdata = calcPowerCurveVelocityData(height);
+		vector<double> ydata;
+		vector<double> powerCurve = engine->getPowerCurveFunction(height);
 		AtmosphereProperties Cond(height);
 		double tempature = Cond.getTemperature();
 		double SLSThrust = engine->getSLSThrust();
-		powerCurve = engine->getPowerCurveFunction(height);
 
 		for (int i = 0; i < xdata.size(); i++) {
 			double xtemp = xdata[i] / (sqrt(1.4 * GAS_CONSTANT * tempature));
-			double y2temp = evaluateFunction(powerCurve, xtemp);
-			y2temp = y2temp * numEngines * SLSThrust * xdata[i];
-			y2data.push_back(y2temp);
+			double ytemp = evaluateFunction(powerCurve, xtemp);
+			ytemp = ytemp * numEngines * SLSThrust * xdata[i];
+			ydata.push_back(ytemp);
 		}
+		return ydata;
+	}
 
+
+
+
+
+
+
+
+
+	// Slightly inefficent bc the calling functions create their own AtmosProp Object
+	void Airplane::getPowerCurveCSV(double gamma, double height, string fileName) const {
+		vector<double> xdata = calcPowerCurveVelocityData(height);
+		vector<double> y1data = calcDragPowerData(gamma, height);
+		vector<double> y2data = calcPowerAvailableData(height);
 		saveVectorsToCSV(xdata, y1data, y2data, fileName);
+		return;
 	}
 
 

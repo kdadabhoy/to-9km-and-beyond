@@ -28,13 +28,15 @@ namespace airplane {
 		double calcLiftCoeff(double AoA) const;																			// AoA in Rad
 		double calcLift(double AoA, double velocity, double density) const;												// AoA in Rad
 
+		// Power Curve
+		void getPowerCurveCSV(double gamma, double height, string fileName) const;           // fileName should have ".csv"
+
+
 		// Climb Functions
 		double calcBestClimbTime(double startHeight, double endHeight) const;               // "Best" means we somehow get to the V we need to get to instaneously
 		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;     // Gamma in degrees, Returns AoA in rad
 
 
-		// Power Curve
-		void getPowerCurveCSV(double gamma, double height, string fileName) const;           // fileName should have ".csv"
 
 
 		// Accessors:
@@ -67,19 +69,23 @@ namespace airplane {
 
 
 
-		// computeAndSet Functions:
+		// calcAndSet Functions:
 		void calcAndSetTotalWeight();
-		void calcAndSetLiftCoeff();													 // Needed for SteadyClimbAoA... sets Cl
+		void calcAndSetLiftCoeff();													// Needed for SteadyClimbAoA... sets Cl
+
+
+
+		// Power Curve Functions
+		vector<double> calcDragPowerData(double gamma, double height) const;       //Gamma in degrees, generates 1000 evenly spaced data points between Mach 0 and 1
+		vector<double> calcPowerCurveMachData() const;						   // Will Always be the same
+		vector<double> calcPowerCurveVelocityData(double height) const;			  // Power Curve needs velocity
+		vector<double> calcPowerAvailableData(double height) const;
+
+
 
 
 		// Climb Functions
 		double calcMaxExcessPower(double startHeight, double endHeight) const;   // Prob also need max excess power speed
-		
-
-		// Power Curve Functions
-		vector<double> calcDragPowerCurveYData(double gamma, double height) const;           // Gamma in degrees, generates 1000 evenly spaced data points between Mach 0 and 1
-		vector<double> calcDragPowerCurveXDataMach() const;									 // Will Always be the same
-		vector<double> calcDragPowerCurveXDataVel(double height) const;						 // Power Curve needs velocity
 	};
 
 
