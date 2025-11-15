@@ -33,10 +33,7 @@ namespace airplane {
 		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;     // Gamma in degrees, Returns AoA in rad
 
 
-		// Testing
-		vector<double> calcDragPowerCurveYData(double gamma, double height) const;           // Gamma in degrees, generates 1000 evenly spaced data points between Mach 0 and 1
-		vector<double> calcDragPowerCurveXDataMach() const;									 // Will Always be the same
-		vector<double> calcDragPowerCurveXDataVel(double height) const;						 // Power Curve needs velocity
+		// Power Curve
 		void getPowerCurveCSV(double gamma, double height, string fileName) const;           // fileName should have ".csv"
 
 
@@ -70,6 +67,11 @@ namespace airplane {
 		// Climb Functions
 		double calcMaxExcessPower(double startHeight, double endHeight) const;   // Prob also need max excess power speed
 		
+
+		// Power Curve Functions
+		vector<double> calcDragPowerCurveYData(double gamma, double height) const;           // Gamma in degrees, generates 1000 evenly spaced data points between Mach 0 and 1
+		vector<double> calcDragPowerCurveXDataMach() const;									 // Will Always be the same
+		vector<double> calcDragPowerCurveXDataVel(double height) const;						 // Power Curve needs velocity
 	};
 
 
