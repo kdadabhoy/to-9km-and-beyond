@@ -1,0 +1,612 @@
+// Test main
+
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include "to-9km-and-beyond/Airplane.h"
+#include "to-9km-and-beyond/AtmosphereProperties.h"
+#include "to-9km-and-beyond/Wing.h"
+#include "to-9km-and-beyond/Airfoil.h"
+#include "to-9km-and-beyond/Nacelle.h"
+#include "to-9km-and-beyond/Fuselage.h"
+#include "to-9km-and-beyond/CF34_3B1.h"
+#include "to-9km-and-beyond/kadenMath.h"
+
+
+
+using namespace std;
+using namespace atmosphere_properties;
+using namespace airplane;
+using namespace kaden_math;
+
+
+
+/*
+
+// Useful main
+int main() {
+	// Airfoil characteristics for my HT and VT:
+	// Let's use a NACA 2412 for starters.. 
+		// bc need to implement 2D zero alpha
+	//LiftCoeff Cl_NACA2412(.178, 6.25);
+	Airfoil NACA2412("2412", -.0349);
+
+
+
+	// Other Variables
+	double currentHeight = 0;
+	double time = 0;
+
+
+	// Givens:
+	Wing VT(NACA2412, 99.68, 86.68, 86.68, 40, 0);												// Set in Stone
+	Wing HT(NACA2412, 239.67, 23.55, 72.45, 32.04, 0);											// Set in Stone
+	double givenAirplaneWeight = 23000 * 2.20462;										// lbms, this it the HT + VT + Fuselage + startingFuel + Payload
+	double startingFuelWeight = 1000 * 2.20462;											// lbm
+	double payLoadWeight = 1000 * 2.20462;												// lbm
+	givenAirplaneWeight = givenAirplaneWeight - startingFuelWeight - payLoadWeight - (2*1670);     // 1670 lbms is CF34_3B1
+	double fuselageWeight = .95 * givenAirplaneWeight;									// lbms... we will also store the VT and HT weight in this
+	double nacelleWeight = .025 * givenAirplaneWeight;                               // just said each one is 2.5% of fuselage+VT+HT
+	Fuselage fuselage(fuselageWeight);
+	Nacelle nacelle(nacelleWeight);
+	CF34_3B1 CF34_3B1;
+
+	// Main Wing Stuff, this is what will be optimized
+	double mainSpan = 120;
+	double mainTipChord = 12;
+	double mainRootChord = 24;
+	double mainSweepAngle = 15;
+	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);
+
+	// Airplane we have with everything
+	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
+
+	// Testing CL3D Wing
+	double AoA = 5 * 3.1415 / 180;
+	AtmosphereProperties Cond(0);
+	double temp = Cond.getTemperature();
+	double kineVisc = Cond.getKinematicVisc();
+	double velocity = 500;
+	double Mach = Airplane.calcMach(velocity, temp);
+
+	cout << "Area: " << mainWing.getArea() << endl;
+	cout << "AR: " << mainWing.getAspectRatio() << endl;
+	cout << "e: " << mainWing.getEllipticalEffic() << endl;
+	cout << "Sweep: " << mainSweepAngle << endl;
+	cout << "MAC: " << mainWing.getMAC() << endl;
+	cout << "AoA rad: " << AoA << endl;
+	cout << "CL3D total: " << mainWing.getC_L_rad(AoA) << endl;
+
+
+	double Re = mainWing.calcReynolds(velocity, kineVisc);
+	double wetAreaRatio = mainWing.calcWettedArea() / mainWing.getArea();
+	double totalDragCoeff = mainWing.getTotalC_D_rad(AoA, velocity, Mach, wetAreaRatio, kineVisc);
+
+	cout << endl << endl << endl;
+	cout << "kineVisc: " << kineVisc << endl;
+	cout << "velocity: " << velocity << endl;
+	cout << "temp: " << temp << endl << endl;
+
+	cout << "Re: " << Re << endl;
+	cout << "C_D: " << totalDragCoeff << endl;
+
+
+	return 0;
+}
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+	// Testing CL3D Wing & Getting Drag from Wing member function
+
+	// Main Wing Stuff, this is what will be optimized
+	double mainSpan = 120;
+	double mainTipChord = 12;
+	double mainRootChord = 24;
+	double mainSweepAngle = 15;
+	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);
+
+	// Airplane we have with everything
+	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
+
+	// Testing CL3D Wing
+	double AoA = 5 * 3.1415 / 180;
+	AtmosphereProperties Cond(0);
+	double temp = Cond.getTemperature();
+	double kineVisc = Cond.getKinematicVisc();
+	double velocity = 500;
+	double Mach = Airplane.calcMach(velocity, temp);
+
+	cout << "Area: " << mainWing.getArea() << endl;
+	cout << "AR: " << mainWing.getAspectRatio() << endl;
+	cout << "e: " << mainWing.getEllipticalEffic() << endl;
+	cout << "Sweep: " << mainSweepAngle << endl;
+	cout << "MAC: " << mainWing.getMAC() << endl;
+	cout << "AoA rad: " << AoA << endl;
+	cout << "CL3D total: " << mainWing.getC_L_rad(AoA) << endl;
+
+
+	double Re = mainWing.calcReynolds(velocity, kineVisc);
+	double wetAreaRatio = mainWing.calcWettedArea() / mainWing.getArea();
+	double totalDragCoeff = mainWing.getTotalC_D_rad(AoA, velocity, Mach, wetAreaRatio, kineVisc);
+
+	cout << endl << endl << endl;
+	cout << "kineVisc: " << kineVisc << endl;
+	cout << "velocity: " << velocity << endl;
+	cout << "temp: " << temp << endl << endl;
+
+	cout << "Re: " << Re << endl;
+	cout << "C_D: " << totalDragCoeff << endl;
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+/*
+	// Testing Weight Assignments
+
+void weightCheck(Wing& VT, Wing HT, double fuel, double payload, Fuselage fuselage, Nacelle nacelle, CF34_3B1 engine);
+int main() {
+	// Airfoil characteristics for my HT and VT:
+	// Let's use a NACA 2412 for starters
+
+	double currentHeight = 0;
+	double time = 0;
+
+
+	// Givens:
+	Wing VT(99.68, 86.68, 86.68, 40, 0);												// Set in Stone
+	Wing HT(239.67, 23.55, 72.45, 32.04, 0);											// Set in Stone
+	double givenAirplaneWeight = 23000 * 2.20462;										// lbms, this it the HT + VT + Fuselage + startingFuel + Payload
+	double startingFuelWeight = 1000 * 2.20462;											// lbm
+	double payLoadWeight = 1000 * 2.20462;												// lbm
+	givenAirplaneWeight = givenAirplaneWeight - startingFuelWeight - payLoadWeight - (2 * 1670);     // 1670 lbms is CF34_3B1
+	double fuselageWeight = .95 * givenAirplaneWeight;									// lbms... we will also store the VT and HT weight in this
+	double nacelleWeight = .025 * givenAirplaneWeight;                               // just said each one is 2.5% of fuselage+VT+HT
+	Fuselage fuselage(fuselageWeight);
+	Nacelle nacelle(nacelleWeight);
+	CF34_3B1 CF34_3B1;
+
+	// Main Wing Stuff, this is what will be optimized
+	double mainSpan = 100;
+	double mainTipChord = 100;
+	double mainRootChord = 100;
+	double mainSweepAngle = 30;
+	Wing mainWing(mainSpan, mainTipChord, mainRootChord, mainSweepAngle);
+
+	// Airplane we have with everything
+	Airplane MyAirplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
+
+
+	weightCheck(VT, HT, startingFuelWeight, payLoadWeight, fuselage, nacelle, CF34_3B1);
+	double check = MyAirplane.getWeight();
+	cout << check << " " << (23000 * 2.20462) << endl;
+
+
+
+	return 0;
+}
+
+
+void weightCheck(Wing& VT, Wing HT, double fuel, double payload, Fuselage fuselage, Nacelle nacelle, CF34_3B1 engine) {
+	double givenWeight = 23000 * 2.20462;
+	double weight = VT.getWeight() + (2 * HT.getWeight()) + fuel + payload + fuselage.getWeight() + (2 * nacelle.getWeight()) + (2 * engine.getWeight());
+
+
+	if ((weight - givenWeight) < .001) {
+		cout << "Weight calcs are right" << endl;
+		return;
+	} else {
+		cout << "Weight calcs are wrong" << endl;
+		return;
+	}
+
+}
+
+	*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+	// Testing AtmosphereProperties 
+
+int main() {
+	AtmosphereProperties Cond(49000);
+	cout << "Height: " << Cond.getHeight() << " Density: " << Cond.getDensity() << " Pressure : " <<
+		Cond.getStaticPressure() << " Temp: " << Cond.getTemperature() <<
+		" Speed of Sound: " << Cond.getSpeedOfSound() << endl;
+
+	return 0;
+}
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+	Testing Wing Class:
+	double MAC;
+	double weight;
+	double AR;
+	double TR;
+	double area;
+
+	MAC = HT.getMAC() * 12;
+	weight = HT.getWeight();
+	AR = HT.getAspectRatio();
+	TR = HT.getTaperRatio();
+	area = HT.getArea();
+
+	cout << "MAC: " << MAC << " in" << endl;
+	cout << "AR: " << AR << endl;
+	cout << "Taper Ratio: " << TR << endl;
+
+	cout << "Area: " << area << " sqft" << endl;
+	cout << "Weight: " << weight << " lbm" << endl;
+	
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+	// Testing Airplane.calcDragCoeff()
+
+int main() {
+	Airfoil NACA2412("2412", -.0349);
+
+	// Other Variables
+	double currentHeight = 0;
+	double time = 0;
+
+
+	// Givens:
+	Wing VT(NACA2412, 99.68, 86.68, 86.68, 40, 0);										// Set in Stone.. Altho not really needed bc ignoring contributions
+	Wing HT(NACA2412, 239.67, 23.55, 72.45, 32.04, 0);									// Set in Stone
+	double givenAirplaneWeight = 23000 * 2.20462;										// lbms, this it the HT + VT + Fuselage + startingFuel + Payload
+	double startingFuelWeight = 1000 * 2.20462;											// lbm
+	double payLoadWeight = 1000 * 2.20462;												// lbm
+	givenAirplaneWeight = givenAirplaneWeight - startingFuelWeight - payLoadWeight - (2*1670);     // 1670 lbms is CF34_3B1
+	double fuselageWeight = .95 * givenAirplaneWeight;									// lbms... we will also store the VT and HT weight in this
+	double nacelleWeight = .025 * givenAirplaneWeight;                               // just said each one is 2.5% of fuselage+VT+HT
+	Fuselage fuselage(fuselageWeight);
+	Nacelle nacelle(nacelleWeight);
+	CF34_3B1 CF34_3B1;
+
+	// Main Wing Stuff, this is what will be optimized
+	double mainSpan = 1176;
+	double mainRootChord = 186.7;
+	double mainTipChord = 74.7;
+	double mainSweepAngle = 20;
+	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);
+
+	// Airplane we have with everything
+	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
+
+	// Testing CL3D Wing
+	double AoA = 5 * 3.1415 / 180;
+	AtmosphereProperties Cond(0);
+	double temp = Cond.getTemperature();
+	double kineVisc = Cond.getKinematicVisc();
+	double velocity = 500;
+	double Mach = Airplane.calcMach(velocity, temp);
+
+
+
+	cout << "HT: " << endl;
+	cout << "Area: " << HT.getArea() << endl;
+	cout << "AR: " << HT.getAspectRatio() << endl;
+	cout << "e: " << HT.getEllipticalEffic() << endl;
+	cout << "Sweep: " << HT.getSweepAngle() << endl;
+
+	cout << endl << endl << endl;
+	cout << "VT: " << endl;
+	cout << "Area: " << VT.getArea() << endl;
+	cout << "AR: " << VT.getAspectRatio() << endl;
+	cout << "e: " << VT.getEllipticalEffic() << endl;
+	cout << "Sweep: " << VT.getSweepAngle() << endl;
+
+
+
+	cout << endl << endl << endl;
+	cout << "Main Wing: " << endl;
+	cout << "Area: " << mainWing.getArea() << endl;
+	cout << "AR: " << mainWing.getAspectRatio() << endl;
+	cout << "e: " << mainWing.getEllipticalEffic() << endl;
+	cout << "Sweep: " << mainSweepAngle << endl;
+	cout << "MAC: " << mainWing.getMAC() << endl;
+	cout << "AoA rad: " << AoA << endl;
+	cout << "CL3D Wing total: " << mainWing.calcLiftCoeff(AoA) << endl;
+
+	cout << endl << endl;
+
+	cout << "Mach: " << Mach << endl;
+	cout << "AoA " << AoA * 180 / 3.1415 << endl;
+	cout << "Airplane Drag Coeff: " << Airplane.calcDragCoeff(AoA, velocity, Mach, kineVisc) << endl;
+
+
+
+	return 0;
+}
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+	// Testing Airplane.calcLiftCoeff()
+int main() {
+	Airfoil NACA2412("2412", -.0349);
+
+	// Other Variables
+	double currentHeight = 0;
+	double time = 0;
+
+
+	// Givens:
+	Wing VT(NACA2412, 99.68, 86.68, 86.68, 40, 0);										// Set in Stone.. Altho not really needed bc ignoring contributions
+	Wing HT(NACA2412, 239.67, 23.55, 72.45, 32.04, 0);									// Set in Stone
+	double givenAirplaneWeight = 23000 * 2.20462;										// lbms, this it the HT + VT + Fuselage + startingFuel + Payload
+	double startingFuelWeight = 1000 * 2.20462;											// lbm
+	double payLoadWeight = 1000 * 2.20462;												// lbm
+	givenAirplaneWeight = givenAirplaneWeight - startingFuelWeight - payLoadWeight - (2*1670);     // 1670 lbms is CF34_3B1
+	double fuselageWeight = .95 * givenAirplaneWeight;									// lbms... we will also store the VT and HT weight in this
+	double nacelleWeight = .025 * givenAirplaneWeight;                               // just said each one is 2.5% of fuselage+VT+HT
+	Fuselage fuselage(fuselageWeight);
+	Nacelle nacelle(nacelleWeight);
+	CF34_3B1 CF34_3B1;
+
+	// Main Wing Stuff, this is what will be optimized
+	double mainSpan = 1176;
+	double mainRootChord = 186.7;
+	double mainTipChord = 74.7;
+	double mainSweepAngle = 20;
+	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);
+
+	// Airplane we have with everything
+	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
+
+	// Testing CL3D Wing
+	double AoA = 5 * 3.1415 / 180;
+	AtmosphereProperties Cond(0);
+	double temp = Cond.getTemperature();
+	double kineVisc = Cond.getKinematicVisc();
+	double velocity = 500;
+	double Mach = Airplane.calcMach(velocity, temp);
+
+
+
+	cout << "Main Wing: " << endl;
+	cout << "Area: " << mainWing.getArea() << endl;
+	cout << "AR: " << mainWing.getAspectRatio() << endl;
+	cout << "e: " << mainWing.getEllipticalEffic() << endl;
+	cout << "Sweep: " << mainSweepAngle << endl;
+	cout << "MAC: " << mainWing.getMAC() << endl;
+	cout << "AoA rad: " << AoA << endl;
+	cout << "CL3D Wing total: " << mainWing.calcLiftCoeff(AoA) << endl;
+
+
+	cout << endl << endl << endl;
+	cout << "HT: " << endl;
+	cout << "Area: " << HT.getArea() << endl;
+	cout << "AR: " << HT.getAspectRatio() << endl;
+	cout << "e: " << HT.getEllipticalEffic() << endl;
+	cout << "Sweep: " << HT.getSweepAngle() << endl;
+	cout << "CL3D HT total: " << HT.calcLiftCoeff(AoA) << endl;
+
+	cout << endl << endl << endl;
+	cout << "Fuselage Lift: " << fuselage.calcLiftCoeff(AoA) << endl;
+
+	cout << endl << endl;
+
+	cout << "Mach: " << Mach << endl;
+	cout << "AoA " << AoA * 180 / 3.1415 << endl;
+	cout << "Airplane Lift Coeff: " << Airplane.calcLiftCoeff(AoA) << endl;
+
+
+
+	return 0;
+}
+
+
+
+*/
+
+
+
+
+/*
+
+	AtmosphereProperties Cond(0);
+	double temp = Cond.getTemperature();
+	double kineVisc = Cond.getKinematicVisc();
+	double density = Cond.getDensity();
+
+	double Mach = Airplane.calcMach(velocity, temp);
+	double AoA = Airplane.calcSteadyClimbAoA(gamma, velocity, density);
+	double velocity = 1004.669673; // ft/s
+
+	cout << "Main Wing: " << endl;
+	cout << "Area: " << mainWing.getArea() << endl;
+	cout << "AR: " << mainWing.getAspectRatio() << endl;
+	cout << "e: " << mainWing.getEllipticalEffic() << endl;
+	cout << "Sweep: " << mainSweepAngle << endl;
+	cout << "MAC: " << mainWing.getMAC() << endl;
+	cout << "CL3D Wing total: " << mainWing.calcLiftCoeff(AoA) << endl;
+
+
+	cout << endl << endl << endl;
+	cout << "HT: " << endl;
+	cout << "Area: " << HT.getArea() << endl;
+	cout << "AR: " << HT.getAspectRatio() << endl;
+	cout << "e: " << HT.getEllipticalEffic() << endl;
+	cout << "Sweep: " << HT.getSweepAngle() << endl;
+	cout << "CL3D HT total: " << HT.calcLiftCoeff(AoA) << endl;
+
+	cout << endl << endl << endl;
+	cout << "Fuselage Lift: " << fuselage.calcLiftCoeff(AoA) << endl;
+
+	cout << endl << endl;
+
+
+
+	cout << "Gamma: " << gamma << endl;
+	cout << "Mach: " << Mach << endl;
+	cout << "AoA Required " << AoA * 180 / 3.1415 << endl;
+	cout << "Airplane Drag Coeff: " << Airplane.calcDragCoeff(AoA, velocity, Mach, kineVisc) << endl;
+	cout << "Airplane Drag: " << Airplane.calcDrag(AoA, velocity, Mach, kineVisc, density) << endl;
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+	// Testing kadenMath
+	vector<double> func1 = { 2,-1, -4 }; // 2x^2 - x - 4
+	vector<double> func2 = { 1,-2 };  // x - 2
+	vector<double> intersections;
+
+	intersections = curveIntersection(func1, func2, -10, 10, 1000);
+	cout << "Intersections at" << endl;
+	for (int i = 0; i < intersections.size(); i++) {
+		cout << "x = " << intersections[i] << endl;
+	}
+
+	
+	vector<double> maxDistance;
+	maxDistance = maxDistBetweenFunctions(func1, func2, intersections[0], intersections[intersections.size() - 1]);
+	cout << "Max Distance " << maxDistance[1] << " at x = " << maxDistance[0] << endl;
+
+*/
+
+
+
+
+
+
+/*
+	// Testing data for Drag Power Curve
+	vector<double> xdata;
+	vector<double> x2data;
+	vector<double> y1data;
+	vector<double> y2data;
+	vector<double> powerCurve;
+
+	double height2 = 0;
+	double gamma2 = 7.5;
+	AtmosphereProperties Cond2(height2);
+	double temp2 = Cond2.getTemperature();
+	string filename = "Drag Power Curve.csv";
+
+	xdata = Airplane.calcDragPowerCurveXDataVel(height2);			// Vel for Power Curve
+	y1data = Airplane.calcDragPowerCurveYData(gamma2, height2);		// Drag for Power Curve
+	powerCurve = CF34_3B1.getPowerCurveFunction(height2);			// Power curve function
+
+	x2data = Airplane.calcDragPowerCurveXDataMach();
+	for (int i = 0; i < xdata.size(); i++) {
+		y2data.push_back(evaluateFunction(powerCurve, x2data[i]));
+	}
+
+
+	for (int i = 0; i < y2data.size(); i++) {
+		y2data[i] = y2data[i]*CF34_3B1.getSLSThrust() * xdata[i] * 2;
+	}
+
+
+
+
+
+	saveVectorsToCSV(xdata, y1data, y2data, filename);
+
+*/
