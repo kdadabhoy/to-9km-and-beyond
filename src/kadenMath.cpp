@@ -2,7 +2,12 @@
 #include "to-9km-and-beyond/kadenMath.h"
 #include <vector>
 #include <cmath>
+#include <fstream>
+#include <string>
+using std::string;
 using std::vector;
+using std::cout;
+using std::endl;
 
 
 namespace kaden_math {
@@ -134,6 +139,54 @@ namespace kaden_math {
 	}
 
 
+	void saveVectorsToCSV(const vector<double>& x, const vector<double>& y, const string& filename) {
+
+		if (x.size() != y.size()) {
+			cout << "Error: Vecs not the same size" << endl;
+			return;
+		}
+
+		std::ofstream file(filename);
+		if (!file.is_open()) {
+			cout << "Could not open file" << endl;
+			return;
+		}
+
+
+		for (int i = 0; i < x.size(); i++) {
+			file << x[i] << ", " << y[i] << "\n";
+		}
+
+		file.close();
+		cout << "Data is saved to: " << filename << endl;
+		return;
+	}
+
+
+
+
+	void saveVectorsToCSV(const vector<double>& x, const vector<double>& y1, const vector<double>& y2, const string& filename) {
+
+		if (x.size() != y1.size() && x.size() != y2.size()) {
+			cout << "Error: Vecs not the same size" << endl;
+			return;
+		}
+
+		std::ofstream file(filename);
+		if (!file.is_open()) {
+			cout << "Could not open file" << endl;
+			return;
+		}
+
+
+		for (int i = 0; i < x.size(); i++) {
+			file << x[i] << ", " << y1[i] << ", " << y2[i] << "\n";
+		}
+
+		file.close();
+		cout << "Data is saved to: " << filename << endl;
+		return;
+	}
 
 
 }

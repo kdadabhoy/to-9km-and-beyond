@@ -1,7 +1,10 @@
 #ifndef KADENMATH
 #define KADENMATH
+#include <fstream>
 #include <vector>
+#include <string>
 using std::vector;
+using std::string;
 // Kaden's own custom math functions
 
 /*
@@ -29,7 +32,7 @@ using std::vector;
 		The function then returns a vector with the first element being the x-cord of maxDistance
 		and the second element being the maxDistance.
 
-		
+	saveVectorsToCSV takes in 2 vectors of the same size and converts the data to a CSV file with the filename
 
 
 
@@ -44,6 +47,8 @@ namespace kaden_math {
 
 	vector<double> maxDistBetweenFunctions(const vector<double>& func1, const vector<double>& func2, double xmin, double xmax);
 	vector<double> maxDistBetweenFunctions(const vector<double>& func1, const vector<double>& func2, double xmin, double xmax, int inSteps);
+	void saveVectorsToCSV(const vector<double>& x, const vector<double>& y, const string& filename);
+	void saveVectorsToCSV(const vector<double>& x, const vector<double>& y1, const vector<double>& y2, const string& filename);
 
 }
 

@@ -1,11 +1,19 @@
 #include <iostream>
+#include <cassert>
+#include <cmath>
+#include <string>
+using std::string;
 #include "to-9km-and-beyond/Airplane.h"
 #include "to-9km-and-beyond/Wing.h"
 #include "to-9km-and-beyond/TurboFan.h"
+#include "to-9km-and-beyond/CF34_3B1.h"
 #include "to-9km-and-beyond/Nacelle.h"
 #include "to-9km-and-beyond/AtmosphereProperties.h"
-#include <cassert>
-#include <cmath>
+#include "to-9km-and-beyond/kadenMath.h"
+using kaden_math::saveVectorsToCSV;
+using kaden_math::evaluateFunction;
+
+
 using namespace std;
 using namespace atmosphere_properties;
 // Assumes we are passing in the full span of the Wing and HT (in other words they are symmetrical)
@@ -41,7 +49,7 @@ namespace airplane {
 	// If I decide none of the objects get modified in this class, then add const here and the pointer won't
 	// allow modificaiton to the passed object
 	// Would also have to change all member vairbales to const Class*
-	Airplane::Airplane(Wing& inWing, Wing& inHT, Wing& inVT, TurboFan& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight){
+	Airplane::Airplane(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight){
 		mainWing = &inWing;
 		HT = &inHT;
 		VT = &inVT;
@@ -242,6 +250,117 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
+
+
+	// Power Curve Functions
+	vector<double> Airplane::calcDragPowerCurveYData(double gamma, double height) const {
+		double steps = 1000;
+		double xmin = .01;
+		double xmax = .97;
+
+		AtmosphereProperties Cond(height);
+		vector<double> data;
+
+		double density = Cond.getDensity();
+		double kineVisc = Cond.getKinematicVisc();
+		double temp = Cond.getTemperature();
+
+		double dx = (xmax - xmin) / steps;            // 1000 even steps between mach~=0 and mach~=1
+		for (int i = 0; i < steps; i++) {
+			double Mach = (i * dx) + xmin;
+			double velocity = Mach * sqrt(1.4 * GAS_CONSTANT * temp);
+			double AoA = calcSteadyClimbAoA(1.4, velocity, density);
+			data.push_back(calcDrag(AoA, velocity, Mach, kineVisc, density) * velocity);
+		}
+		return data;
+	}
+
+
+
+
+
+
+
+
+	vector<double> Airplane::calcDragPowerCurveXDataMach() const {
+		double steps = 1000;
+		double xmin = .01;
+		double xmax = .97;
+
+		vector<double> data;
+
+		double dx = (xmax - xmin) / steps;            // 1000 even steps between mach~=0 and mach~=1
+		for (int i = 0; i < steps; i++) {
+			double Mach = (i * dx) + xmin;
+			data.push_back(Mach);
+		}
+		return data;
+	}
+
+
+
+
+
+
+
+	vector<double> Airplane::calcDragPowerCurveXDataVel(double height) const {
+		double steps = 1000;
+		double xmin = .01;
+		double xmax = .97;
+		vector<double> data;
+
+		AtmosphereProperties Cond(height);
+		double temp = Cond.getTemperature();
+
+		double dx = (xmax - xmin) / steps;            // 1000 even steps between mach~=0 and mach~=1
+		for (int i = 0; i < steps; i++) {
+			double Mach = (i * dx) + xmin;
+			double velocity = Mach * sqrt(1.4 * GAS_CONSTANT * temp);
+			data.push_back(velocity);
+		}
+		return data;
+	}
+
+
+
+
+
+
+
+
+	// Slightly inefficent bc creating an Atmosphere property within functions bc of height
+	void Airplane::getPowerCurveCSV(double gamma, double height, string fileName) const {
+		vector<double> xdata;
+		vector<double> x2data;
+		vector<double> y1data;
+		vector<double> y2data;
+		vector<double> powerCurve;
+
+		xdata = calcDragPowerCurveXDataVel(height);			// Vel for Power Curve
+		y1data = calcDragPowerCurveYData(gamma, height);		// Drag for Power Curve
+
+		AtmosphereProperties Cond(height);
+		double temp = Cond.getTemperature();
+		double SLSThrust = engine->getSLSThrust();
+		powerCurve = engine->getPowerCurveFunction(height);
+		x2data = calcDragPowerCurveXDataMach();
+
+		for (int i = 0; i < xdata.size(); i++) {
+			double xtemp = xdata[i] / (sqrt(1.4 * GAS_CONSTANT * temp));
+			double y2temp = evaluateFunction(powerCurve, x2data[i]);
+			y2temp = y2temp * 2 * SLSThrust * xdata[i];
+			y2data.push_back(y2temp);
+		}
+
+		saveVectorsToCSV(xdata, y1data, y2data, fileName);
+	}
 
 }
 

@@ -16,26 +16,23 @@ namespace airplane {
 
 		// Accessors
 		double getWeight() const;
-		double getSSLThrust() const;
-		double getThrustPerSSLThrust() const;
+		double getSLSThrust() const;
 		double getSpecificFuelConsumption() const;
 
 
 		// Mutators
 		void setWeight(double inWeight);
-		void setSSLThrust(double inThrust);
-		void setThrustPerSSLThrust(double inFrac);
+		void setSLSThrust(double inThrust);
 		void setSpecificFuelConsumption(double inFrac);
 
 		// Useful Calc
-		double getThrust() const;
+		//double getPowerCurveFunction(double height);
 
 
 	private:
 		double weight;						// lbm
-		double SSLThrust;				    // lbf, Sea-level static standard day thrust
+		double SLSThrust;				    // lbf, Sea-level static standard day thrust
 		double specificFuelConsumption;		// should change based off Mach (Performance map)
-		double thrustPerSSLThrust;          // should change based off Mach (Performance map), it's a fraction < 1 typically
 
 
 		

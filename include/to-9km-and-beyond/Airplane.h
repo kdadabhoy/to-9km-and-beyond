@@ -1,8 +1,11 @@
 #ifndef AIRPLANE_H
 #define AIRPLANE_H
-
+#include <string>
+using std::string;
+#include <vector>
+using std::vector;
 #include "to-9km-and-beyond/Wing.h"
-#include "to-9km-and-beyond/TurboFan.h"
+#include "to-9km-and-beyond/CF34_3B1.h"
 #include "to-9km-and-beyond/Nacelle.h"
 #include "to-9km-and-beyond/Fuselage.h"
 
@@ -15,25 +18,32 @@ namespace airplane {
 	class Airplane {
 	public:
 		Airplane();
-		Airplane(Wing& inWing, Wing& inHT, Wing& inVT, TurboFan& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight);
+		Airplane(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight);
 
 		double calcMach(double velocity, double temp) const;
 
-		double calcDragCoeff(double AoA, double velocity, double Mach, double kinematicViscosity) const;
-		double calcDrag(double AoA, double velocity, double Mach, double kinematicViscosity, double density) const;
+		double calcDragCoeff(double AoA, double velocity, double Mach, double kinematicViscosity) const;				// AoA in Rad
+		double calcDrag(double AoA, double velocity, double Mach, double kinematicViscosity, double density) const;     // AoA in Rad
 
-		double calcLiftCoeff(double AoA) const;
-		double calcLift(double AoA, double velocity, double density) const;
+		double calcLiftCoeff(double AoA) const;																			// AoA in Rad
+		double calcLift(double AoA, double velocity, double density) const;												// AoA in Rad
 
 		// Climb Functions
 		double calcBestClimbTime(double startHeight, double endHeight) const;               // "Best" means we somehow get to the V we need to get to instaneously
 		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;     // Gamma in degrees, Returns AoA in rad
 
 
+		// Testing
+		vector<double> calcDragPowerCurveYData(double gamma, double height) const;           // Gamma in degrees, generates 1000 evenly spaced data points between Mach 0 and 1
+		vector<double> calcDragPowerCurveXDataMach() const;									 // Will Always be the same
+		vector<double> calcDragPowerCurveXDataVel(double height) const;						 // Power Curve needs velocity
+		void getPowerCurveCSV(double gamma, double height, string fileName) const;           // fileName should have ".csv"
 
 
 		// Accessors:
 		double getWeight() const;
+
+
 
 	private:
 		double totalWeight;      // Class calculates this
@@ -41,7 +51,7 @@ namespace airplane {
 		Wing* HT;                // Full HT (Full Span / Planform)
 		Wing* VT;                // Full VT (Full Span / Planform)
 		Wing* mainWing;          // Full mainWing (Full Span / Planform)
-		TurboFan* engine;        // One engine (Class assumes plane has 2 identical engines)
+		CF34_3B1* engine;        // One engine (Class assumes plane has 2 identical engines)
 		Nacelle* nacelle;        // One nacelle (Class assumes plane has 2 identical nacelles)
 		Fuselage* fuselage;      // One fuselage
 		double payLoadWeight;    //
@@ -59,6 +69,7 @@ namespace airplane {
 
 		// Climb Functions
 		double calcMaxExcessPower(double startHeight, double endHeight) const;   // Prob also need max excess power speed
+		
 	};
 
 

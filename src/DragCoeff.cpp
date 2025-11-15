@@ -110,9 +110,6 @@ namespace airplane {
 
 		double r = Mach / Wing->calcMcc(AoA);      // M_freestream / Mcc
 
-		//del
-		cout << "r " << r << endl;
-
 		if (r < .75) {
 			// Assuming compressibility negligible bc Shevell graph doesn't cover it
 			return 0;	

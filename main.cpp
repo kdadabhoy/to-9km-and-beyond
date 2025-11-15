@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
 #include "to-9km-and-beyond/Airplane.h"
 #include "to-9km-and-beyond/AtmosphereProperties.h"
 #include "to-9km-and-beyond/Wing.h"
@@ -90,75 +91,12 @@ int main() {
 
 
 
-	// Testing CL3D Wing
-	AtmosphereProperties Cond(0);
-	double temp = Cond.getTemperature();
-	double kineVisc = Cond.getKinematicVisc();
-	double density = Cond.getDensity();
-
-
-
 	double gamma = 7.5; // Deg
-	double velocity = 1004.669673; // ft/s
-
-	double Mach = Airplane.calcMach(velocity, temp);
-	double AoA = Airplane.calcSteadyClimbAoA(gamma, velocity, density);
+	double height = 0;  // ft
+	string fileName = "DragCurve.csv";
 
 
-
-	/*
-	cout << "Main Wing: " << endl;
-	cout << "Area: " << mainWing.getArea() << endl;
-	cout << "AR: " << mainWing.getAspectRatio() << endl;
-	cout << "e: " << mainWing.getEllipticalEffic() << endl;
-	cout << "Sweep: " << mainSweepAngle << endl;
-	cout << "MAC: " << mainWing.getMAC() << endl;
-	cout << "CL3D Wing total: " << mainWing.calcLiftCoeff(AoA) << endl;
-
-
-	cout << endl << endl << endl;
-	cout << "HT: " << endl;
-	cout << "Area: " << HT.getArea() << endl;
-	cout << "AR: " << HT.getAspectRatio() << endl;
-	cout << "e: " << HT.getEllipticalEffic() << endl;
-	cout << "Sweep: " << HT.getSweepAngle() << endl;
-	cout << "CL3D HT total: " << HT.calcLiftCoeff(AoA) << endl;
-
-	cout << endl << endl << endl;
-	cout << "Fuselage Lift: " << fuselage.calcLiftCoeff(AoA) << endl;
-
-	cout << endl << endl;
-
-
-
-	cout << "Gamma: " << gamma << endl;
-	cout << "Mach: " << Mach << endl;
-	cout << "AoA Required " << AoA * 180 / 3.1415 << endl;
-	cout << "Airplane Drag Coeff: " << Airplane.calcDragCoeff(AoA, velocity, Mach, kineVisc) << endl;
-	cout << "Airplane Drag: " << Airplane.calcDrag(AoA, velocity, Mach, kineVisc, density) << endl;
-	*/
-
-
-
-	// Testing kadenMath
-	vector<double> func1 = { 2,-1, -4 }; // 2x^2 - x - 4
-	vector<double> func2 = { 1,-2 };  // x - 2
-	vector<double> intersections;
-
-	intersections = curveIntersection(func1, func2, -10, 10, 1000);
-	cout << "Intersections at" << endl;
-	for (int i = 0; i < intersections.size(); i++) {
-		cout << "x = " << intersections[i] << endl;
-	}
-
-	
-	vector<double> maxDistance;
-	maxDistance = maxDistBetweenFunctions(func1, func2, intersections[0], intersections[intersections.size() - 1]);
-	cout << "Max Distance " << maxDistance[1] << " at x = " << maxDistance[0] << endl;
-
-
-
-
+	Airplane.getPowerCurveCSV(gamma, height, fileName);
 
 
 	return 0;

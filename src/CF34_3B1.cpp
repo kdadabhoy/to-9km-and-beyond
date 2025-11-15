@@ -37,6 +37,9 @@ namespace airplane {
 
 
 
+
+
+
 	vector<double> CF34_3B1::getPowerCurveFunction(double height) {
 		double interval = (5000 / 2); // Interval where we switch to next height power curve... instead of interpolating
 

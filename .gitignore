@@ -13,6 +13,8 @@
 *.log
 *.tlog
 
+*.csv
+
 # Visual Studio folders
 .vs/
 Debug/
