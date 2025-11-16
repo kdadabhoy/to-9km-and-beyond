@@ -41,6 +41,15 @@ namespace airplane {
 
 		// Accessors:
 		double getWeight() const;
+		double getMaxExcessPower() const;
+		double getVelocityMaxExcessPower() const;
+		vector<double> getMaxExcessPowerVector() const;
+
+
+		// Remember to put back in private:
+		void calcAndSetPowerCurveData(double gamma, double height);					// Used for setting all data
+
+
 
 
 
@@ -57,8 +66,16 @@ namespace airplane {
 		double fuelWeight;       // Weight of Fuel
 		LiftCoeff CL;           // One CL for the whole plane
 
-		const static int numEngines = 2;
+		// Power Curve
+		vector<double> powerCurveVelocityData;
+		vector<double> powerRequiredData;
+		vector<double> powerAvailableData;
+		double maxExcessPower = 0;
+		double velocityMaxExcessPower = 0;
 
+
+		// Constants
+		const static int numEngines = 2;
 		static constexpr double GAS_CONSTANT = 1716;
 		static constexpr double pi = 3.141592653589;
 
@@ -69,15 +86,23 @@ namespace airplane {
 
 
 
+
+
+
 		// calcAndSet Functions:
 		void calcAndSetTotalWeight();
 		void calcAndSetLiftCoeff();													// Needed for SteadyClimbAoA... sets Cl
 
+		//void calcAndSetPowerCurveData(double gamma, double height);					// Used for setting all data
+		//void calcAndSetPowerRequiredData(double gamma, double height);				// Used if you only need to change Power Required (bc changed gamma)
+
+		void calcAndSetMaxExcessPower();					                        // Sets maxExcessPower and velocityExcessPower (assumes priv memb vars are accurate)
+
 
 
 		// Power Curve Functions
-		vector<double> calcDragPowerData(double gamma, double height) const;       //Gamma in degrees, generates 1000 evenly spaced data points between Mach 0 and 1
-		vector<double> calcPowerCurveMachData() const;						   // Will Always be the same
+		vector<double> calcDragPowerData(double gamma, double height) const;      //Gamma in degrees, generates 1000 evenly spaced data points between Mach 0 and 1
+		vector<double> calcPowerCurveMachData() const;						      // Will Always be the same
 		vector<double> calcPowerCurveVelocityData(double height) const;			  // Power Curve needs velocity
 		vector<double> calcPowerAvailableData(double height) const;
 
@@ -85,7 +110,10 @@ namespace airplane {
 
 
 		// Climb Functions
-		double calcMaxExcessPower(double startHeight, double endHeight) const;   // Prob also need max excess power speed
+		vector<double> calcExcessPower(double velocity) const;				      // Assumes Power Curve member vars are set
+		vector<double> calcExcessPower(double velocity, double height) const;	  // Doesn't assume Power Curve member vars are set
+
+
 	};
 
 

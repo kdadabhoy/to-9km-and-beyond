@@ -12,7 +12,7 @@ using std::string;
 #include "to-9km-and-beyond/kadenMath.h"
 using kaden_math::saveVectorsToCSV;
 using kaden_math::evaluateFunction;
-using kaden_math::maxDistBetweenCurves;
+using kaden_math::maxDistBetweenCurves2;
 
 
 using namespace std;
@@ -241,24 +241,6 @@ namespace airplane {
 
 
 
-	// Power Required Curve Implementation
-	double Airplane::calcMaxExcessPower(double startHeight, double endHeight) const {
-		
-		return 0;
-	}
-
-
-
-
-
-
-	// Accessors:
-	double Airplane::getWeight() const {
-		return totalWeight;
-	}
-
-
-
 
 
 
@@ -372,8 +354,68 @@ namespace airplane {
 
 
 
+	void Airplane::calcAndSetPowerCurveData(double gamma, double height) {
+		if (powerCurveVelocityData.empty()) {
+			powerCurveVelocityData = calcPowerCurveVelocityData(height);
+		}
+
+		powerRequiredData = calcDragPowerData(gamma, height);
+		powerAvailableData = calcPowerAvailableData(height);
+		calcAndSetMaxExcessPower();
+
+		return;
+	}
 
 
+
+
+
+
+
+
+	void Airplane::calcAndSetMaxExcessPower() {
+		vector<double> result = maxDistBetweenCurves2(powerCurveVelocityData, powerAvailableData, powerRequiredData);
+		if (result.empty()) {
+			velocityMaxExcessPower = -1;
+			maxExcessPower = 0;
+		} else {
+			velocityMaxExcessPower = result[0];
+			maxExcessPower = result[1];
+		}
+
+		return;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// Accessors:
+	double Airplane::getWeight() const {
+		return totalWeight;
+	}
+
+	double Airplane::getMaxExcessPower() const {
+		return maxExcessPower;
+	}
+
+	double Airplane::getVelocityMaxExcessPower() const {
+		return velocityMaxExcessPower;
+	}
+
+	vector<double> Airplane::getMaxExcessPowerVector() const {
+		return { velocityMaxExcessPower, maxExcessPower };
+	}
 
 
 }

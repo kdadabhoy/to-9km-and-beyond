@@ -78,12 +78,14 @@ int main() {
 
 
 
-	double gamma = 7.5; // Deg
-	double height = 0;  // ft
+	double gamma = 2; // Deg
+	double height = 10000;  // ft
 	string fileName = "DragCurve2.csv";
 
 
 	Airplane.getPowerCurveCSV(gamma, height, fileName);
+	Airplane.calcAndSetPowerCurveData(gamma, height);
+	cout << "Max Excess Power: " << Airplane.getMaxExcessPower() << " at vel = " << Airplane.getVelocityMaxExcessPower() << endl;
 
 
 	return 0;

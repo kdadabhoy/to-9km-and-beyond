@@ -14,7 +14,7 @@ using std::fabs;
 
 namespace kaden_math {
 
-// Polynomial Math:
+	// Polynomial Math:
 
 	double evaluateFunction(const vector<double>& func, double x) {
 		// Using Horner's method for efficiency
@@ -28,7 +28,7 @@ namespace kaden_math {
 
 
 
-	vector<double> curveIntersection(const vector<double>& func1, const vector<double>& func2, double xmin, double xmax) {
+	vector<double> functionIntersection(const vector<double>& func1, const vector<double>& func2, double xmin, double xmax) {
 		int steps = 1000;
 		vector<double> intersections;
 		double dx = (xmax - xmin) / steps;
@@ -58,7 +58,7 @@ namespace kaden_math {
 
 
 
-	vector<double> curveIntersection(const vector<double>& func1, const vector<double>& func2, double xmin, double xmax, int inSteps) {
+	vector<double> functionIntersection(const vector<double>& func1, const vector<double>& func2, double xmin, double xmax, int inSteps) {
 		int steps = inSteps;
 		vector<double> intersections;
 		double dx = (xmax - xmin) / steps;
@@ -140,7 +140,6 @@ namespace kaden_math {
 		}
 		return { maxLocation, maxDistance };
 	}
-	
 
 
 
@@ -149,7 +148,62 @@ namespace kaden_math {
 
 
 
-// Vector Math and Functions
+
+	// Vector Math and Functions
+
+	vector<double> curveIntersection(const vector<double>& x, const vector<double>& y1, const vector<double>& y2) {
+		vector<double> intersections;
+
+		if (y1.size() != y2.size() || y1.size() != x.size()) {
+			cout << "Error: Data set sizes do no match" << endl;
+			return {};
+		}
+
+
+		for (int i = 1; i < y1.size(); i++) {
+			double diff1 = y1[i] - y2[i];
+			double diff2 = y1[i - 1] - y2[i - 1];
+
+			if (diff1 * diff2 <= 0) {
+				double intersectPt = (x[i] + x[i - 1]) / 2;
+				intersections.push_back(intersectPt);
+			}
+		}
+		return intersections;
+	}
+
+
+
+
+
+	vector<double> curveIntersection(const vector<double>& x, const vector<double>& y1, const vector<double>& y2, double skip) {
+		vector<double> intersections;
+
+		if (y1.size() != y2.size() || y1.size() != x.size()) {
+			cout << "Error: Data set sizes do no match" << endl;
+			return {};
+		}
+
+
+		for (int i = 1; i < y1.size(); i += skip) {
+			if (i >= y1.size()) {
+				// Safety incase the skip is large
+				break;
+			}
+
+			double diff1 = y1[i] - y2[i];
+			double diff2 = y1[i - 1] - y2[i - 1];
+
+			if (diff1 * diff2 <= 0) {
+				double intersectPt = (x[i] + x[i - 1]) / 2;
+				intersections.push_back(intersectPt);
+			}
+		}
+		return intersections;
+	}
+
+
+
 
 
 	vector<double> maxDistBetweenCurves(const vector<double>& xdata, const vector<double>& y1data, const vector<double>& y2data) {
@@ -173,6 +227,43 @@ namespace kaden_math {
 	}
 
 
+
+
+
+
+
+
+
+	vector<double> maxDistBetweenCurves2(const vector<double>& x, const vector<double>& y1, const vector<double>& y2) {
+		// Only returns distances when y1 > y2
+		// Returns {} if none
+		if (y1.size() != y2.size() || x.size() != y1.size()) {
+			cout << "Error: Data set sizes do no match" << endl;
+			return {};
+		}
+
+		bool found = false;
+		double maxLocation;
+		double maxDistance = -1;
+
+		for (int i = 0; i < x.size(); i++) {
+			if (y1[i] > y2[i]) {
+				double difference = y1[i] - y2[i];
+
+				if (difference > maxDistance) {
+					maxLocation = x[i];
+					maxDistance = difference;
+					found = true;
+				}
+			}
+		}
+
+		if (!found) {
+			return {};
+		} else {
+			return { maxLocation, maxDistance };
+		}
+	}
 
 
 
@@ -241,6 +332,22 @@ namespace kaden_math {
 		cout << "Data is saved to: " << filename << endl;
 		return;
 	}
+
+
+
+
+
+// Linear Math
+
+	double linearInterpolate(double point, double x1, double y1, double x2, double y2) {
+		static constexpr double ferror = 1e-5;
+		if (fabs((x2 - x1)) < ferror) {
+			return y1;
+		} else{
+			return ((y2 - y1) / (x2 - x1)) * (point - x1) + y1;
+		}
+	}
+
 
 
 }
