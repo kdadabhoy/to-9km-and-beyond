@@ -13,7 +13,8 @@ using std::string;
 using kaden_math::saveVectorsToCSV;
 using kaden_math::evaluateFunction;
 using kaden_math::maxDistBetweenCurves2;
-
+using kaden_math::linearInterpolate;
+using std::floor;
 
 using namespace std;
 using namespace atmosphere_properties;
@@ -288,7 +289,7 @@ namespace airplane {
 
 
 
-	vector<double> Airplane::calcDragPowerData(double gamma, double height) const {
+	vector<double> Airplane::calcPowerRequiredData(double gamma, double height) const {
 		AtmosphereProperties Cond(height);
 		vector<double> data;
 		double density = Cond.getDensity();
@@ -342,7 +343,7 @@ namespace airplane {
 	// Slightly inefficent bc the calling functions create their own AtmosProp Object
 	void Airplane::getPowerCurveCSV(double gamma, double height, string fileName) const {
 		vector<double> xdata = calcPowerCurveVelocityData(height);
-		vector<double> y1data = calcDragPowerData(gamma, height);
+		vector<double> y1data = calcPowerRequiredData(gamma, height);
 		vector<double> y2data = calcPowerAvailableData(height);
 		saveVectorsToCSV(xdata, y1data, y2data, fileName);
 		return;
@@ -359,7 +360,7 @@ namespace airplane {
 			powerCurveVelocityData = calcPowerCurveVelocityData(height);
 		}
 
-		powerRequiredData = calcDragPowerData(gamma, height);
+		powerRequiredData = calcPowerRequiredData(gamma, height);
 		powerAvailableData = calcPowerAvailableData(height);
 		calcAndSetMaxExcessPower();
 
@@ -387,6 +388,25 @@ namespace airplane {
 	}
 
 
+	double Airplane::calcExcessPower(double velocity) const {
+		double dx = (xmax - xmin) / steps;   // Power Curve velocities have known spacing
+		double point = (velocity - xmin) / dx;
+		int lowerIndex = static_cast<int>(floor(point));	
+		int upperIndex = lowerIndex + 1;
+
+		// Maybe possible to do without this interpolation method bc evenly spaced...
+		double powerAvail = linearInterpolate(point, powerCurveVelocityData[lowerIndex], powerAvailableData[lowerIndex], powerCurveVelocityData[upperIndex], powerAvailableData[upperIndex]);
+		double powerReq = linearInterpolate(point, powerCurveVelocityData[lowerIndex], powerRequiredData[lowerIndex], powerCurveVelocityData[upperIndex], powerRequiredData[upperIndex]);
+
+		return (powerAvail - powerReq);
+	}
+
+
+
+// Takeoff Functions
+	double Airplane::calcTakeoffTime() const {
+		return 0;
+	}
 
 
 
@@ -395,12 +415,7 @@ namespace airplane {
 
 
 
-
-
-
-
-
-	// Accessors:
+// Accessors:
 	double Airplane::getWeight() const {
 		return totalWeight;
 	}

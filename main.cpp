@@ -84,8 +84,8 @@ int main() {
 
 
 	Airplane.getPowerCurveCSV(gamma, height, fileName);
-	Airplane.calcAndSetPowerCurveData(gamma, height);
-	cout << "Max Excess Power: " << Airplane.getMaxExcessPower() << " at vel = " << Airplane.getVelocityMaxExcessPower() << endl;
+	//Airplane.calcAndSetPowerCurveData(gamma, height);
+	//cout << "Max Excess Power: " << Airplane.getMaxExcessPower() << " at vel = " << Airplane.getVelocityMaxExcessPower() << endl;
 
 
 	return 0;
