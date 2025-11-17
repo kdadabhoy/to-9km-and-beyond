@@ -489,10 +489,6 @@ namespace airplane {
 
 
 
-
-
-
-
 // Climb Functions
 // 
 		// (ROC)_max = (Excess Power)_max / Weight
@@ -507,27 +503,42 @@ namespace airplane {
 
 
 
+
+
 	// Test this
-		// Might need to implement AoA < 15 deg or smt checks
+
+	// *** Need to account for weight loss ***
+	// Uses small angle approx for gamma
 	double Airplane::calcBestClimbTime(double startHeight, double startVelocity, double endHeight) {
 		// Implementing an accelerate/declerate in a straight line then climb at maxExcessPower
+		// Might need to implement AoA < 15 deg or smt checks
 		double totalTime = 0;
 		double height = startHeight;
 		double velocity = startVelocity;
 		double VELOCITY_ERROR = .5;						// Can Change if too inefficient
-		double TIME_STEP = .1;                      // Can Change if too inefficient
+		double TIME_STEP = .1;							// Can Change if too inefficient
 
-
+		calcAndSetPowerCurveData(height);
+		calcAndSetMaxExcessPower();
 		while (height <= endHeight) {
-			calcAndSetPowerCurveData(height);
-			calcAndSetMaxExcessPower();
 
 			if (fabs(velocity - velocityMaxExcessPower) > VELOCITY_ERROR) {
 				totalTime += calcSteadyLevelAccelerationTime(velocity, velocityMaxExcessPower, height);
 				velocity = velocityMaxExcessPower;
 			} else {
-				height += (maxExcessPower / totalWeight) * TIME_STEP;
+				calcAndSetPowerCurveData(height);
+				calcAndSetMaxExcessPower();
+				height += (maxExcessPower / totalWeight) * TIME_STEP; // small angle approx method
 				totalTime += TIME_STEP;
+
+				/*
+					// If you want to see how gamma changes during flight
+					double gamma = asin(maxExcessPower / (totalWeight * velocityMaxExcessPower));
+					cout << "gamma (deg): " << gamma * 180 / 3.1415 << endl;
+				*/
+
+				calcAndSetPowerCurveData(height);
+				calcAndSetMaxExcessPower();
 			}
 		}
 		return totalTime;
@@ -543,6 +554,8 @@ namespace airplane {
 
 
 
+
+	// *** Need to account for weight loss ***
 	// Only evalutes Power Curves when height changes by 500
 	double Airplane::calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight) {
 		// Implementing an accelerate/declerate in a straight line then climb at maxExcessPower
@@ -589,11 +602,39 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
+
+// Steady Level Flight (L=W) Functions
+
+	double Airplane::calcSteadyLevelAoA(double velocity, double density) const {
+		assert(velocity > 0.00 && density > 0.00 && CL.getCL_Alpha() > 0.00);
+
+		double CL_needed = 0;
+		double AoA_needed = 0;
+
+		CL_needed = (totalWeight) / (0.5 * velocity * velocity * density * referenceArea);
+		CL_needed = CL_needed - CL.getCL_Knott();
+		AoA_needed = CL_needed / CL.getCL_Alpha();
+
+		return AoA_needed;
+	}
+
+
+
+
+
+	// *** Need to account for weight loss ***
 	// Constant height Max Horizontal Acceleration
-			// In a straight line F = ma, a = F/m
-			// Max Acceleration = (ThrustAvail - Drag) / weight
-			// change in v = acceleration * dt
-			// change in v = (acceleration - v0) / time
+		// In a straight line F = ma, a = F/m
+		// Max Acceleration = (ThrustAvail - Drag) / weight
+		// change in v = acceleration * dt
+		// change in v = (acceleration - v0) / time
 	double Airplane::calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height) {
 		double totalTime = 0;
 		double velocity = startVelocity;
@@ -619,7 +660,7 @@ namespace airplane {
 			} else {
 				// Decelerate
 				engineFactor = .20;	 // Thrust to 20% max thrust (brake using drag)... could use some PID thing instead.. but this is good enough
-									 // Set this to 0% for best possible time... but real life is ~20% of thrust being minimum
+				// Set this to 0% for best possible time... but real life is ~20% of thrust being minimum
 			}
 
 			thrust = numEngines * engine->getThrust(height, velocity) * engineFactor;
@@ -635,25 +676,6 @@ namespace airplane {
 	}
 
 
-
-
-
-
-
-// Steady Level Flight (L=W) Functions
-
-	double Airplane::calcSteadyLevelAoA(double velocity, double density) const {
-		assert(velocity > 0.00 && density > 0.00 && CL.getCL_Alpha() > 0.00);
-
-		double CL_needed = 0;
-		double AoA_needed = 0;
-
-		CL_needed = (totalWeight) / (0.5 * velocity * velocity * density * referenceArea);
-		CL_needed = CL_needed - CL.getCL_Knott();
-		AoA_needed = CL_needed / CL.getCL_Alpha();
-
-		return AoA_needed;
-	}
 
 
 
@@ -690,6 +712,69 @@ namespace airplane {
 	vector<double> Airplane::getMaxExcessPowerVector() const {
 		return { velocityMaxExcessPower, maxExcessPower };
 	}
+
+
+
+
+
+
+
+
+// Best Gamma for ROC(max)
+	/*
+		RoC = (P_avail - P_req) / W 
+		RoC = P_excess / W
+
+		P = Force * velocity
+		P_excess = W*v_vertical           (using all power to climb)
+		RoC = v_vertical = V*sin(gamma)
+		so:
+			P_excess = W*V*sin(gamma)
+		so:
+			sin(gamma) = (P_avail - P_req) / W*V
+		so:
+			RoC = Vsin(gamma) = (P_excess) / W
+		so:
+			Max RoC when maximize P_excess
+
+			P_excess depends on gamma bc P+req depends on gamma bc Alpha Steady level depends on gamma
+	
+
+		P_req is a function of V, h, gamma
+
+		v_vertical = V*sin(gamma)
+	
+	*/
+
+	/*
+		Psuedocode for this:
+
+		gamma = 0;
+		gamma_max = 20;
+		
+		while(gamma_max - gamma > 0){
+		P_mid = P_max((gamma + gamma_max) / 2)     // Need to write a function that just returns the max Excess power for a given gamma at a given height
+		P_left = P_max(gamma)
+		P_right = P_max(gamm_max)
+
+		if (P_left > P_mind){
+			gamma_max = gamma_mid;
+		} else if (P_right > P_mid){
+			gamma = gamma_mid
+		} else{
+			return gamma_mid
+		}
+
+		
+	
+	*/
+
+
+
+
+
+
+
 
 
 }
