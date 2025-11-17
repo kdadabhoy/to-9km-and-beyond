@@ -368,7 +368,16 @@ namespace airplane {
 
 	double Wing::calcSweptMExponent(double AoA) const {
 		double CL = fabs(CL3D.calcLiftCoefficient(AoA));       // AGAIN NOT SURE IF FABS WORKS FOR THIS CL PLOT... but worst case just say we assume symmetric airfoil
-		assert(CL > 0 && CL <= .6001); 
+
+		//cout << "CL3d = " << CL << endl; // delete
+
+		if (CL > .6) {
+			// Chart doesnt go past CL = .6.. so we will assume anything more is .5
+			// This is actually a conservative approx (Bc itll produce a lower Mcc)
+			return .5;
+		}
+
+		assert(CL > 0 && CL <= .60);							
 		//m = 0.823 + -0.57x + 0.101x^2
 		return 0.823 + (-.57 * CL) + (0.101 * CL * CL);
 	}

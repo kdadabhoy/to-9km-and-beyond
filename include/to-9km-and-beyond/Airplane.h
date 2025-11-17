@@ -28,31 +28,40 @@ namespace airplane {
 		double calcLiftCoeff(double AoA) const;																			// AoA in Rad
 		double calcLift(double AoA, double velocity, double density) const;												// AoA in Rad
 
-		// Power Curve
+	// Power Curve
 			// Maybe add the maxExcessPower and where it occurs to the output
-		void getPowerCurveCSV(double gamma, double height, string fileName) const;           // fileName should have ".csv"
+		void getPowerCurveCSV(double gamma, double height, string fileName) const;           // fileName should have ".csv", no small angle approx
+		void getPowerCurveCSV(double height, string fileName) const;						 // fileName should have ".csv", small angle approx 
 
 
-		// Takeoff Functions
+	// Takeoff Functions
 			// Need final height, final time, final AoA, final gamma, and total time
 		double calcTakeoffTime() const;
 
 
-		// Climb Functions
-		double calcBestClimbTime(double startHeight, double startVelocity, double startGamma, double startAoA, double endHeight) const;  // Most important function
-		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;     // Gamma in degrees, Returns AoA in rad
+	// Climb Functions
+		double calcBestClimbTime(double startHeight, double startVelocity, double endHeight);  // Most important function might need to add start AoA and gamma
+		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;       // Gamma in degrees, Returns AoA in rad
+		double calcSteadyClimbAoAApprox(double velocity, double density) const;				   // Small angle approx, so cos(gamma) = 1
+		
+	// Steady Level Flight Functions (L = W)
+		double calcSteadyLevelAoA(double velocity, double density) const;
+		double calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height);
 
 
 
-
-		// Accessors:
+	// Accessors:
 		double getWeight() const;
 		double getMaxExcessPower() const;
 		double getVelocityMaxExcessPower() const;
 		vector<double> getMaxExcessPowerVector() const;
 
 
-
+	// Should be private (used for testing:
+		/*
+		void calcAndSetPowerCurveData(double gamma, double height);					// No small angle approx, Used for setting all data
+		void calcAndSetPowerCurveData(double height);								// Small angle approx, Used for setting all data
+		*/
 
 
 	private:
@@ -68,7 +77,7 @@ namespace airplane {
 		double fuelWeight;       // Weight of Fuel
 		LiftCoeff CL;           // One CL for the whole plane
 
-		// Power Curve
+	// Power Curve
 		vector<double> powerCurveVelocityData;
 		vector<double> powerRequiredData;
 		vector<double> powerAvailableData;
@@ -76,13 +85,15 @@ namespace airplane {
 		double velocityMaxExcessPower = 0;
 
 
-		// Constants
+	// Constants
 		const static int numEngines = 2;
 		static constexpr double GAS_CONSTANT = 1716;
 		static constexpr double pi = 3.141592653589;
+		static constexpr double GRAVITY = 32.2;
 
-		// Power Function's Curve Constants
-		static constexpr double xmin = .005;
+
+	// Power Function's Curve Constants
+		static constexpr double xmin = .01;
 		static constexpr double xmax = .975;
 		const static int steps = 1000;
 
@@ -91,23 +102,30 @@ namespace airplane {
 
 
 
-		// calcAndSet Functions:
+	// calcAndSet Functions:
 		void calcAndSetTotalWeight();
 		void calcAndSetLiftCoeff();													// Needed for SteadyClimbAoA... sets Cl
-		void calcAndSetPowerCurveData(double gamma, double height);					// Used for setting all data
 		void calcAndSetMaxExcessPower();					                        // Sets maxExcessPower and velocityExcessPower (assumes priv memb vars are accurate)
+		void calcAndSetPowerCurveData(double gamma, double height);					// No small angle approx, Used for setting all data
+		void calcAndSetPowerCurveData(double height);								// Small angle approx, Used for setting all data
 
 
-		// Power Curve Functions
-		vector<double> calcPowerRequiredData(double gamma, double height) const;      //Gamma in degrees, generates 1000 evenly spaced data points between Mach 0 and 1
+
+	// Power Curve Functions
 		vector<double> calcPowerCurveMachData() const;						      // Will Always be the same
 		vector<double> calcPowerCurveVelocityData(double height) const;			  // Power Curve needs velocity
 		vector<double> calcPowerAvailableData(double height) const;
 
+		// No Small Angle Approx:	
+		vector<double> calcPowerRequiredData(double gamma, double height) const;      //Gamma in degrees, generates 1000 evenly spaced data points between Mach 0 and 1
+		
+		// Small Angle Approx (cos(gamma) ~= 1)
+		vector<double> calcPowerRequiredData(double height) const;
 
 
 
-		// Climb Functions
+
+	// Climb Functions
 		double calcExcessPower(double velocity) const;				      // Assumes Power Curve member vars are set
 
 

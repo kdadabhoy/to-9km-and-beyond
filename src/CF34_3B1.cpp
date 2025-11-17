@@ -3,6 +3,12 @@
 using std::vector;
 #include "to-9km-and-beyond/CF34_3B1.h"
 #include "to-9km-and-beyond/TurboFan.h"
+#include "to-9km-and-beyond/AtmosphereProperties.h"
+using namespace atmosphere_properties;
+#include "to-9km-and-beyond/kadenMath.h"
+using kaden_math::evaluateFunction;
+#include <cmath>
+using std::sqrt;
 // Prob should add assignment operator at some point
 
 
@@ -39,8 +45,9 @@ namespace airplane {
 
 
 
-
-	vector<double> CF34_3B1::getPowerCurveFunction(double height) {
+	// y axis is Thrust/SSL Thrust
+	// x axis is Mach #
+	vector<double> CF34_3B1::getThrustCurveFunction(double height) const {
 		double interval = (5000 / 2); // Interval where we switch to next height power curve... instead of interpolating
 
 		if (height < (5000 - interval)) {
@@ -70,6 +77,21 @@ namespace airplane {
 		}
 	}
 
+
+
+
+
+	// Test this function
+	double CF34_3B1::getThrust(double height, double velocity) const {
+		double thrust = 0;
+		AtmosphereProperties Cond(height);
+		vector<double> thrustFunction = getThrustCurveFunction(height);
+		double Mach = velocity / sqrt(1.4 * GAS_CONSTANT * Cond.getTemperature());
+
+		thrust = evaluateFunction(thrustFunction, Mach) * getSLSThrust();
+
+		return thrust;
+	}
 
 
 

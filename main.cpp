@@ -70,22 +70,56 @@ int main() {
 	double mainRootChord = 186.7;
 	double mainTipChord = 74.7;
 	double mainSweepAngle = 20;
-	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);
+	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle, 30000); // delete 15000 and let the approx in constructor do this... (when implemented)
 
 	// Airplane we have with everything
 	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 
 
 
-
+	/*
 	double gamma = 2; // Deg
 	double height = 10000;  // ft
-	string fileName = "DragCurve2.csv";
+	double velocity = 500;
+	AtmosphereProperties Cond(height);
+	double density = Cond.getDensity();
+
+	cout << "Not Approx: " << Airplane.calcSteadyClimbAoA(gamma, velocity, density) << endl;
+	cout << "Approx: " << Airplane.calcSteadyClimbAoAApprox(velocity, density) << endl;
+	*/
 
 
-	Airplane.getPowerCurveCSV(gamma, height, fileName);
+
+
+	/*
+	double gamma = 10; // Deg
+	double height = 10000;  // ft
+	string fileName1 = "ActualCurve.csv";
+	string fileName2 = "ApproxCurve.csv";
+
+
+	Airplane.getPowerCurveCSV(gamma, height, fileName1);
 	//Airplane.calcAndSetPowerCurveData(gamma, height);
-	//cout << "Max Excess Power: " << Airplane.getMaxExcessPower() << " at vel = " << Airplane.getVelocityMaxExcessPower() << endl;
+	cout << "Max Excess Power: " << Airplane.getMaxExcessPower() << " at vel = " << Airplane.getVelocityMaxExcessPower() << endl;
+
+	cout << endl << endl;
+
+
+	Airplane.getPowerCurveCSV(height, fileName2);
+	//Airplane.calcAndSetPowerCurveData(height);
+	cout << "Max Excess Power: " << Airplane.getMaxExcessPower() << " at vel = " << Airplane.getVelocityMaxExcessPower() << endl;
+	*/
+
+	double startHeight = 0;
+	double endHeight = 29527.6; // 9km
+	double startVelocity = 200;
+	AtmosphereProperties Cond(startHeight);
+	double temp = Cond.getTemperature();
+	double breakingHeight = 19256.8;
+	//cout << Airplane.calcBestClimbTime(startHeight, startVelocity, endHeight) / 60.0 << " mins" << endl;
+
+
+	cout << Airplane.calcBestClimbTime(startHeight, startVelocity, endHeight) / 60.0 << " mins" << endl;
 
 
 	return 0;

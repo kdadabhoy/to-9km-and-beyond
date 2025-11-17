@@ -191,25 +191,6 @@ namespace airplane {
 
 
 
-	// Unrealistic ("Best") Climb Function
-		// (ROC)_max = (Excess Power)_max / Weight
-			// Excess Power = Power Avaiable - Power Required
-				// Power Required = Total Drag * velocity
-
-		// Time to Climb = integral from h1 to h2 (dh / RoC)
-			// ROC * change in time = dh
-
-	double Airplane::calcBestClimbTime(double startHeight, double endHeight) const {
-		double time = 0;
-
-		while (endHeight > startHeight){
-
-
-		}
-
-
-		return time;
-	}
 
 
 
@@ -236,6 +217,19 @@ namespace airplane {
 
 
 
+	// Small Angle assumption (L = W*cos(0) = W)
+	double Airplane::calcSteadyClimbAoAApprox(double velocity, double density) const {
+		assert(velocity > 0.00 && density > 0.00 && CL.getCL_Alpha() > 0.00);
+
+		double CL_needed = 0;
+		double AoA_needed = 0;
+
+		CL_needed = (totalWeight) / (0.5 * velocity * velocity * density * referenceArea);
+		CL_needed = CL_needed - CL.getCL_Knott();
+		AoA_needed = CL_needed / CL.getCL_Alpha();
+
+		return AoA_needed;
+	}
 
 
 
@@ -287,6 +281,89 @@ namespace airplane {
 
 
 
+	vector<double> Airplane::calcPowerAvailableData(double height) const {
+		vector<double> xdata = calcPowerCurveVelocityData(height);
+		vector<double> ydata;
+		vector<double> thrustCurve = engine->getThrustCurveFunction(height);
+		AtmosphereProperties Cond(height);
+		double tempature = Cond.getTemperature();
+		double SLSThrust = engine->getSLSThrust();
+
+		for (int i = 0; i < xdata.size(); i++) {
+			double xtemp = xdata[i] / (sqrt(1.4 * GAS_CONSTANT * tempature));
+			double ytemp = evaluateFunction(thrustCurve, xtemp);
+			ytemp = ytemp * numEngines * SLSThrust * xdata[i];
+			ydata.push_back(ytemp);
+		}
+		return ydata;
+	}
+
+
+
+
+
+
+
+	void Airplane::calcAndSetMaxExcessPower() {
+		vector<double> result = maxDistBetweenCurves2(powerCurveVelocityData, powerAvailableData, powerRequiredData);
+		if (result.empty()) {
+			velocityMaxExcessPower = -1;
+			maxExcessPower = 0;
+		} else {
+			velocityMaxExcessPower = result[0];
+			maxExcessPower = result[1];
+		}
+
+		return;
+	}
+
+
+
+
+
+
+
+
+	double Airplane::calcExcessPower(double velocity) const {
+		double dx = (xmax - xmin) / steps;   // Power Curve velocities have known spacing
+		double point = (velocity - xmin) / dx;
+		int lowerIndex = static_cast<int>(floor(point));
+		int upperIndex = lowerIndex + 1;
+
+		// Maybe possible to do without this interpolation method bc evenly spaced...
+		double powerAvail = linearInterpolate(point, powerCurveVelocityData[lowerIndex], powerAvailableData[lowerIndex], powerCurveVelocityData[upperIndex], powerAvailableData[upperIndex]);
+		double powerReq = linearInterpolate(point, powerCurveVelocityData[lowerIndex], powerRequiredData[lowerIndex], powerCurveVelocityData[upperIndex], powerRequiredData[upperIndex]);
+
+		return (powerAvail - powerReq);
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+// 100% Accurate (gamma accounted for):
+
+	void Airplane::calcAndSetPowerCurveData(double gamma, double height) {
+		if (powerCurveVelocityData.empty()) {
+			powerCurveVelocityData = calcPowerCurveVelocityData(height);
+		}
+
+		powerRequiredData = calcPowerRequiredData(gamma, height);
+		powerAvailableData = calcPowerAvailableData(height);
+		calcAndSetMaxExcessPower();
+
+		return;
+	}
+
+
+
 
 
 	vector<double> Airplane::calcPowerRequiredData(double gamma, double height) const {
@@ -300,37 +377,13 @@ namespace airplane {
 		for (int i = 0; i < steps; i++) {
 			double Mach = (i * dx) + xmin;
 			double velocity = Mach * sqrt(1.4 * GAS_CONSTANT * temp);
-			double AoA = calcSteadyClimbAoA(1.4, velocity, density);
+			double AoA = calcSteadyClimbAoA(gamma, velocity, density);
 			data.push_back(calcDrag(AoA, velocity, Mach, kineVisc, density) * velocity);
 		}
 		return data;
 	}
 
 
-
-
-
-
-
-
-
-
-	vector<double> Airplane::calcPowerAvailableData(double height) const {
-		vector<double> xdata = calcPowerCurveVelocityData(height);
-		vector<double> ydata;
-		vector<double> powerCurve = engine->getPowerCurveFunction(height);
-		AtmosphereProperties Cond(height);
-		double tempature = Cond.getTemperature();
-		double SLSThrust = engine->getSLSThrust();
-
-		for (int i = 0; i < xdata.size(); i++) {
-			double xtemp = xdata[i] / (sqrt(1.4 * GAS_CONSTANT * tempature));
-			double ytemp = evaluateFunction(powerCurve, xtemp);
-			ytemp = ytemp * numEngines * SLSThrust * xdata[i];
-			ydata.push_back(ytemp);
-		}
-		return ydata;
-	}
 
 
 
@@ -355,12 +408,14 @@ namespace airplane {
 
 
 
-	void Airplane::calcAndSetPowerCurveData(double gamma, double height) {
+// Small Angle Approx (cos(gamma) ~= 1)
+
+	void Airplane::calcAndSetPowerCurveData(double height) {
 		if (powerCurveVelocityData.empty()) {
 			powerCurveVelocityData = calcPowerCurveVelocityData(height);
 		}
 
-		powerRequiredData = calcPowerRequiredData(gamma, height);
+		powerRequiredData = calcPowerRequiredData(height);
 		powerAvailableData = calcPowerAvailableData(height);
 		calcAndSetMaxExcessPower();
 
@@ -370,36 +425,193 @@ namespace airplane {
 
 
 
+	vector<double> Airplane::calcPowerRequiredData(double height) const {
+		AtmosphereProperties Cond(height);
+		vector<double> data;
+		double density = Cond.getDensity();
+		double kineVisc = Cond.getKinematicVisc();
+		double temp = Cond.getTemperature();
 
+		double dx = (xmax - xmin) / steps;     // 1000 steps between mach~=0 and mach~=1
+		for (int i = 0; i < steps; i++) {
+			double Mach = (i * dx) + xmin;
+			double velocity = Mach * sqrt(1.4 * GAS_CONSTANT * temp);
+			double AoA = calcSteadyClimbAoAApprox(velocity, density);
 
+			/*
+			cout << "Height: " << height << endl; // delete
+			cout << "AoA: " << AoA * 180 / 3.1415 << " velocity: " << velocity << endl; // delete
+			*/
 
-
-	void Airplane::calcAndSetMaxExcessPower() {
-		vector<double> result = maxDistBetweenCurves2(powerCurveVelocityData, powerAvailableData, powerRequiredData);
-		if (result.empty()) {
-			velocityMaxExcessPower = -1;
-			maxExcessPower = 0;
-		} else {
-			velocityMaxExcessPower = result[0];
-			maxExcessPower = result[1];
+			data.push_back(calcDrag(AoA, velocity, Mach, kineVisc, density) * velocity);
 		}
+		return data;
+	}
 
+
+
+
+
+
+	// Slightly inefficent bc the calling functions create their own AtmosProp Object
+	void Airplane::getPowerCurveCSV(double height, string fileName) const {
+		vector<double> xdata = calcPowerCurveVelocityData(height);
+		vector<double> y1data = calcPowerRequiredData(height);
+		vector<double> y2data = calcPowerAvailableData(height);
+		saveVectorsToCSV(xdata, y1data, y2data, fileName);
 		return;
 	}
 
 
-	double Airplane::calcExcessPower(double velocity) const {
-		double dx = (xmax - xmin) / steps;   // Power Curve velocities have known spacing
-		double point = (velocity - xmin) / dx;
-		int lowerIndex = static_cast<int>(floor(point));	
-		int upperIndex = lowerIndex + 1;
 
-		// Maybe possible to do without this interpolation method bc evenly spaced...
-		double powerAvail = linearInterpolate(point, powerCurveVelocityData[lowerIndex], powerAvailableData[lowerIndex], powerCurveVelocityData[upperIndex], powerAvailableData[upperIndex]);
-		double powerReq = linearInterpolate(point, powerCurveVelocityData[lowerIndex], powerRequiredData[lowerIndex], powerCurveVelocityData[upperIndex], powerRequiredData[upperIndex]);
 
-		return (powerAvail - powerReq);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Climb Functions
+// 
+		// (ROC)_max = (Excess Power)_max / Weight
+			// Excess Power = Power Avaiable - Power Required
+				// Power Required = Total Drag * velocity
+
+		// Time to Climb = integral from h1 to h2 (dh / RoC)
+			// ROC * change in time = dh
+		// RoC = (P_avail - P_req) / weight
+		// dh = (RoC)dt
+
+
+
+	// Test this
+		// Might need to implement AoA < 15 deg or smt checks
+	double Airplane::calcBestClimbTime(double startHeight, double startVelocity, double endHeight) {
+		double totalTime = 0;
+		double height = startHeight;
+		double velocity = startVelocity;
+		double velError = 5;						// Can Change if too inefficient
+		double timeStep = 1;                      // Can Change if too inefficient
+		double oldHeight = startHeight;
+		// Implementing an accelerate/declerate in a straight line then climb at best gamma approach
+		calcAndSetPowerCurveData(height);
+		calcAndSetMaxExcessPower();
+
+		while (height <= endHeight) {
+
+			if (height - oldHeight >= 1000) {
+				calcAndSetPowerCurveData(height);	// Small angle approx, gets me my power curve
+				calcAndSetMaxExcessPower();			// Gets me my max Excess Power and what velocity it is at
+				oldHeight = height;
+			}
+
+			if (fabs(velocity - velocityMaxExcessPower) > velError) {
+				totalTime += calcSteadyLevelAccelerationTime(velocity, velocityMaxExcessPower, height);
+				velocity = velocityMaxExcessPower;
+			} else {
+				height += (maxExcessPower / totalWeight) * timeStep;
+				totalTime += timeStep;
+			}
+		}
+		return totalTime;
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+	// Constant height Max Horizontal Acceleration
+			// In a straight line F = ma, a = F/m
+			// Max Acceleration = (ThrustAvail - Drag) / weight
+			// change in v = acceleration * dt
+			// change in v = (acceleration - v0) / time
+	double Airplane::calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height) {
+		double totalTime = 0;
+		double velocity = startVelocity;
+
+		AtmosphereProperties Cond(height);
+		double temp = Cond.getTemperature();
+		double kineVisc = Cond.getKinematicVisc();
+		double density = Cond.getDensity();
+		double Mach, thrust, AoA, drag, maxAcceleration, engineFactor;
+
+		double timeStep = 0.1;        // Can Change if too inefficient
+		double velError = 0.1;		  // Can Change if too inefficient
+		double velDifference = finalVelocity - startVelocity;
+
+		while (fabs(velDifference) > velError) {
+			Mach = calcMach(velocity, temp);
+			AoA = calcSteadyLevelAoA(velocity, density);
+			drag = calcDrag(AoA, velocity, Mach, kineVisc, density);
+
+			if (velDifference > 0) {
+				// Accelerate case
+				engineFactor = 1;
+			} else {
+				// Decelerate
+				engineFactor = .20;	 // Thrust to 20% max thrust (brake using drag)... could use some PID thing instead.. but this is good enough
+									 // Set this to 0% for best possible time... but real life is ~20% of thrust being minimum
+			}
+
+			thrust = numEngines * engine->getThrust(height, velocity) * engineFactor;
+			maxAcceleration = ((thrust - drag) * GRAVITY) / totalWeight;                // Don't forget gravity... bc imperial!
+			velocity = (maxAcceleration * timeStep) + velocity;
+			totalTime = totalTime + timeStep;
+			velDifference = finalVelocity - velocity;
+
+			assert(fabs(AoA) < (20 * 3.1415) / 180);                                    // Just a precaution to make sure AoA never goes above 20 deg (optimisitic)
+		}
+
+		return totalTime;
+	}
+
+
+
+
+
+
+
+// Steady Level Flight (L=W) Functions
+
+	double Airplane::calcSteadyLevelAoA(double velocity, double density) const {
+		assert(velocity > 0.00 && density > 0.00 && CL.getCL_Alpha() > 0.00);
+
+		double CL_needed = 0;
+		double AoA_needed = 0;
+
+		CL_needed = (totalWeight) / (0.5 * velocity * velocity * density * referenceArea);
+		CL_needed = CL_needed - CL.getCL_Knott();
+		AoA_needed = CL_needed / CL.getCL_Alpha();
+
+		return AoA_needed;
+	}
+
+
+
+
+
 
 
 

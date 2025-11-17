@@ -14,12 +14,13 @@ namespace airplane {
 
 		// Helpful Functions
 		// Prob put this funciton in base class as well at some point...
-		vector<double> getPowerCurveFunction(double height);
-
+		vector<double> getThrustCurveFunction(double height) const;
+		double getThrust(double height, double velocity) const;
 
 
 
 	private:
+		static constexpr double GAS_CONSTANT = 1716;
 		// Have ability to get:
 			//	weight
 			// 
@@ -40,6 +41,9 @@ namespace airplane {
 		const vector<double> h40kPowerFunc = { 0.563 ,-0.775 , 0.906 };
 		const vector<double> h45kPowerFunc = { 0.563 ,-0.775 , 0.906 };
 		const vector<double> h50kPowerFunc = { 0.563 ,-0.775 , 0.906 };
+
+
+
 
 	}; 
 
