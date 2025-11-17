@@ -247,9 +247,9 @@ namespace airplane {
 	vector<double> Airplane::calcPowerCurveMachData() const {
 		vector<double> data;
 
-		double dx = (xmax - xmin) / steps;   // 1000 steps between mach~=0 and mach~=1
-		for (int i = 0; i < steps; i++) {
-			double Mach = (i * dx) + xmin;
+		double dx = (X_MAX - X_MIN) / STEPS;   // 1000 steps between mach~=0 and mach~=1
+		for (int i = 0; i < STEPS; i++) {
+			double Mach = (i * dx) + X_MIN;
 			data.push_back(Mach);
 		}
 		return data;
@@ -266,9 +266,9 @@ namespace airplane {
 		AtmosphereProperties Cond(height);
 		double temp = Cond.getTemperature();
 
-		double dx = (xmax - xmin) / steps;   // 1000 steps between mach~=0 and mach~=1
-		for (int i = 0; i < steps; i++) {
-			double Mach = (i * dx) + xmin;
+		double dx = (X_MAX - X_MIN) / STEPS;   // 1000 steps between mach~=0 and mach~=1
+		for (int i = 0; i < STEPS; i++) {
+			double Mach = (i * dx) + X_MIN;
 			double velocity = Mach * sqrt(1.4 * GAS_CONSTANT * temp);
 			data.push_back(velocity);
 		}
@@ -323,16 +323,19 @@ namespace airplane {
 
 
 
-
+	// double check that the interpolation is working accurately sometime
+		// It's close.. but not sure it's 100% accurate
 	double Airplane::calcExcessPower(double velocity) const {
-		double dx = (xmax - xmin) / steps;   // Power Curve velocities have known spacing
-		double point = (velocity - xmin) / dx;
+		double x_min = powerCurveVelocityData[0];
+		double x_max = powerCurveVelocityData[powerCurveVelocityData.size() - 1];
+		double dx = (x_max - x_min) / STEPS;   // Power Curve velocities have known spacing
+		double point = (velocity - x_min) / dx;
 		int lowerIndex = static_cast<int>(floor(point));
 		int upperIndex = lowerIndex + 1;
 
 		// Maybe possible to do without this interpolation method bc evenly spaced...
-		double powerAvail = linearInterpolate(point, powerCurveVelocityData[lowerIndex], powerAvailableData[lowerIndex], powerCurveVelocityData[upperIndex], powerAvailableData[upperIndex]);
-		double powerReq = linearInterpolate(point, powerCurveVelocityData[lowerIndex], powerRequiredData[lowerIndex], powerCurveVelocityData[upperIndex], powerRequiredData[upperIndex]);
+		double powerAvail = linearInterpolate(velocity, powerCurveVelocityData[lowerIndex], powerAvailableData[lowerIndex], powerCurveVelocityData[upperIndex], powerAvailableData[upperIndex]);
+		double powerReq = linearInterpolate(velocity, powerCurveVelocityData[lowerIndex], powerRequiredData[lowerIndex], powerCurveVelocityData[upperIndex], powerRequiredData[upperIndex]);
 
 		return (powerAvail - powerReq);
 	}
@@ -373,9 +376,9 @@ namespace airplane {
 		double kineVisc = Cond.getKinematicVisc();
 		double temp = Cond.getTemperature();
 
-		double dx = (xmax - xmin) / steps;     // 1000 steps between mach~=0 and mach~=1
-		for (int i = 0; i < steps; i++) {
-			double Mach = (i * dx) + xmin;
+		double dx = (X_MAX - X_MIN) / STEPS;     // 1000 steps between mach~=0 and mach~=1
+		for (int i = 0; i < STEPS; i++) {
+			double Mach = (i * dx) + X_MIN;
 			double velocity = Mach * sqrt(1.4 * GAS_CONSTANT * temp);
 			double AoA = calcSteadyClimbAoA(gamma, velocity, density);
 			data.push_back(calcDrag(AoA, velocity, Mach, kineVisc, density) * velocity);
@@ -439,17 +442,11 @@ namespace airplane {
 		double kineVisc = Cond.getKinematicVisc();
 		double temp = Cond.getTemperature();
 
-		double dx = (xmax - xmin) / steps;     // 1000 steps between mach~=0 and mach~=1
-		for (int i = 0; i < steps; i++) {
-			double Mach = (i * dx) + xmin;
+		double dx = (X_MAX - X_MIN) / STEPS;     // 1000 steps between mach~=0 and mach~=1
+		for (int i = 0; i < STEPS; i++) {
+			double Mach = (i * dx) + X_MIN;
 			double velocity = Mach * sqrt(1.4 * GAS_CONSTANT * temp);
 			double AoA = calcSteadyClimbAoAApprox(velocity, density);
-
-			/*
-			cout << "Height: " << height << endl; // delete
-			cout << "AoA: " << AoA * 180 / 3.1415 << " velocity: " << velocity << endl; // delete
-			*/
-
 			data.push_back(calcDrag(AoA, velocity, Mach, kineVisc, density) * velocity);
 		}
 		return data;
@@ -518,16 +515,15 @@ namespace airplane {
 		double VELOCITY_ERROR = .5;						// Can Change if too inefficient
 		double TIME_STEP = .1;							// Can Change if too inefficient
 
-		calcAndSetPowerCurveData(height);
-		calcAndSetMaxExcessPower();
+
 		while (height <= endHeight) {
+			calcAndSetPowerCurveData(height);
+			calcAndSetMaxExcessPower();
 
 			if (fabs(velocity - velocityMaxExcessPower) > VELOCITY_ERROR) {
 				totalTime += calcSteadyLevelAccelerationTime(velocity, velocityMaxExcessPower, height);
 				velocity = velocityMaxExcessPower;
 			} else {
-				calcAndSetPowerCurveData(height);
-				calcAndSetMaxExcessPower();
 				height += (maxExcessPower / totalWeight) * TIME_STEP; // small angle approx method
 				totalTime += TIME_STEP;
 
@@ -536,9 +532,6 @@ namespace airplane {
 					double gamma = asin(maxExcessPower / (totalWeight * velocityMaxExcessPower));
 					cout << "gamma (deg): " << gamma * 180 / 3.1415 << endl;
 				*/
-
-				calcAndSetPowerCurveData(height);
-				calcAndSetMaxExcessPower();
 			}
 		}
 		return totalTime;
@@ -568,10 +561,9 @@ namespace airplane {
 
 		double oldHeight = startHeight;
 		double HEIGHT_STEP = 500;
+
 		calcAndSetPowerCurveData(height);
 		calcAndSetMaxExcessPower();
-	
-
 		while (height <= endHeight) {
 
 			if (height - oldHeight >= HEIGHT_STEP) {
@@ -660,7 +652,7 @@ namespace airplane {
 			} else {
 				// Decelerate
 				engineFactor = .20;	 // Thrust to 20% max thrust (brake using drag)... could use some PID thing instead.. but this is good enough
-				// Set this to 0% for best possible time... but real life is ~20% of thrust being minimum
+									 // Set this to 0% for best possible time... but real life is ~20% of thrust being minimum
 			}
 
 			thrust = numEngines * engine->getThrust(height, velocity) * engineFactor;
@@ -685,8 +677,69 @@ namespace airplane {
 
 
 // Takeoff Functions
-	double Airplane::calcTakeoffTime() const {
-		return 0;
+
+	// *** Need to account for weight loss ***
+
+	// This function assumes we start climbing at V2 = 1.2V_stall = 1.2 * sqrt((2*W) / (rho*CL_max*S))
+	// And we climb until we reach 500 ft.. which is on the low end of FAA regs
+		// I have doubts that this is the best way to takeoff for a time-to-climb... 
+		// but for realism and the purpose of integrating lec content into this program
+		// we will take this approach
+
+	// V2 = 1.2V_stall = 1.2 * sqrt((2*W) / (rho*CL_max*S))
+	// Rolling Resistance = mu(W-(q*S*C_L))
+		// mu ~= .02
+	// a  = F/m
+		// Force = Thrust - Drag - Rolling Resistance
+		// F = T - qSC_D - mu(W-(q*S*C_L))
+		// m = W/g
+	double Airplane::calcTakeoffTime(double height) {
+		double totalTime = 0;
+		double velocity = 0;  // Start from rest 
+
+		//double CL_Stall = mainWing->get...   // Need to code a function that gets this from my airfoil and converts that to 3D
+		double AoA_Stall = 15 * pi / 180;      // Just using a realistic, arbirtary AoA rn
+		double CL_Stall = calcLiftCoeff(AoA_Stall);
+
+		AtmosphereProperties Cond(height);
+		double density = Cond.getDensity();
+		double temp = Cond.getTemperature();
+		double kineVisc = Cond.getKinematicVisc();
+
+		double V2 = 1.2 * sqrt((2 * totalWeight) / (density * CL_Stall * mainWing->getArea()));
+
+		double Mach, thrust, AoA, drag, lift, rollingFriction, maxAcceleration;
+		double ROLLING_FRIC_COEFF = .02; // A realistic approx
+		double TIME_STEP = 0.05;        // Can Change if too inefficient
+
+		while (velocity < V2) {
+			Mach = calcMach(velocity, temp);
+			AoA = 2 * pi / 180;				 // An Assumption, it is very close to 0... while on runway
+			drag = calcDrag(AoA, velocity, Mach, kineVisc, density);
+			lift = calcLift(AoA, velocity, density);
+			rollingFriction = ROLLING_FRIC_COEFF * (totalWeight - lift);
+
+			thrust = numEngines * engine->getThrust(height, velocity);
+			maxAcceleration = ((thrust - drag - rollingFriction) * GRAVITY) / totalWeight;                // Don't forget gravity... bc imperial!
+			velocity = (maxAcceleration * TIME_STEP) + velocity;
+			totalTime = totalTime + TIME_STEP;
+		}
+
+		assert(velocity > V2); // Precaution to make sure we accelerated enough
+
+	
+		double END_HEIGHT = height + 500; // Arbritary
+		while (height < END_HEIGHT) {
+			calcAndSetPowerCurveData(height);
+			double excessPower = calcExcessPower(velocity);
+			height += (excessPower / totalWeight) * TIME_STEP; // small angle approx method
+			totalTime += TIME_STEP;
+			// Just a precaution to make sure AoA never goes above 15 deg (optimisitic)
+			AoA = calcSteadyClimbAoAApprox(velocity, density);
+			assert(fabs(AoA) < (15 * 3.1415) / 180); 
+
+		}
+		return totalTime;
 	}
 
 

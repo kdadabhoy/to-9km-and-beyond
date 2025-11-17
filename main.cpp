@@ -71,7 +71,7 @@ int main() {
 	double mainRootChord = 186.7;
 	double mainTipChord = 74.7;
 	double mainSweepAngle = 20;
-	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle, 1300); // delete 15000 and let the approx in constructor do this... (when implemented)
+	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle, 10000); // delete 15000 and let the approx in constructor do this... (when implemented)
 
 	// Airplane we have with everything
 	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
@@ -111,15 +111,22 @@ int main() {
 	cout << "Max Excess Power: " << Airplane.getMaxExcessPower() << " at vel = " << Airplane.getVelocityMaxExcessPower() << endl;
 	*/
 
+	
 	double startHeight = 0;
+	double postTakeoffHeight = startHeight + 500; // Takeoff function gets us to 500 ft more than start height
 	double endHeight = 29527.6; // 9km in ft
 	double startVelocity = 200;
 	AtmosphereProperties Cond(startHeight);
 	double temp = Cond.getTemperature();
 
 	cout << fixed << setprecision(5);
+	cout << Airplane.calcTakeoffTime(0) << endl;
 	cout << Airplane.calcBestClimbTime(startHeight, startVelocity, endHeight) / 60.0 << " mins" << endl;
-	cout << Airplane.calcBestClimbTimeApprox(startHeight, startVelocity, endHeight) / 60.0 << " mins" << endl;
+	cout << Airplane.calcBestClimbTimeApprox(postTakeoffHeight, startVelocity, endHeight) / 60.0 << " mins" << endl;
+	
+	Airplane.getPowerCurveCSV(500, "Drag.csv");
+
+	//cout << 2*CF34_3B1.getThrust(0, 144) / Airplane.getWeight() << endl;
 
 
 	return 0;

@@ -35,15 +35,14 @@ namespace airplane {
 
 
 	// Takeoff Functions
-			// Need final height, final time, final AoA, final gamma, and total time
-		double calcTakeoffTime() const;
+		double calcTakeoffTime(double height);
 
 
 	// Climb Functions
 		double calcBestClimbTime(double startHeight, double startVelocity, double endHeight);  
 		double calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight);  // doesnt do power curve at every height... just some
 
-		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;       // Gamma in degrees, Returns AoA in rad
+		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;        // Gamma in degrees, Returns AoA in rad
 		double calcSteadyClimbAoAApprox(double velocity, double density) const;				   // Small angle approx, so cos(gamma) = 1
 		
 	// Steady Level Flight Functions (L = W)
@@ -95,9 +94,9 @@ namespace airplane {
 
 
 	// Power Function's Curve Constants
-		static constexpr double xmin = .01;
-		static constexpr double xmax = .975;
-		const static int steps = 1000;
+		static constexpr double X_MIN = .01;   // This xmin and xmax are used to space out Mach
+		static constexpr double X_MAX = .975;
+		const static int STEPS = 1000;
 
 
 
