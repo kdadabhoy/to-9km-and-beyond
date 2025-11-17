@@ -408,6 +408,9 @@ namespace airplane {
 
 
 
+
+
+
 // Small Angle Approx (cos(gamma) ~= 1)
 
 	void Airplane::calcAndSetPowerCurveData(double height) {
@@ -421,6 +424,10 @@ namespace airplane {
 
 		return;
 	}
+
+
+
+
 
 
 
@@ -499,33 +506,73 @@ namespace airplane {
 
 
 
+
 	// Test this
 		// Might need to implement AoA < 15 deg or smt checks
 	double Airplane::calcBestClimbTime(double startHeight, double startVelocity, double endHeight) {
+		// Implementing an accelerate/declerate in a straight line then climb at maxExcessPower
 		double totalTime = 0;
 		double height = startHeight;
 		double velocity = startVelocity;
-		double velError = 5;						// Can Change if too inefficient
-		double timeStep = 1;                      // Can Change if too inefficient
+		double VELOCITY_ERROR = .5;						// Can Change if too inefficient
+		double TIME_STEP = .1;                      // Can Change if too inefficient
+
+
+		while (height <= endHeight) {
+			calcAndSetPowerCurveData(height);
+			calcAndSetMaxExcessPower();
+
+			if (fabs(velocity - velocityMaxExcessPower) > VELOCITY_ERROR) {
+				totalTime += calcSteadyLevelAccelerationTime(velocity, velocityMaxExcessPower, height);
+				velocity = velocityMaxExcessPower;
+			} else {
+				height += (maxExcessPower / totalWeight) * TIME_STEP;
+				totalTime += TIME_STEP;
+			}
+		}
+		return totalTime;
+	}
+
+
+
+
+
+
+
+
+
+
+
+	// Only evalutes Power Curves when height changes by 500
+	double Airplane::calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight) {
+		// Implementing an accelerate/declerate in a straight line then climb at maxExcessPower
+		double totalTime = 0;
+		double height = startHeight;
+		double velocity = startVelocity;
+		double VELOCITY_ERROR = .5;						// Can Change if too inefficient
+		double TIME_STEP = .1;                      // Can Change if too inefficient
+
+
 		double oldHeight = startHeight;
-		// Implementing an accelerate/declerate in a straight line then climb at best gamma approach
+		double HEIGHT_STEP = 500;
 		calcAndSetPowerCurveData(height);
 		calcAndSetMaxExcessPower();
+	
 
 		while (height <= endHeight) {
 
-			if (height - oldHeight >= 1000) {
+			if (height - oldHeight >= HEIGHT_STEP) {
 				calcAndSetPowerCurveData(height);	// Small angle approx, gets me my power curve
 				calcAndSetMaxExcessPower();			// Gets me my max Excess Power and what velocity it is at
 				oldHeight = height;
 			}
 
-			if (fabs(velocity - velocityMaxExcessPower) > velError) {
+			if (fabs(velocity - velocityMaxExcessPower) > VELOCITY_ERROR) {
 				totalTime += calcSteadyLevelAccelerationTime(velocity, velocityMaxExcessPower, height);
 				velocity = velocityMaxExcessPower;
 			} else {
-				height += (maxExcessPower / totalWeight) * timeStep;
-				totalTime += timeStep;
+				height += (maxExcessPower / totalWeight) * TIME_STEP;
+				totalTime += TIME_STEP;
 			}
 		}
 		return totalTime;
@@ -557,11 +604,11 @@ namespace airplane {
 		double density = Cond.getDensity();
 		double Mach, thrust, AoA, drag, maxAcceleration, engineFactor;
 
-		double timeStep = 0.1;        // Can Change if too inefficient
-		double velError = 0.1;		  // Can Change if too inefficient
+		double TIME_STEP = 0.05;        // Can Change if too inefficient
+		double VELOCITY_ERROR = .5;		  // Can Change if too inefficient
 		double velDifference = finalVelocity - startVelocity;
 
-		while (fabs(velDifference) > velError) {
+		while (fabs(velDifference) > VELOCITY_ERROR) {
 			Mach = calcMach(velocity, temp);
 			AoA = calcSteadyLevelAoA(velocity, density);
 			drag = calcDrag(AoA, velocity, Mach, kineVisc, density);
@@ -577,8 +624,8 @@ namespace airplane {
 
 			thrust = numEngines * engine->getThrust(height, velocity) * engineFactor;
 			maxAcceleration = ((thrust - drag) * GRAVITY) / totalWeight;                // Don't forget gravity... bc imperial!
-			velocity = (maxAcceleration * timeStep) + velocity;
-			totalTime = totalTime + timeStep;
+			velocity = (maxAcceleration * TIME_STEP) + velocity;
+			totalTime = totalTime + TIME_STEP;
 			velDifference = finalVelocity - velocity;
 
 			assert(fabs(AoA) < (20 * 3.1415) / 180);                                    // Just a precaution to make sure AoA never goes above 20 deg (optimisitic)

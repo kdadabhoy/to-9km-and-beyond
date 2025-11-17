@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <iomanip>
 #include "to-9km-and-beyond/Airplane.h"
 #include "to-9km-and-beyond/AtmosphereProperties.h"
 #include "to-9km-and-beyond/Wing.h"
@@ -111,15 +112,14 @@ int main() {
 	*/
 
 	double startHeight = 0;
-	double endHeight = 29527.6; // 9km
+	double endHeight = 29527.6; // 9km in ft
 	double startVelocity = 200;
 	AtmosphereProperties Cond(startHeight);
 	double temp = Cond.getTemperature();
-	double breakingHeight = 19256.8;
-	//cout << Airplane.calcBestClimbTime(startHeight, startVelocity, endHeight) / 60.0 << " mins" << endl;
 
-
+	cout << fixed << setprecision(5);
 	cout << Airplane.calcBestClimbTime(startHeight, startVelocity, endHeight) / 60.0 << " mins" << endl;
+	cout << Airplane.calcBestClimbTimeApprox(startHeight, startVelocity, endHeight) / 60.0 << " mins" << endl;
 
 
 	return 0;

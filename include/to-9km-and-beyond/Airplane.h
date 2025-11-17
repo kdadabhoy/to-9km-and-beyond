@@ -40,7 +40,9 @@ namespace airplane {
 
 
 	// Climb Functions
-		double calcBestClimbTime(double startHeight, double startVelocity, double endHeight);  // Most important function might need to add start AoA and gamma
+		double calcBestClimbTime(double startHeight, double startVelocity, double endHeight);  
+		double calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight);  // doesnt do power curve at every height... just some
+
 		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;       // Gamma in degrees, Returns AoA in rad
 		double calcSteadyClimbAoAApprox(double velocity, double density) const;				   // Small angle approx, so cos(gamma) = 1
 		
