@@ -35,8 +35,14 @@ namespace airplane {
 
 
 	// Takeoff Functions
-		double calcTakeoffTime(double height, double endHeight);                             // Time to get off runway and climb to endHeight
-																							 // (at max excess power when you takeoff... no optimizing, constant gamma) 
+		double calcTakeoffTime(double height, double endHeight);                                           // Time to get off runway and climb to endHeight
+
+																							                // (at max excess power when you takeoff... no optimizing, constant gamma) 
+		void calcTakeoffPropertites(double height, double& endHeight, double& totalTime, double& velocity); // Modifies the passed by reference totalTime and velocity to what it is after																									  // takeoff
+		// Make private helper function at some poinnt
+		void calcEndRunwayAirplaneProperties(double height, double& totalTime, double& velocity) const;   // Modifies the passed by reference totalTime and velocity to what it is 																									        // When the airplane leaves the runway 
+																										  // Should always pass in velocity = 0 (start from rest)
+																										  // Should always pass in totalTime = 0 (time starts at 0)
 
 
 	// Climb Functions
@@ -54,8 +60,9 @@ namespace airplane {
 
 	// Accessors:
 		double getWeight() const;
-		double getMaxExcessPower() const;
+		double getMaxExcessPower() const;                                     // Assumes power curve is set 
 		double getVelocityMaxExcessPower() const;
+		//double getCurrentVelocity() const;                                    // Assumes power curve is set 
 		vector<double> getMaxExcessPowerVector() const;
 
 

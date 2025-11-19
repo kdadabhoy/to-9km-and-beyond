@@ -548,6 +548,7 @@ namespace airplane {
 
 
 
+
 	// *** Need to account for weight loss ***
 	// Only evalutes Power Curves when height changes by 500
 	double Airplane::calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight) {
@@ -616,6 +617,12 @@ namespace airplane {
 
 		return AoA_needed;
 	}
+
+
+
+
+
+
 
 
 
@@ -742,6 +749,85 @@ namespace airplane {
 	}
 
 
+
+
+
+
+
+
+
+
+
+	// A modified calcTakeOffTime (same logic)... but "returns" (modifies the passed by reference variables:
+	// endVelocity and totalTime and endHeight... which is often needed
+	// Note: a common FAA endheight is around 500 ft... the best endHeight for climb is 0 ft (with the way the program is written)
+		// Technically 0 ft shouldn't be the best... unless you were somehow able to get rid of your wheels...
+		// But with the assumption you are able to steady level accelerate at 0 ft... and ignoring ground effect... 0 ft is the best
+	void Airplane::calcTakeoffPropertites(double height, double& endHeight, double& totalTime, double& velocity) {
+		calcEndRunwayAirplaneProperties(height, totalTime, velocity);
+		AtmosphereProperties Cond(height);
+		double density = Cond.getDensity();
+		double TIME_STEP = 0.05;                 // Can Change if too inefficient
+		double AoA = 2 * pi / 180;				 // An Assumption, it is very close to 0... while on runway
+		
+
+		while (height < endHeight) {
+			calcAndSetPowerCurveData(height);
+			double excessPower = calcExcessPower(velocity);
+			height += (excessPower / totalWeight) * TIME_STEP; // small angle approx method
+			totalTime += TIME_STEP;
+			// Just a precaution to make sure AoA never goes above 15 deg (optimisitic)
+			AoA = calcSteadyClimbAoAApprox(velocity, density);
+			assert(fabs(AoA) < (15 * 3.1415) / 180);
+
+		}
+		endHeight = height;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+	void Airplane::calcEndRunwayAirplaneProperties(double height, double& totalTime, double& velocity) const {
+
+		//double CL_Stall = mainWing->get...   // Need to code a function that gets this from my airfoil and converts that to 3D
+		double AoA_Stall = 15 * pi / 180;      // Just using a realistic, arbirtary AoA rn
+		double CL_Stall = calcLiftCoeff(AoA_Stall);
+
+		AtmosphereProperties Cond(height);
+		double density = Cond.getDensity();
+		double temp = Cond.getTemperature();
+		double kineVisc = Cond.getKinematicVisc();
+
+		double V2 = 1.2 * sqrt((2 * totalWeight) / (density * CL_Stall * mainWing->getArea()));
+
+		double Mach, thrust, AoA, drag, lift, rollingFriction, maxAcceleration;
+		double ROLLING_FRIC_COEFF = .02; // A realistic approx
+		double TIME_STEP = 0.05;        // Can Change if too inefficient
+
+		while (velocity < V2) {
+			Mach = calcMach(velocity, temp);
+			AoA = 2 * pi / 180;				 // An Assumption, it is very close to 0... while on runway
+			drag = calcDrag(AoA, velocity, Mach, kineVisc, density);
+			lift = calcLift(AoA, velocity, density);
+			rollingFriction = ROLLING_FRIC_COEFF * (totalWeight - lift);
+
+			thrust = numEngines * engine->getThrust(height, velocity);
+			maxAcceleration = ((thrust - drag - rollingFriction) * GRAVITY) / totalWeight;                // Don't forget gravity... bc imperial!
+			velocity = (maxAcceleration * TIME_STEP) + velocity;
+			totalTime = totalTime + TIME_STEP;
+		}
+
+		assert(velocity > V2); // Precaution to make sure we accelerated enough
+	}
 
 
 

@@ -16,6 +16,7 @@ using namespace atmosphere_properties;
 using namespace airplane;
 using namespace kaden_math;
 
+double calcTimeTo9km(Airplane& Airplane, double startHeight, double takeOffEndHeight);
 
 
 /*
@@ -79,20 +80,10 @@ int main() {
 
 	double startHeight = 0;
 	double takeOffEndHeight = 500;
-	double postTakeoffHeight = startHeight + takeOffEndHeight; // Takeoff function gets us to 500 ft more than start height
-	double endHeight = 29527.6; // 9km in ft
-	double startVelocity = 200;
-	AtmosphereProperties Cond(startHeight);
-	double temp = Cond.getTemperature();
 
 	cout << fixed << setprecision(5);
-	cout << (Airplane.calcTakeoffTime(startHeight, takeOffEndHeight) + Airplane.calcBestClimbTime(startHeight, startVelocity, endHeight)) / 60 << " mins" << endl;
-	//cout << Airplane.calcBestClimbTime(startHeight, startVelocity, endHeight) / 60.0 << " mins" << endl;
-	//cout << Airplane.calcBestClimbTimeApprox(postTakeoffHeight, startVelocity, endHeight) / 60.0 << " mins" << endl;
-	
-	// Airplane.getPowerCurveCSV(500, "Drag.csv");
-
-	//cout << 2*CF34_3B1.getThrust(0, 144) / Airplane.getWeight() << endl;
+	cout << calcTimeTo9km(Airplane, startHeight, 0) << " mins" << endl;
+	cout << calcTimeTo9km(Airplane, startHeight, takeOffEndHeight) << " mins" << endl;
 
 
 	return 0;
@@ -102,6 +93,19 @@ int main() {
 
 
 
+
+
+// Calcs the time to 9km (accurately) from h=0 to h = 9km + startHeight (accounts for possibility of not starting at sea level)
+double calcTimeTo9km(Airplane& Airplane, double startHeight, double takeOffEndHeight) {
+	double endHeight = 29527.6 + startHeight; // 9km in ft
+	double totalTime = 0;
+	double velocity = 0;
+
+	Airplane.calcTakeoffPropertites(startHeight, takeOffEndHeight, totalTime, velocity);
+	totalTime += Airplane.calcBestClimbTime(takeOffEndHeight, velocity, endHeight);
+
+	return totalTime / 60;
+}
 
 
 
