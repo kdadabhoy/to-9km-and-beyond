@@ -47,6 +47,9 @@ namespace airplane {
 
 
 
+
+
+
 	// don't do const Class& object, because I might want to modify the object in this class...
 	// If I decide none of the objects get modified in this class, then add const here and the pointer won't
 	// allow modificaiton to the passed object
@@ -72,6 +75,12 @@ namespace airplane {
 		}
 
 	}
+
+
+
+
+
+
 
 
 
@@ -111,6 +120,17 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 	// Can make this safer by mimicing totalWeight function's if statements
 	void Airplane::calcAndSetLiftCoeff() {
 		double alphaTerm = 0;
@@ -129,6 +149,15 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
+
+
 // Drag Functions
 	double Airplane::calcDragCoeff(double AoA, double velocity, double Mach, double kinematicViscosity) const {
 		double totalDrag = 0;
@@ -140,6 +169,13 @@ namespace airplane {
 
 		return totalDrag;
 	}
+
+
+
+
+
+
+
 
 
 
@@ -163,12 +199,22 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
+
 // Lift Functions:
 	double Airplane::calcLiftCoeff(double AoA) const {
 		return CL.calcLiftCoefficient(AoA);
 	}
 
-	
+
+
+
 
 
 
@@ -186,14 +232,17 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
 // Useful Functions:
 
 	double Airplane::calcMach(double velocity, double temp) const {
 		return velocity / sqrt(1.4 * GAS_CONSTANT * temp);
 	}
-
-
-
 
 
 
@@ -225,6 +274,18 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 	// Small Angle assumption (L = W*cos(0) = W)
 	double Airplane::calcSteadyClimbAoAApprox(double velocity, double density) const {
 		assert(velocity > 0.00 && density > 0.00 && CL.getCL_Alpha() > 0.00);
@@ -238,6 +299,10 @@ namespace airplane {
 
 		return AoA_needed;
 	}
+
+
+
+
 
 
 
@@ -269,6 +334,13 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
 	vector<double> Airplane::calcPowerCurveVelocityData(double height) const {
 		vector<double> data;
 		AtmosphereProperties Cond(height);
@@ -282,6 +354,12 @@ namespace airplane {
 		}
 		return data;
 	}
+
+
+
+
+
+
 
 
 
@@ -312,6 +390,12 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
 	void Airplane::calcAndSetMaxExcessPower() {
 		vector<double> result = maxDistBetweenCurves2(powerCurveVelocityData, powerAvailableData, powerRequiredData);
 		if (result.empty()) {
@@ -324,6 +408,12 @@ namespace airplane {
 
 		return;
 	}
+
+
+
+
+
+
 
 
 
@@ -359,6 +449,7 @@ namespace airplane {
 
 
 
+
 // 100% Accurate (gamma accounted for):
 
 	void Airplane::calcAndSetPowerCurveData(double gamma, double height) {
@@ -372,6 +463,14 @@ namespace airplane {
 
 		return;
 	}
+
+
+
+
+
+
+
+
 
 
 
@@ -404,6 +503,8 @@ namespace airplane {
 
 
 
+
+
 	// Slightly inefficent bc the calling functions create their own AtmosProp Object
 	void Airplane::getPowerCurveCSV(double gamma, double height, string fileName) const {
 		vector<double> xdata = calcPowerCurveVelocityData(height);
@@ -412,6 +513,8 @@ namespace airplane {
 		saveVectorsToCSV(xdata, y1data, y2data, fileName);
 		return;
 	}
+
+
 
 
 
@@ -443,6 +546,10 @@ namespace airplane {
 
 
 
+
+
+
+
 	vector<double> Airplane::calcPowerRequiredData(double height) const {
 		AtmosphereProperties Cond(height);
 		vector<double> data;
@@ -459,6 +566,11 @@ namespace airplane {
 		}
 		return data;
 	}
+
+
+
+
+
 
 
 
@@ -485,32 +597,7 @@ namespace airplane {
 
 
 
-
-
-
-
-
-
-
-
-
 // Climb Functions
-// 
-		// (ROC)_max = (Excess Power)_max / Weight
-			// Excess Power = Power Avaiable - Power Required
-				// Power Required = Total Drag * velocity
-
-		// Time to Climb = integral from h1 to h2 (dh / RoC)
-			// ROC * change in time = dh
-		// RoC = (P_avail - P_req) / weight
-		// dh = (RoC)dt
-
-
-
-
-
-
-	// Test this
 
 	// *** Need to account for weight loss ***
 	// Uses small angle approx for gamma
@@ -605,12 +692,6 @@ namespace airplane {
 
 
 
-
-
-
-
-
-
 // Steady Level Flight (L=W) Functions
 
 	double Airplane::calcSteadyLevelAoA(double velocity, double density) const {
@@ -637,6 +718,7 @@ namespace airplane {
 
 
 	// *** Need to account for weight loss ***
+
 	// Constant height Max Horizontal Acceleration
 		// In a straight line F = ma, a = F/m
 		// Max Acceleration = (ThrustAvail - Drag) / weight
@@ -694,20 +776,8 @@ namespace airplane {
 // Takeoff Functions
 
 	// *** Need to account for weight loss ***
-
-	// This function assumes we start climbing at V2 = 1.2V_stall = 1.2 * sqrt((2*W) / (rho*CL_max*S))
-	// And we climb until we reach 500 ft.. which is on the low end of FAA regs
-		// I have doubts that this is the best way to takeoff for a time-to-climb... 
-		// but for realism and the purpose of integrating lec content into this program
-		// we will take this approach
-
-	// V2 = 1.2V_stall = 1.2 * sqrt((2*W) / (rho*CL_max*S))
-	// Rolling Resistance = mu(W-(q*S*C_L))
-		// mu ~= .02
-	// a  = F/m
-		// Force = Thrust - Drag - Rolling Resistance
-		// F = T - qSC_D - mu(W-(q*S*C_L))
-		// m = W/g
+	
+	// See physics derivation in notes
 	double Airplane::calcTakeoffTime(double height, double endHeight) {
 		double totalTime = 0;
 		double velocity = 0;  // Start from rest 
@@ -735,7 +805,7 @@ namespace airplane {
 			rollingFriction = ROLLING_FRIC_COEFF * (totalWeight - lift);
 
 			thrust = numEngines * engine->getThrust(height, velocity);
-			maxAcceleration = ((thrust - drag - rollingFriction) * GRAVITY) / totalWeight;                // Don't forget gravity... bc imperial!
+			maxAcceleration = ((thrust - drag - rollingFriction) * GRAVITY) / totalWeight;  // Don't forget gravity... bc imperial!
 			velocity = (maxAcceleration * TIME_STEP) + velocity;
 			totalTime = totalTime + TIME_STEP;
 		}
@@ -765,7 +835,8 @@ namespace airplane {
 
 
 
-
+	// *** Need to account for weight loss ***
+	
 	// A modified calcTakeOffTime (same logic)... but "returns" (modifies the passed by reference variables:
 	// endVelocity and totalTime and endHeight... which is often needed
 	// Note: a common FAA endheight is around 500 ft... the best endHeight for climb is 0 ft (with the way the program is written)
@@ -801,9 +872,9 @@ namespace airplane {
 
 
 
+	// *** Need to account for weight loss ***
 
-
-
+	// Incomplete
 	void Airplane::calcEndRunwayAirplaneProperties(double height, double& totalTime, double& velocity) const {
 
 		//double CL_Stall = mainWing->get...   // Need to code a function that gets this from my airfoil and converts that to 3D
@@ -829,7 +900,7 @@ namespace airplane {
 			rollingFriction = ROLLING_FRIC_COEFF * (totalWeight - lift);
 
 			thrust = numEngines * engine->getThrust(height, velocity);
-			maxAcceleration = ((thrust - drag - rollingFriction) * GRAVITY) / totalWeight;                // Don't forget gravity... bc imperial!
+			maxAcceleration = ((thrust - drag - rollingFriction) * GRAVITY) / totalWeight;   // Don't forget gravity... bc imperial!
 			velocity = (maxAcceleration * TIME_STEP) + velocity;
 			totalTime = totalTime + TIME_STEP;
 		}
@@ -847,49 +918,35 @@ namespace airplane {
 
 
 
-// Wing Weight Approx (Raynmond w/ FAR 25 Cert for n and a 1.5 safety factor)
-	/*
-		Equation:
-		weight = RAYMOND_CST * pow(totalWeight * n_ult, 0.557) * pow(wingArea, 0.649) 
-			* sqrt(aspectRatio) * pow(thicknessRatio, -0.4) * pow(1 + taperRatio, 0.1) 
-			* (1 / cos(sweepAngle)) * pow(controlArea, 0.1);
 	
-		weight = K * pow(totalWeight * n_ult, 0.557)
-
-		totalWeight = wingWeight + everything else
-		So need to solve iteratively
-
-	*/
-	// But totalWeight depends on Wing weight... so we need to solve iteratively
+	// Wing Weight Approx (Raynmond w/ FAR 25 Cert for n and a 1.5 safety factor)
+	// weight = K * pow(totalWeight * n_ult, 0.557)
 	void Airplane::calcAndSetMainWingWeight() {
-		double wingArea = mainWing->getArea() * (1 - PERCENT_CONTROL_SURFACE_AREA); // Area - control surface area
+		double wingArea = mainWing->getArea() * (1 - PERCENT_CONTROL_SURFACE_AREA); // wingArea = totalArea - control surface area
 		double aspectRatio = mainWing->getAspectRatio();
 		double taperRatio = mainWing->getTaperRatio();
 		double controlArea = mainWing->getArea() * PERCENT_CONTROL_SURFACE_AREA;
 		double sweepAngle = mainWing->getSweepAngleRad();
 		Airfoil* mainAirfoil = mainWing->getAirfoil();
-		double thicknessRatio = mainAirfoil->getThicknessRatio();       // t/c
+		double thicknessRatio = mainAirfoil->getThicknessRatio();  // t/c
 		double weightEverythingExceptWing = totalWeight;
 
 		double K = RAYMOND_CST * pow(wingArea, 0.649)* sqrt(aspectRatio) * pow(thicknessRatio, -0.4) 
 			* pow(1 + taperRatio, 0.1) * (1 / cos(sweepAngle)) * pow(controlArea, 0.1);
 
 
-
 		int MAX_ITERATIONS = 500;             // Change as needed
-		double TOLERANCE = 0.1;              // Change as needed
+		double TOLERANCE = 0.1;               // Change as needed
 
 		double N_ult = MIN_LIMIT_LOAD_FACTOR * LOAD_SAFETY_FACTOR;
 		double prev_N_ult = 0;
 
-		double wingWeight = weightEverythingExceptWing * .10;      // 10% of everything else is a good starting point
+		double wingWeight = weightEverythingExceptWing * .10;   // 10% of everything else is a good starting point for iteration
 		double totalWeightGuess;
 		int outer_iter = 0;
 
-
 		double prevWingWeight = 0;
 		int inner_iter = 0;
-
 
 		while (outer_iter < MAX_ITERATIONS && fabs(N_ult - prev_N_ult) >= TOLERANCE) {
 			prev_N_ult = N_ult;
@@ -906,8 +963,6 @@ namespace airplane {
 
 			N_ult = (2.1 + (24000 / (wingWeight + weightEverythingExceptWing))) * LOAD_SAFETY_FACTOR;
 
-			 //cout << "Nnew " << N_ult << " N_old " << prev_N_ult << endl; // debugging
-
 			if (N_ult < MIN_LIMIT_LOAD_FACTOR * LOAD_SAFETY_FACTOR){
 				N_ult = MIN_LIMIT_LOAD_FACTOR;
 			} else if(N_ult > MAX_LIMIT_LOAD_FACTOR * LOAD_SAFETY_FACTOR) {
@@ -918,11 +973,6 @@ namespace airplane {
 		}
 	
 		mainWing->setWeight(wingWeight*SMUDGE_FACTOR);
-		/* // debugging
-			cout << "Wing weight = " << mainWing->getWeight() << " = " << wingWeight * SMUDGE_FACTOR << endl; // debugging
-			cout << "N " << N_ult << " Should be between " << MIN_LIMIT_LOAD_FACTOR * LOAD_SAFETY_FACTOR << " and " 
-			<< MAX_LIMIT_LOAD_FACTOR * LOAD_SAFETY_FACTOR << endl; // debugging
-		*/
 		return;
 	}
 
@@ -941,77 +991,38 @@ namespace airplane {
 		return totalWeight;
 	}
 
+
+
+
+
+
+
+
 	double Airplane::getMaxExcessPower() const {
 		return maxExcessPower;
 	}
+
+
+
+
+
+
+
 
 	double Airplane::getVelocityMaxExcessPower() const {
 		return velocityMaxExcessPower;
 	}
 
+
+
+
+
+
+
+
 	vector<double> Airplane::getMaxExcessPowerVector() const {
 		return { velocityMaxExcessPower, maxExcessPower };
 	}
-
-
-
-
-
-
-
-
-// Best Gamma for ROC(max)
-	/*
-		RoC = (P_avail - P_req) / W 
-		RoC = P_excess / W
-
-		P = Force * velocity
-		P_excess = W*v_vertical           (using all power to climb)
-		RoC = v_vertical = V*sin(gamma)
-		so:
-			P_excess = W*V*sin(gamma)
-		so:
-			sin(gamma) = (P_avail - P_req) / W*V
-		so:
-			RoC = Vsin(gamma) = (P_excess) / W
-		so:
-			Max RoC when maximize P_excess
-
-			P_excess depends on gamma bc P+req depends on gamma bc Alpha Steady level depends on gamma
-	
-
-		P_req is a function of V, h, gamma
-
-		v_vertical = V*sin(gamma)
-	
-	*/
-
-	/*
-		Psuedocode for this:
-
-		gamma = 0;
-		gamma_max = 20;
-		
-		while(gamma_max - gamma > 0){
-		P_mid = P_max((gamma + gamma_max) / 2)     // Need to write a function that just returns the max Excess power for a given gamma at a given height
-		P_left = P_max(gamma)
-		P_right = P_max(gamm_max)
-
-		if (P_left > P_mind){
-			gamma_max = gamma_mid;
-		} else if (P_right > P_mid){
-			gamma = gamma_mid
-		} else{
-			return gamma_mid
-		}
-
-		
-	
-	*/
-
-
-
-
 
 
 
@@ -1036,13 +1047,73 @@ namespace airplane {
 
 
 
+/*
+	Notes:
+		
+	// Climb Functions
+
+		(ROC)_max = (Excess Power)_max / Weight
+		Excess Power = Power Avaiable - Power Required
+		Power Required = Total Drag * velocity
+
+		Time to Climb = integral from h1 to h2 (dh / RoC)
+		ROC * change in time = dh
+		RoC = (P_avail - P_req) / weight
+		dh = (RoC)dt
+
+
+
+
+
+
+
+	// Wing Weight Approx (Raynmond w/ FAR 25 Cert for n and a 1.5 safety factor)
+
+		Equation:
+		weight = RAYMOND_CST * pow(totalWeight * n_ult, 0.557) * pow(wingArea, 0.649) 
+			* sqrt(aspectRatio) * pow(thicknessRatio, -0.4) * pow(1 + taperRatio, 0.1) 
+			* (1 / cos(sweepAngle)) * pow(controlArea, 0.1);
+	
+		weight = K * pow(totalWeight * n_ult, 0.557)
+
+		totalWeight = wingWeight + everything else
+		So need to solve iteratively 
+
+
+
+
+	// calcTakeoffTime():
+		This function assumes we start climbing at V2 = 1.2V_stall = 1.2 * sqrt((2*W) / (rho*CL_max*S))
+		And we climb until we reach 500 ft.. which is on the low end of FAA regs
+			I have doubts that this is the best way to takeoff for a time-to-climb... 
+			but for realism and the purpose of integrating lec content into this program
+			we will take this approach
+
+		V2 = 1.2V_stall = 1.2 * sqrt((2*W) / (rho*CL_max*S))
+		Rolling Resistance = mu*(W-(q*S*C_L))
+			 mu ~= .02
+		 a  = F/m
+			Force = Thrust - Drag - Rolling Resistance
+			F = T - qSC_D - mu*(W-(q*S*C_L))
+		    m = W/g
+
+
+	// 
+
+*/
+
+
+
+
+
+
+
+
 
 
 
 
 // Old Implementations:
-
-
 
 
 	/*
@@ -1057,6 +1128,8 @@ namespace airplane {
 			return totalLift;
 	}
 	*/
+
+
 
 
 
@@ -1079,3 +1152,58 @@ namespace airplane {
 	
 	
 	*/
+
+
+
+
+
+
+
+	// Best Gamma for ROC(max)
+		/*
+			RoC = (P_avail - P_req) / W
+			RoC = P_excess / W
+
+			P = Force * velocity
+			P_excess = W*v_vertical           (using all power to climb)
+			RoC = v_vertical = V*sin(gamma)
+			so:
+				P_excess = W*V*sin(gamma)
+			so:
+				sin(gamma) = (P_avail - P_req) / W*V
+			so:
+				RoC = Vsin(gamma) = (P_excess) / W
+			so:
+				Max RoC when maximize P_excess
+
+				P_excess depends on gamma bc P+req depends on gamma bc Alpha Steady level depends on gamma
+
+
+			P_req is a function of V, h, gamma
+
+			v_vertical = V*sin(gamma)
+
+		*/
+
+		/*
+			Psuedocode for this:
+
+			gamma = 0;
+			gamma_max = 20;
+
+			while(gamma_max - gamma > 0){
+			P_mid = P_max((gamma + gamma_max) / 2)     // Need to write a function that just returns the max Excess power for a given gamma at a given height
+			P_left = P_max(gamma)
+			P_right = P_max(gamm_max)
+
+			if (P_left > P_mind){
+				gamma_max = gamma_mid;
+			} else if (P_right > P_mid){
+				gamma = gamma_mid
+			} else{
+				return gamma_mid
+			}
+
+
+
+		*/

@@ -5,7 +5,6 @@
 using namespace std;
 
 namespace airplane {
-
 	Fuselage::Fuselage() {
 		weight = 0;
 		length = 0;
