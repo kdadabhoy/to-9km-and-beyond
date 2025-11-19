@@ -38,12 +38,8 @@ double calcTimeTo9km(Airplane& Airplane, double startHeight, double takeOffEndHe
 
 // Useful main
 int main() {
+	// Aifoil :)
 	Airfoil NACA2412("2412", -.0349);
-
-	// Other Variables
-	double currentHeight = 0;
-	double time = 0;
-
 
 	// Givens:
 	Wing VT(NACA2412, 99.68, 86.68, 86.68, 40, 0);										// Set in Stone.. Altho not really needed bc ignoring contributions
@@ -61,38 +57,60 @@ int main() {
 	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
-	double mainSpan = 1000;
+	double mainSpan = 1176;
 	double mainRootChord = 186.7;
 	double mainTipChord = 74.7;
-	double mainSweepAngle = 25;
+	double mainSweepAngle = 20;
 	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);      // mainWing weight will be calculated by airplane
 
 	// Airplane we have with everything
-	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
+	Airplane airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 
 	double startHeight = 0;
 	double takeOffEndHeight = 500;
-	int ITERATIONS = 20;
 
 
 
 
-	for (int i = 0; i < ITERATIONS; i += 100) {
-		mainSpan += i;
-		cout << fixed << setprecision(5);
-		cout << "Area: " << mainWing.getArea() << endl;
-		cout << "AR: " << mainWing.getAspectRatio() << endl;
-		cout << "e: " << mainWing.getEllipticalEffic() << endl;
-		cout << "Sweep: " << mainSweepAngle << endl;
-		cout << "MAC: " << mainWing.getMAC() << endl;
-		cout << "Taper Ratio: " << mainWing.getTaperRatio() << endl;
-		cout << "Wing Weight: " << mainWing.getWeight() << endl;
-		cout << "Total Weight lbm: " << Airplane.getWeight() << endl;
-		cout << "Total Weight in kg: " << Airplane.getWeight() / 2.20462 << endl;
-		cout << calcTimeTo9km(Airplane, startHeight, takeOffEndHeight) << " mins" << endl;
-		cout << endl << endl << endl;
-	}
 
+// Optimizer Stuff
+	/*
+		Approach:
+		0) Fix Airfoil
+		1) Fix ct and cr to reasonable values and optimize span
+		2) Fix span at the top 3 best values and optimize ct and cr (use a nester loop for this)
+		3) Fix all the previous variables and optimize sweep angle
+		4) Re-run from start with different airfoisl
+		
+		Notes:
+			- Need to make sure min and max weight are adhered to and airplanes not adhereing are scrapped
+			- Will have to re-run all of the results once I add:
+				- Full plot digitizations (more accuracy)
+				- Weight loss accounted for with engine and time
+
+		After:
+			- Would be nice to have data plotted
+				- gamma vs time
+				- height vs time
+				- excess power vs time
+				- max possible excess power - excess power vs time
+				- AoA vs time
+				- Other stuff :)
+	*/
+
+	cout << fixed << setprecision(5);
+	cout << "Area: " << mainWing.getArea() << endl;
+	cout << "AR: " << mainWing.getAspectRatio() << endl;
+	cout << "e: " << mainWing.getEllipticalEffic() << endl;
+	cout << "Sweep: " << mainSweepAngle << endl;
+	cout << "MAC: " << mainWing.getMAC() << endl;
+	cout << "Taper Ratio: " << mainWing.getTaperRatio() << endl;
+	cout << "Wing Weight: " << mainWing.getWeight() << endl;
+	cout << "Total Weight lbm: " << airplane.getWeight() << endl;
+	cout << "Total Weight in kg: " << airplane.getWeight() / 2.20462 << endl;
+	cout << calcTimeTo9km(airplane, startHeight, takeOffEndHeight) << " mins" << endl;
+	cout << endl << endl << endl;
+	
 
 	return 0;
 }
@@ -118,5 +136,52 @@ double calcTimeTo9km(Airplane& Airplane, double startHeight, double takeOffEndHe
 
 
 
+/*
+vector<Airplane*> spanOptimizer(Airplane& airplane) {
+	double SPAN_MIN = 12 * 12;      // just saying 144 inches rn (in reality higher)
+	double SPAN_MAX = 350 * 12;     // ~265 is the max.. but will let optimizer try up to 350
+	vector<Airplane*> spanOptimizedResults;
 
 
+	int NUM_STEPS = 100;
+	double step = (SPAN_MAX - SPAN_MIN) / NUM_STEPS;
+
+	for (int i = 0; i < NUM_STEPS; i += step) {
+
+	}
+
+	return spanOptimizedResults;
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+		cout << fixed << setprecision(5);
+		cout << "Area: " << mainWing.getArea() << endl;
+		cout << "AR: " << mainWing.getAspectRatio() << endl;
+		cout << "e: " << mainWing.getEllipticalEffic() << endl;
+		cout << "Sweep: " << mainSweepAngle << endl;
+		cout << "MAC: " << mainWing.getMAC() << endl;
+		cout << "Taper Ratio: " << mainWing.getTaperRatio() << endl;
+		cout << "Wing Weight: " << mainWing.getWeight() << endl;
+		cout << "Total Weight lbm: " << airplane.getWeight() << endl;
+		cout << "Total Weight in kg: " << airplane.getWeight() / 2.20462 << endl;
+		cout << calcTimeTo9km(airplane, startHeight, takeOffEndHeight) << " mins" << endl;
+		cout << endl << endl << endl;
+
+*/

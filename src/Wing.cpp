@@ -12,7 +12,7 @@ using namespace std;
 namespace airplane {
 
 
-	// Default Constructor
+// Default Constructor
 	Wing::Wing() {
 		airfoil = nullptr;
 		tipChord = 0;
@@ -32,52 +32,64 @@ namespace airplane {
 
 
 
-	// main wing (so it calcs weight for me)
-	Wing::Wing(Airfoil& inAirfoil, double inSpan, double inTipChord, double inRootChord, double inSweepAngle) {
-		tipChord = inTipChord / 12;
-		rootChord = inRootChord / 12;
-		sweepAngle = inSweepAngle * pi / 180;
-		span = inSpan / 12;
+
+
+
+
+
+
+// Typically used for main wing... because Airplane Class will take care of calculating it's weight
+	Wing::Wing(Airfoil& inAirfoil, double inSpanInch, double inTipChordInch, double inRootChordInch, double inSweepAngleDeg) {
+		tipChord = inTipChordInch / 12;
+		rootChord = inRootChordInch / 12;
+		sweepAngle = inSweepAngleDeg * pi / 180;
+		span = inSpanInch / 12;
 		airfoil = &inAirfoil;
+		taperRatio = inTipChordInch / inRootChordInch;
 
-		taperRatio = inTipChord / inRootChord;
+		// If this is the mainWing, the weight will be set when Airplane constructor is called
+		// This is becasue this weight is approxed using MTOW of the Airplane... no (valid) way to calc it here
+		weight = 0; 
 
-		area = calcArea(taperRatio);
-		MAC = calcMAC(taperRatio);
-		aspectRatio = calcAspectRatio(area);
-		ellipEfficiency = calcEllipEfficiency();
-		calcAndSetCL3D();
-		
-		weight = 0; // If this is the mainWing, the weight will be set when Airplane constructor is called
-					// This is becasue this weight is approxed using MTOW of the Airplane... no (valid) way to calc it here
+		calcAndSetAllProperties();
 	}
 
 
 
 
 
-	// If you want to specifically set weight... Airplane constructor won't touch it if it is set
-	Wing::Wing(Airfoil& inAirfoil, double inSpan, double inTipChord, double inRootChord, double inSweepAngle, double inWeight) {
-		tipChord = inTipChord / 12;
-		rootChord = inRootChord / 12;
-		sweepAngle = inSweepAngle * pi / 180;
-		span = inSpan / 12;
+
+
+
+
+
+
+
+
+// Typically used for HT and VT because you need to set their weights
+	Wing::Wing(Airfoil& inAirfoil, double inSpanInch, double inTipChordInch, double inRootChordInch, double inSweepAngleDeg, double inWeight) {
+		tipChord = inTipChordInch / 12;
+		rootChord = inRootChordInch / 12;
+		sweepAngle = inSweepAngleDeg * pi / 180;
+		span = inSpanInch / 12;
 		airfoil = &inAirfoil;
-
-		taperRatio = inTipChord / inRootChord;
-
-		area = calcArea(taperRatio);
-		MAC = calcMAC(taperRatio);
-		aspectRatio = calcAspectRatio(area);
-		ellipEfficiency = calcEllipEfficiency();
-		calcAndSetCL3D();
-
+		taperRatio = inTipChordInch / inRootChordInch;
 		weight = inWeight;
+
+		calcAndSetAllProperties();
 	}
 
 
 
-	//Copy Constructor
+
+
+
+
+
+
+
+
+//Copy Constructor
 	Wing::Wing(const Wing& other) {
 		tipChord = other.tipChord;
 		rootChord = other.rootChord;
@@ -89,7 +101,6 @@ namespace airplane {
 		aspectRatio = other.aspectRatio;
 		weight = other.weight;
 		ellipEfficiency = other.ellipEfficiency;
-
 		airfoil = other.airfoil;					// This could run into pointer errors... and prob needs dynamic memory allocation...
 													// But won't really be using a copy constructor so... :)
 	}
@@ -100,24 +111,45 @@ namespace airplane {
 
 
 
-	double Wing::calcArea(double inTaperRatio) const {
-		return (0.5 * rootChord * span * (inTaperRatio + 1));
+
+
+
+
+
+// CalcAndSet functions:
+
+	// The order these functions are called is very important!
+	void Wing::calcAndSetAllProperties() {
+		calcAndSetArea();					// Needs span, rootChord, and taperRatio to be defined
+		calcAndSetMAC();					// Needs rootChord and taperRatio to be defined
+		calcAndSetAspectRatio();			// Needs span and area to be defined
+		calcAndSetEllipEfficiency();        // Needs sweepAngle, aspectRatio, and taperRatio to be defined
+		calcAndSetCL3D();                   // Needs sweepAngle, aspectRatio, and airfoil to be defined
+		return;
 	}
 
 
 
 
 
-	double Wing::calcMAC(double inTaperRatio) const {
-		return (2.0/3.0) * rootChord * ((1 + inTaperRatio + (inTaperRatio * inTaperRatio)) / (1 + inTaperRatio));
+
+
+
+	void Wing::calcAndSetArea() {
+		area = (0.5 * rootChord * span * (taperRatio + 1));
+		return;
 	}
 
 
 
 
 
-	double Wing::calcAspectRatio(double inArea) const {
-		return (span * span) / inArea;
+
+
+
+	void Wing::calcAndSetMAC() {
+		MAC = (2.0 / 3.0) * rootChord * ((1 + taperRatio + (taperRatio * taperRatio)) / (1 + taperRatio));
+		return;
 	}
 
 
@@ -127,10 +159,19 @@ namespace airplane {
 
 
 
+	void Wing::calcAndSetAspectRatio() {
+		aspectRatio = (span * span) / area;
+		return;
+	}
 
 
 
-	double Wing::calcEllipEfficiency() const {
+
+
+
+
+
+	void Wing::calcAndSetEllipEfficiency() {
 		double effic;
 		double leadingEdgeSweep = 0;
 		leadingEdgeSweep = atan(tan(sweepAngle) + ((.25 * (1 - taperRatio)) / (aspectRatio * (1 + taperRatio))));
@@ -139,16 +180,19 @@ namespace airplane {
 			// Emperical formula for unswept Wings
 			effic = (1.78 * (1 - (.045 * pow(aspectRatio, 0.68)))) - 0.65;
 			assert(effic <= 1 && effic >= .65);
-			return effic;
+			ellipEfficiency = effic;
+			return;
 		} else {
 			// Good assumption if none of the others apply
-			return effic = .8;
+			effic = .8;
+			ellipEfficiency = effic;
+			return;
 		}
 
 
 		/*
-			// This is the emperical equation for swept wings with LE sweep > 30 
-			// but it really only gives e below .7 (and sometimes much lower) 
+			// This is the emperical equation for swept wings with LE sweep > 30
+			// but it really only gives e below .7 (and sometimes much lower)
 			// which doesn't seem accurate
 
 		else if (leadingEdgeSweep > (29 * pi / 180) && leadingEdgeSweep < (46 * pi / 180) && aspectRatio > 5.9 && aspectRatio < 11.1) {
@@ -168,7 +212,12 @@ namespace airplane {
 
 
 
-	// CL 3D Calc
+
+
+
+
+
+// CL 3D Calc
 	void Wing::calcAndSetCL3D() {
 		double Cl2D_alphaTerm = airfoil->getCl_AlphaTerm();						// This is gunna be 2pi always
 		double Cl2D_alphaZeroLift = airfoil->getCl_alphaZeroLift();				// This differs by airfoil
@@ -180,9 +229,9 @@ namespace airplane {
 
 		assert(sweepAngle <= (89.0 * pi / 180));
 		double insideSqrtTerm = (pi * aspectRatio) / (Cl2D_alphaTerm * cos(sweepAngle));
-		a0 = (pi * aspectRatio) / (1 + sqrt(1 + (insideSqrtTerm*insideSqrtTerm)));        // Accounts for Sweep Angle
+		a0 = (pi * aspectRatio) / (1 + sqrt(1 + (insideSqrtTerm * insideSqrtTerm)));        // Accounts for Sweep Angle
 
-		knottTerm = Cl2D_alphaZeroLift * -1 * a0;								// CL = a0(alpha - zeroLiftalpha)
+		knottTerm = Cl2D_alphaZeroLift * -1 * a0;								            // CL = a0*(alpha - zeroLiftalpha)
 		alphaTerm = a0;
 
 		CL3D.setCL_Alpha(alphaTerm);
@@ -198,13 +247,77 @@ namespace airplane {
 
 
 
+// Calc Public Functions:
 
-	// Useful Calcs
+	double Wing::calcArea(double inSpan, double inRootChord, double inTaperRatio) const {
+		return (0.5 * inRootChord * inSpan * (inTaperRatio + 1));
+	}
+
+
+
+
+
+
+
+
+	double Wing::calcMAC(double inRootChord, double inTaperRatio) const {
+		return (2.0/3.0) * inRootChord * ((1 + inTaperRatio + (inTaperRatio * inTaperRatio)) / (1 + inTaperRatio));
+	}
+
+
+
+
+
+
+
+
+	double Wing::calcAspectRatio(double inSpan, double inArea) const {
+		return (inSpan * inSpan) / inArea;
+	}
+
+
+
+
+
+
+
+
+	double Wing::calcEllipEfficiency(double inSweepAngleRad, double inAspectRatio, double inTaperRatio) const {
+		double effic;
+		double leadingEdgeSweep = 0;
+		leadingEdgeSweep = atan(tan(inSweepAngleRad) + ((.25 * (1 - inTaperRatio)) / (inAspectRatio * (1 + inTaperRatio))));
+
+		if (leadingEdgeSweep < .001 && leadingEdgeSweep > -.001 && inAspectRatio > 3.9 && inAspectRatio < 10.1) {
+			// Emperical formula for unswept Wings
+			effic = (1.78 * (1 - (.045 * pow(inAspectRatio, 0.68)))) - 0.65;
+			assert(effic <= 1 && effic >= .65);
+			return effic;
+		} else {
+			// Good assumption if none of the others apply
+			return effic = .8;
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// Useful Calcs:
 
 	double Wing::calcReynolds(double velocity, double kinematicViscosity) const {
-
 		return ((velocity * MAC) / kinematicViscosity);
 	}
+
 
 
 
@@ -215,6 +328,7 @@ namespace airplane {
 	double Wing::calcWettedArea() const {
 		return 2 * area * 1.02;
 	}
+
 
 
 
@@ -234,10 +348,10 @@ namespace airplane {
 
 
 
-	double Wing::calcDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) {
+	double Wing::calcDragCoeff(double AoA_rad, double Reynolds, double Mach, double wetAreaRatio) const {
 		assert(Mach <= .99);
 		DragCoeff CD_Total(*this);
-		return CD_Total.calcTotalDragCoeff(AoA, Reynolds, Mach, wetAreaRatio);
+		return CD_Total.calcTotalDragCoeff(AoA_rad, Reynolds, Mach, wetAreaRatio);
 	}
 
 
@@ -247,8 +361,8 @@ namespace airplane {
 
 
 
-	double Wing::calcLiftCoeff(double AoA) const {
-		return CL3D.calcLiftCoefficient(AoA);
+	double Wing::calcLiftCoeff(double AoA_rad) const {
+		return CL3D.calcLiftCoefficient(AoA_rad);
 	}
 
 
@@ -258,11 +372,10 @@ namespace airplane {
 
 
 
-	double Wing::calcMcc(double AoA) const {
+	double Wing::calcMcc(double AoA_rad) const {
 		// Mcc = Mcc0 / (cos(sweep))^m
-		return calcMccZeroSweep(AoA) / pow(cos(sweepAngle), calcSweptMExponent(AoA));
+		return calcMccZeroSweep(AoA_rad) / pow(cos(sweepAngle), calcSweptMExponent(AoA_rad));
 	}
-
 
 
 
@@ -272,8 +385,8 @@ namespace airplane {
 
 
 	// Incomplete - Need to finish digitalization
-	double Wing::calcMccZeroSweep(double AoA) const {
-		double CL = fabs(CL3D.calcLiftCoefficient(AoA));	// NOT SURE IF THIS WORKS, NEEDED BC SOMETIMES HAVE NEGATIVE CL
+	double Wing::calcMccZeroSweep(double AoA_rad) const {
+		double CL = fabs(CL3D.calcLiftCoefficient(AoA_rad));	// NOT SURE IF THIS WORKS, NEEDED BC SOMETIMES HAVE NEGATIVE CL
 		double TR = airfoil->getThicknessRatio();           // thickness ratio, called TR for simplicity
 		double Mcc = 0;
 		double ferror = .01;                                // Error for comparisons of doubles
@@ -353,8 +466,9 @@ namespace airplane {
 
 
 
-	double Wing::calcSweptMExponent(double AoA) const {
-		double CL = fabs(CL3D.calcLiftCoefficient(AoA));       // AGAIN NOT SURE IF FABS WORKS FOR THIS CL PLOT... but worst case just say we assume symmetric airfoil
+
+	double Wing::calcSweptMExponent(double AoA_rad) const {
+		double CL = fabs(CL3D.calcLiftCoefficient(AoA_rad));       // AGAIN NOT SURE IF FABS WORKS FOR THIS CL PLOT... but worst case just say we assume symmetric airfoil
 
 		//cout << "CL3d = " << CL << endl; // delete
 
@@ -372,6 +486,13 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
 // Mutators:
 	void Wing::setWeight(double inWeight) {
 		weight = inWeight;
@@ -382,55 +503,152 @@ namespace airplane {
 
 
 
+
+
+
+
+	void Wing::setSpan(double inSpan) {
+		span = inSpan / 12;
+		// weight = 0;    // Airplane Class fixes weight if it's the main wing
+		calcAndSetAllProperties();
+		return;
+	}
+
+
+
+
+
+
 // Accessors:
 	double Wing::getArea() const {
 		return area;
 	}
 
+
+
+
+
+
+
+
 	double Wing::getMAC() const {
 		return MAC;
 	}
+
+
+
+
+
+
 
 	double Wing::getTaperRatio() const {
 		return taperRatio;
 	}
 
+
+
+
+
+
+
+
 	double Wing::getAspectRatio() const {
 		return aspectRatio;
 	}
+
+
+
+
+
+
+
 
 	double Wing::getWeight() const {
 		return weight;
 	}
 
 
+
+
+
+
+
+
 	double Wing::getEllipticalEffic() const {
 		return ellipEfficiency;
 	}
+
+
+
+
+
+
+
 
 	double Wing::getSweepAngle() const {
 		return sweepAngle * 180 / pi;
 	}
 
+
+
+
+
+
+
+
 	double Wing::getSweepAngleRad() const {
 		return sweepAngle;
 	}
+
+
+
+
+
+
+
 
 	double Wing::getLeadingEdgeSweep() const {
 		return atan(tan(sweepAngle) + ((.25 * (1 - taperRatio)) / (aspectRatio * (1 + taperRatio))));
 	}
 
 
+
+
+
+
+
+
 	double Wing::getCL_Alpha() const {
 		return CL3D.getCL_Alpha();
 	}
+
+
+
+
+
+
+
 
 	double Wing::getCL_Knott() const {
 		return CL3D.getCL_Knott();
 	}
 
+
+
+
+
+
+
+
 	Airfoil* Wing::getAirfoil() const {
 		return airfoil;
 	}
+
+
+
+
+
+
+
 
 }
