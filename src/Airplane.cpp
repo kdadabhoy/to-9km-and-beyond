@@ -63,7 +63,14 @@ namespace airplane {
 		assert(mainWing != nullptr);
 		referenceArea = mainWing->getArea();
 		calcAndSetLiftCoeff();
-		calcAndSetTotalWeight();
+		calcAndSetTotalWeight();				// Main Wing Weight depends on total weight before everything else
+												// So need to calc that first
+
+		if (fabs(mainWing->getWeight()) < .01) {
+			calcAndSetMainWingWeight();				// Now calc main wing weight using Raymond Approx
+			totalWeight += mainWing->getWeight();   // Add mainWingWeight to totalWeight
+		}
+
 	}
 
 
@@ -828,6 +835,100 @@ namespace airplane {
 
 		assert(velocity > V2); // Precaution to make sure we accelerated enough
 	}
+
+
+
+
+
+
+
+
+
+
+
+// Wing Weight Approx (Raynmond w/ FAR 25 Cert for n and a 1.5 safety factor)
+	/*
+		Equation:
+		weight = RAYMOND_CST * pow(totalWeight * n_ult, 0.557) * pow(wingArea, 0.649) 
+			* sqrt(aspectRatio) * pow(thicknessRatio, -0.4) * pow(1 + taperRatio, 0.1) 
+			* (1 / cos(sweepAngle)) * pow(controlArea, 0.1);
+	
+		weight = K * pow(totalWeight * n_ult, 0.557)
+
+		totalWeight = wingWeight + everything else
+		So need to solve iteratively
+
+	*/
+	// But totalWeight depends on Wing weight... so we need to solve iteratively
+	void Airplane::calcAndSetMainWingWeight() {
+		double wingArea = mainWing->getArea() * (1 - PERCENT_CONTROL_SURFACE_AREA); // Area - control surface area
+		double aspectRatio = mainWing->getAspectRatio();
+		double taperRatio = mainWing->getTaperRatio();
+		double controlArea = mainWing->getArea() * PERCENT_CONTROL_SURFACE_AREA;
+		double sweepAngle = mainWing->getSweepAngleRad();
+		Airfoil* mainAirfoil = mainWing->getAirfoil();
+		double thicknessRatio = mainAirfoil->getThicknessRatio();       // t/c
+		double weightEverythingExceptWing = totalWeight;
+
+		double K = RAYMOND_CST * pow(wingArea, 0.649)* sqrt(aspectRatio) * pow(thicknessRatio, -0.4) 
+			* pow(1 + taperRatio, 0.1) * (1 / cos(sweepAngle)) * pow(controlArea, 0.1);
+
+
+
+		int MAX_ITERATIONS = 500;             // Change as needed
+		double TOLERANCE = 0.1;              // Change as needed
+
+		double N_ult = MIN_LIMIT_LOAD_FACTOR * LOAD_SAFETY_FACTOR;
+		double prev_N_ult = 0;
+
+		double wingWeight = weightEverythingExceptWing * .10;      // 10% of everything else is a good starting point
+		double totalWeightGuess;
+		int outer_iter = 0;
+
+
+		double prevWingWeight = 0;
+		int inner_iter = 0;
+
+
+		while (outer_iter < MAX_ITERATIONS && fabs(N_ult - prev_N_ult) >= TOLERANCE) {
+			prev_N_ult = N_ult;
+
+			double prevWingWeight = 0;
+			int inner_iter = 0;
+
+			while (inner_iter < MAX_ITERATIONS && fabs(wingWeight - prevWingWeight) >= TOLERANCE) {
+				prevWingWeight = wingWeight;
+				totalWeightGuess = weightEverythingExceptWing + wingWeight;
+				wingWeight = K * pow(totalWeightGuess * N_ult, 0.557);
+				inner_iter++;
+			}
+
+			N_ult = (2.1 + (24000 / (wingWeight + weightEverythingExceptWing))) * LOAD_SAFETY_FACTOR;
+
+			 //cout << "Nnew " << N_ult << " N_old " << prev_N_ult << endl; // debugging
+
+			if (N_ult < MIN_LIMIT_LOAD_FACTOR * LOAD_SAFETY_FACTOR){
+				N_ult = MIN_LIMIT_LOAD_FACTOR;
+			} else if(N_ult > MAX_LIMIT_LOAD_FACTOR * LOAD_SAFETY_FACTOR) {
+				N_ult = MAX_LIMIT_LOAD_FACTOR;
+			}
+
+			outer_iter++;
+		}
+	
+		mainWing->setWeight(wingWeight*SMUDGE_FACTOR);
+		/* // debugging
+			cout << "Wing weight = " << mainWing->getWeight() << " = " << wingWeight * SMUDGE_FACTOR << endl; // debugging
+			cout << "N " << N_ult << " Should be between " << MIN_LIMIT_LOAD_FACTOR * LOAD_SAFETY_FACTOR << " and " 
+			<< MAX_LIMIT_LOAD_FACTOR * LOAD_SAFETY_FACTOR << endl; // debugging
+		*/
+		return;
+	}
+
+
+
+
+
 
 
 

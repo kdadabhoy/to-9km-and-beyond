@@ -26,6 +26,9 @@ namespace airplane {
 		double getCl_deg(double inAlphaDeg) const;
 		double getCl_rad(double inAlphaRad) const;
 
+
+
+
 		// Accesors
 		double getCl_AlphaTerm() const;				// Radians
 		double getCl_KnottTerm() const;             // No one really cares about this

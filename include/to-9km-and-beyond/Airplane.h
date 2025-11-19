@@ -12,7 +12,8 @@ using std::vector;
 
 // Assumes that plane is symmetric and has 2 engines (wings are symmetrical)
 // Assumes VT makes negligible lift and drag
-// Can re-write some functions to take in height instead so I can use AtmosphereProp Class behind the scences
+
+// Can rewrite takeoff property function with a strut 
 
 namespace airplane {
 	class Airplane {
@@ -56,6 +57,8 @@ namespace airplane {
 		double calcSteadyLevelAoA(double velocity, double density) const;
 		double calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height);
 
+	// Main Wing Weight Estimation (make private most likely)
+		void calcAndSetMainWingWeight();	// Raymond Cargo Method, with some assumptions
 
 
 	// Accessors:
@@ -92,6 +95,21 @@ namespace airplane {
 		vector<double> powerAvailableData;
 		double maxExcessPower = 0;
 		double velocityMaxExcessPower = 0;
+
+
+	// Wing Weight Constants (Assumptions)
+		// FAR 25 cert n = 2.1 + (24000 / MTOW), 2.5 <= n <= 3.8
+		static constexpr double RAYMOND_CST = .0051;			// Raymond constat in Cargo/Transport Weight Eq'n
+		static constexpr double MIN_LIMIT_LOAD_FACTOR = 2.5;    
+		static constexpr double MAX_LIMIT_LOAD_FACTOR = 3.8;	
+
+		static constexpr double LOAD_SAFETY_FACTOR = 1.5;    // Typical safety factor 
+		static constexpr double SMUDGE_FACTOR = 0.85;      // Our wing is an advanced composite... obviously! (Table 15.4 from Raymond book)
+		static constexpr double PERCENT_CONTROL_SURFACE_AREA = 0.10;      // % Control Surface Area of main Wing (Approx 10%)
+
+		static constexpr double MAX_MTOW = 35000 * 2.20462;          // lbms, Project specifications / Max limit for this competition
+		static constexpr double MIN_MTOW = 25000 * 2.20462;          // lbms, Project specifications / Min limit for this competition
+
 
 
 	// Constants

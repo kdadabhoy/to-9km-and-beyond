@@ -3,6 +3,7 @@
 #include "to-9km-and-beyond/Airfoil.h"
 #include "to-9km-and-beyond/LiftCoeff.h"
 // Prob should add assignment operator at some point
+// Can't calculate wing weight in this class because need MTOW
 
 namespace airplane {
 	class Wing {
@@ -26,6 +27,10 @@ namespace airplane {
 		double calcMcc(double AoA) const;                                                          // AoA in Radians
 
 
+
+		// Mutators
+		void setWeight(double inWeight);
+
 		// Accessors
 		double getArea() const;
 		double getMAC() const;
@@ -38,6 +43,7 @@ namespace airplane {
 		double getLeadingEdgeSweep() const;                             // Technically not an accessor.. but will treat it as one
 		double getCL_Alpha() const;										// This returns the 3D CL_Alpha for CL = CL_Alpha * alpha + CL_Knott
 		double getCL_Knott() const;										// This returns the 3D CL_Knott for CL = CL_Alpha * alpha + CL_Knott
+		Airfoil* getAirfoil() const;
 
 
 
@@ -79,10 +85,6 @@ namespace airplane {
 
 		double calcMccZeroSweep(double AoA) const;						// AoA in radians, 0 deg Sweep Crest Critical Mach
 		double calcSweptMExponent(double AoA) const;					// exponent "m" based on m vs CL graph
-
-
-		double calcWeight() const;                                      // Need to figure out how to approx this
-
 
 	};
 

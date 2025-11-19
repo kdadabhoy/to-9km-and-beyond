@@ -27,15 +27,6 @@ double calcTimeTo9km(Airplane& Airplane, double startHeight, double takeOffEndHe
 		- Need to write the fuel consumption / Thrust and mach number curve stuff into my engine class
 
 
-	-In the Airplane Class
-		- Need to write a getWeight function that takes in a time and gets my weight, which will use the enginge stuff
-		- Probably need a gamma calc to get Max RoC
-
-
-	- Need to write a takeoff time thing
-	- Need to write ROC thing
-
-
 	- General Idea for optimizing
 		1. Optimize span
 		2. Optimize airfoil (need a alpha zero AoA for NACA to do this)
@@ -62,17 +53,19 @@ int main() {
 	double payLoadWeight = 1000 * 2.20462;												// lbm
 	givenAirplaneWeight = givenAirplaneWeight - startingFuelWeight - payLoadWeight - (2*1670);     // 1670 lbms is CF34_3B1
 	double fuselageWeight = .95 * givenAirplaneWeight;									// lbms... we will also store the VT and HT weight in this
-	double nacelleWeight = .025 * givenAirplaneWeight;                               // just said each one is 2.5% of fuselage+VT+HT
-	Fuselage fuselage(fuselageWeight);
+	double nacelleWeight = .025 * givenAirplaneWeight;									// just said each one is 2.5% of fuselage+VT+HT
+	double fuselageLength = 216;														// inches
+	double fuselageWettedArea = 811.55 / 12;                                            // inches
+	Fuselage fuselage(fuselageWeight, fuselageLength, fuselageWettedArea);
 	Nacelle nacelle(nacelleWeight);
 	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
-	double mainSpan = 900;
-	double mainRootChord = 150;
-	double mainTipChord = 30;
-	double mainSweepAngle = 20;
-	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle, 20000); // this is roughly a wing that would weigh 20,000 lbm (max weight can be ~26000lbm)
+	double mainSpan = 100*12;
+	double mainRootChord = 120;
+	double mainTipChord = 36;
+	double mainSweepAngle = 25;
+	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);      // mainWing weight will be calculated by airplane
 
 	// Airplane we have with everything
 	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
@@ -82,8 +75,8 @@ int main() {
 	double takeOffEndHeight = 500;
 
 	cout << fixed << setprecision(5);
-	cout << calcTimeTo9km(Airplane, startHeight, 0) << " mins" << endl;
-	cout << calcTimeTo9km(Airplane, startHeight, takeOffEndHeight) << " mins" << endl;
+	//cout << calcTimeTo9km(Airplane, startHeight, 0) << " mins" << endl;
+	//cout << calcTimeTo9km(Airplane, startHeight, takeOffEndHeight) << " mins" << endl;
 
 
 	return 0;

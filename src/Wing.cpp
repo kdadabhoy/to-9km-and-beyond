@@ -48,14 +48,15 @@ namespace airplane {
 		ellipEfficiency = calcEllipEfficiency();
 		calcAndSetCL3D();
 		
-		weight = calcWeight();
+		weight = 0; // If this is the mainWing, the weight will be set when Airplane constructor is called
+					// This is becasue this weight is approxed using MTOW of the Airplane... no (valid) way to calc it here
 	}
 
 
 
 
 
-	// HT and VT (so I can have weight = 0)
+	// If you want to specifically set weight... Airplane constructor won't touch it if it is set
 	Wing::Wing(Airfoil& inAirfoil, double inSpan, double inTipChord, double inRootChord, double inSweepAngle, double inWeight) {
 		tipChord = inTipChord / 12;
 		rootChord = inRootChord / 12;
@@ -159,20 +160,6 @@ namespace airplane {
 	}
 
 
-
-
-
-
-
-
-
-	//Weight Calc
-
-	double Wing::calcWeight() const {
-		double weight = -1;
-		// Need to figure out approx
-		return weight;
-	}
 
 
 
@@ -385,9 +372,17 @@ namespace airplane {
 
 
 
+// Mutators:
+	void Wing::setWeight(double inWeight) {
+		weight = inWeight;
+		return;
+	}
 
 
-	// Accessors:
+
+
+
+// Accessors:
 	double Wing::getArea() const {
 		return area;
 	}
@@ -432,6 +427,10 @@ namespace airplane {
 
 	double Wing::getCL_Knott() const {
 		return CL3D.getCL_Knott();
+	}
+
+	Airfoil* Wing::getAirfoil() const {
+		return airfoil;
 	}
 
 }

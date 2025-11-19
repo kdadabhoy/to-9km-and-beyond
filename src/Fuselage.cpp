@@ -15,8 +15,10 @@ namespace airplane {
 
 
 
-	Fuselage::Fuselage(double inWeight) {
+	Fuselage::Fuselage(double inWeight, double inLength, double inWettedArea) {
 		weight = inWeight;
+		length = inLength;
+		wettedArea = inWettedArea;
 	}
 
 
@@ -26,6 +28,8 @@ namespace airplane {
 	// Copy constrcutor
 	Fuselage::Fuselage(const Fuselage& other) {
 		weight = other.weight;
+		length = other.length;
+		wettedArea = other.wettedArea;
 	}
 
 
@@ -38,6 +42,8 @@ namespace airplane {
 			return *this;
 		} else {
 			weight = other.weight;
+			length = other.length;
+			wettedArea = other.wettedArea;
 			return *this;
 		}
 	}
