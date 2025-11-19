@@ -22,14 +22,16 @@ double calcTimeTo9km(Airplane& Airplane, double startHeight, double takeOffEndHe
 /*
 	To Do List:
 
-	- In TurboFan class:
+	- In CF34_3B1 class:
 		- Need to digitalize my plots
 		- Need to write the fuel consumption / Thrust and mach number curve stuff into my engine class
+		- Make it a proper derived class
 
-
-	- General Idea for optimizing
-		1. Optimize span
-		2. Optimize airfoil (need a alpha zero AoA for NACA to do this)
+	- Done Refactoring:
+		- Wing
+			- Well might need to add dynamic memory capabilities still...
+		- AtmosphereProperties
+		-
 
 */
 

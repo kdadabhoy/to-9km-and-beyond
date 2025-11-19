@@ -17,10 +17,18 @@ namespace airplane {
 
 
 
+
+
+
+
 	DragCoeff::DragCoeff(const airplane::Wing& inWing) {
 		Wing = &inWing;
 		Fuselage = nullptr;
 	}
+
+
+
+
 
 
 
@@ -34,21 +42,9 @@ namespace airplane {
 
 
 
-                 
-
-	// Total Drag Functions 
-
-	// Need
-	// AoA,							or CL
-	// kinematicViscosity			or Reynolds	
-	// temp                         or Mach
-	// velocity    
-
-	// Prob also need Mach Critical Crest (have a wing function for this
 
 
 
-	// Total Drag Function
 	double DragCoeff::calcTotalDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const {
 		if (Wing) {
 			return calcParasiteCoeff(Reynolds, wetAreaRatio) + calcCompressibilityCoeff(Mach, AoA) +calcInducedCoeff(AoA);
@@ -65,7 +61,9 @@ namespace airplane {
 
 
 
-	// Parasite Drag Function
+
+
+
 	double DragCoeff::calcParasiteCoeff(double Reynolds, double wetAreaRatio) const {
 		assert(Wing != nullptr || Fuselage != nullptr);
 
@@ -84,7 +82,7 @@ namespace airplane {
 
 
 
-	// Induced Drag Function
+
 	double DragCoeff::calcInducedCoeff(double AoA) const {
 		assert(Wing != nullptr);
 		double CL = Wing->calcLiftCoeff(AoA);
@@ -97,40 +95,88 @@ namespace airplane {
 
 
 
-	// Induced Compressibility Functions
+
 	double DragCoeff::calcCompressibilityCoeff(double Mach, double AoA) const {
 		assert(Wing != nullptr);
 
 		if (Mach < .3) {
-			// Compressibility drag negligible  for sure
+			// Compressibility drag negligble 
 			return 0;
-
 		} 
 
 
-		double r = Mach / Wing->calcMcc(AoA);      // M_freestream / Mcc
+		double machRatio = Mach / Wing->calcMcc(AoA);      // M_freestream / Mcc
 
-		if (r < .75) {
+		if (machRatio < .75) {
 			// Assuming compressibility negligible bc Shevell graph doesn't cover it
 			return 0;
 		} else {
-			assert(r >= .75 && r <= 1.5);
+			assert(machRatio >= .75 && machRatio <= 1.5);
 			double Cdc = 0;
 			double sweepCosine = cos(Wing->getSweepAngleRad());
 
 			// y = (7.05*10^-11)*e^(17x)
-			Cdc = (7.05e-11) * exp(17 * r);
+			Cdc = (7.05e-11) * exp(17 * machRatio);
 			Cdc = Cdc / (sweepCosine * sweepCosine * sweepCosine);
 			return Cdc;
 		}
+	}
 
 
 
 
-		// Eliminating this gives a more continous Power Required Curve
+
+
+
+
+	// Form Drag - Fuselage Only
+	double DragCoeff::calcFormDragCoeff(double Cf) const {
+		assert(Fuselage != nullptr);
+		return Cf * Fuselage->getFormFactor();
+	}
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+/*
+	Notes:
+
+		// Total Drag Functions
+
+		// Need
+		// AoA,							or CL
+		// kinematicViscosity			or Reynolds
+		// temp                         or Mach
+		// velocity
+
+		// Prob also need Mach Critical Crest (have a wing function for this)
+
+
+
+
+
+
+
+
+
+
+		// Eliminating this from Compressibility Function gives a more continous Power Required Curve
 		// The Cdc = .025 was messing it up...
 
-	/*
+	
 		} else if (r <= 1.08) {
 			assert(r >= .75 && r <= 1.08); // This function only works if r >= .75 or <= 1.08
 			double Cdc = 0;
@@ -151,23 +197,7 @@ namespace airplane {
 			Cdc = Cdc / (sweepCosine * sweepCosine * sweepCosine);
 			return Cdc;
 		}
-	*/
-
-
-	}
 
 
 
-
-
-
-	// Form Drag - Fuselage Only
-	double DragCoeff::calcFormDragCoeff(double Cf) const {
-		assert(Fuselage != nullptr);
-		return Cf * Fuselage->getFormFactor();
-	}
-
-
-
-
-}
+*/
