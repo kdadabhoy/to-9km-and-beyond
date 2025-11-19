@@ -116,6 +116,31 @@ namespace airplane {
 		static constexpr double GRAVITY = 32.2;
 
 
+	// Plotting Variables and Functions:
+		bool plotting = false;                // If false doesn't matter what others are set to, no plotting happens
+		bool plotGammaVsTime = false;
+		bool plotGammaVsHeight = false;
+		bool plotMaxExcesssPowerVsTime = false;
+		vector<double> time;
+		vector<double> gamma;
+		vector<double> height;
+		vector<double> excessPower;
+		// etc
+
+		// Obviously need to change some of these to public memember functions... and implement them
+		void setPlotting(bool plotting, bool plotGammaVsTime, bool plotGammaVsHeight, bool plotMaxExcesssPowerVsTime); // Add all other plotting bools to this
+		void collectDataPoints(double inTime, double inHeight, double inGamma, double inExcessPower);  // This function will call all other collectDataPoint functions... only if their	
+																									   // bool is true
+		void collectTimeDataPoint(double inTime);     // append inTime to time vector
+		void collectHeightDataPoint(double inHeight); // append inHeight to height vector
+		void collectGammaDataPoint(double inGamma);   // append inGamma to gamma vector
+		// etc
+
+		void printHeaderToFile();                     // appending airplane characterisitcs to top of file
+		void exportDataToCSV();                       // calls printHeaderFile... etc etc... used to get data to a file the python script can use
+		void plotData(string& fileDirectory, string& fileName);    // Call a python script to plot all this stuff and put it in x place
+		
+
 
 
 
