@@ -79,6 +79,7 @@ namespace airplane {
 
 	void Airplane::calcAndSetTotalWeight() {
 		double total = 0.0;
+		total += fuelWeight + payLoadWeight;
 
 		if (mainWing) {
 			total += mainWing->getWeight();

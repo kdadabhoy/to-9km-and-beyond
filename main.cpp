@@ -61,10 +61,10 @@ int main() {
 	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
-	double mainSpan = 200;
+	double mainSpan = 1000;
 	double mainRootChord = 186.7;
 	double mainTipChord = 74.7;
-	double mainSweepAngle = 20;
+	double mainSweepAngle = 25;
 	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);      // mainWing weight will be calculated by airplane
 
 	// Airplane we have with everything
@@ -72,19 +72,27 @@ int main() {
 
 	double startHeight = 0;
 	double takeOffEndHeight = 500;
+	int ITERATIONS = 20;
 
-	cout << fixed << setprecision(5);
-	cout << "Area: " << mainWing.getArea() << endl;
-	cout << "AR: " << mainWing.getAspectRatio() << endl;
-	cout << "e: " << mainWing.getEllipticalEffic() << endl;
-	cout << "Sweep: " << mainSweepAngle << endl;
-	cout << "MAC: " << mainWing.getMAC() << endl;
-	cout << "Taper Ratio: " << mainWing.getTaperRatio() << endl;
-	cout << "Wing Weight: " << mainWing.getWeight() << endl;
-	cout << "Total Weight lbm: " << Airplane.getWeight() << endl;
-	cout << "Total Weight in kg: " << Airplane.getWeight() / 2.20462 << endl;
-	cout << calcTimeTo9km(Airplane, startHeight, takeOffEndHeight) << " mins" << endl;
-	//Airplane.getPowerCurveCSV(0, "exp.csv");
+
+
+
+	for (int i = 0; i < ITERATIONS; i += 100) {
+		mainSpan += i;
+		cout << fixed << setprecision(5);
+		cout << "Area: " << mainWing.getArea() << endl;
+		cout << "AR: " << mainWing.getAspectRatio() << endl;
+		cout << "e: " << mainWing.getEllipticalEffic() << endl;
+		cout << "Sweep: " << mainSweepAngle << endl;
+		cout << "MAC: " << mainWing.getMAC() << endl;
+		cout << "Taper Ratio: " << mainWing.getTaperRatio() << endl;
+		cout << "Wing Weight: " << mainWing.getWeight() << endl;
+		cout << "Total Weight lbm: " << Airplane.getWeight() << endl;
+		cout << "Total Weight in kg: " << Airplane.getWeight() / 2.20462 << endl;
+		cout << calcTimeTo9km(Airplane, startHeight, takeOffEndHeight) << " mins" << endl;
+		cout << endl << endl << endl;
+	}
+
 
 	return 0;
 }
