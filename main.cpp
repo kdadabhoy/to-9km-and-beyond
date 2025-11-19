@@ -67,64 +67,30 @@ int main() {
 	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
-	double mainSpan = 1176;
-	double mainRootChord = 186.7;
-	double mainTipChord = 74.7;
+	double mainSpan = 900;
+	double mainRootChord = 150;
+	double mainTipChord = 30;
 	double mainSweepAngle = 20;
-	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle, 10000); // delete 15000 and let the approx in constructor do this... (when implemented)
+	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle, 20000); // this is roughly a wing that would weigh 20,000 lbm (max weight can be ~26000lbm)
 
 	// Airplane we have with everything
 	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 
 
-
-	/*
-	double gamma = 2; // Deg
-	double height = 10000;  // ft
-	double velocity = 500;
-	AtmosphereProperties Cond(height);
-	double density = Cond.getDensity();
-
-	cout << "Not Approx: " << Airplane.calcSteadyClimbAoA(gamma, velocity, density) << endl;
-	cout << "Approx: " << Airplane.calcSteadyClimbAoAApprox(velocity, density) << endl;
-	*/
-
-
-
-
-	/*
-	double gamma = 10; // Deg
-	double height = 10000;  // ft
-	string fileName1 = "ActualCurve.csv";
-	string fileName2 = "ApproxCurve.csv";
-
-
-	Airplane.getPowerCurveCSV(gamma, height, fileName1);
-	//Airplane.calcAndSetPowerCurveData(gamma, height);
-	cout << "Max Excess Power: " << Airplane.getMaxExcessPower() << " at vel = " << Airplane.getVelocityMaxExcessPower() << endl;
-
-	cout << endl << endl;
-
-
-	Airplane.getPowerCurveCSV(height, fileName2);
-	//Airplane.calcAndSetPowerCurveData(height);
-	cout << "Max Excess Power: " << Airplane.getMaxExcessPower() << " at vel = " << Airplane.getVelocityMaxExcessPower() << endl;
-	*/
-
-	
 	double startHeight = 0;
-	double postTakeoffHeight = startHeight + 500; // Takeoff function gets us to 500 ft more than start height
+	double takeOffEndHeight = 500;
+	double postTakeoffHeight = startHeight + takeOffEndHeight; // Takeoff function gets us to 500 ft more than start height
 	double endHeight = 29527.6; // 9km in ft
 	double startVelocity = 200;
 	AtmosphereProperties Cond(startHeight);
 	double temp = Cond.getTemperature();
 
 	cout << fixed << setprecision(5);
-	cout << Airplane.calcTakeoffTime(0) << endl;
-	cout << Airplane.calcBestClimbTime(startHeight, startVelocity, endHeight) / 60.0 << " mins" << endl;
-	cout << Airplane.calcBestClimbTimeApprox(postTakeoffHeight, startVelocity, endHeight) / 60.0 << " mins" << endl;
+	cout << (Airplane.calcTakeoffTime(startHeight, takeOffEndHeight) + Airplane.calcBestClimbTime(startHeight, startVelocity, endHeight)) / 60 << " mins" << endl;
+	//cout << Airplane.calcBestClimbTime(startHeight, startVelocity, endHeight) / 60.0 << " mins" << endl;
+	//cout << Airplane.calcBestClimbTimeApprox(postTakeoffHeight, startVelocity, endHeight) / 60.0 << " mins" << endl;
 	
-	Airplane.getPowerCurveCSV(500, "Drag.csv");
+	// Airplane.getPowerCurveCSV(500, "Drag.csv");
 
 	//cout << 2*CF34_3B1.getThrust(0, 144) / Airplane.getWeight() << endl;
 

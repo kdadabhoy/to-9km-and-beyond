@@ -693,7 +693,7 @@ namespace airplane {
 		// Force = Thrust - Drag - Rolling Resistance
 		// F = T - qSC_D - mu(W-(q*S*C_L))
 		// m = W/g
-	double Airplane::calcTakeoffTime(double height) {
+	double Airplane::calcTakeoffTime(double height, double endHeight) {
 		double totalTime = 0;
 		double velocity = 0;  // Start from rest 
 
@@ -728,8 +728,7 @@ namespace airplane {
 		assert(velocity > V2); // Precaution to make sure we accelerated enough
 
 	
-		double END_HEIGHT = height + 500; // Arbritary
-		while (height < END_HEIGHT) {
+		while (height < endHeight) {
 			calcAndSetPowerCurveData(height);
 			double excessPower = calcExcessPower(velocity);
 			height += (excessPower / totalWeight) * TIME_STEP; // small angle approx method

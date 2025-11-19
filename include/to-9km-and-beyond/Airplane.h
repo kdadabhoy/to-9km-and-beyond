@@ -35,7 +35,8 @@ namespace airplane {
 
 
 	// Takeoff Functions
-		double calcTakeoffTime(double height);
+		double calcTakeoffTime(double height, double endHeight);                             // Time to get off runway and climb to endHeight
+																							 // (at max excess power when you takeoff... no optimizing, constant gamma) 
 
 
 	// Climb Functions
