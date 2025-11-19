@@ -141,8 +141,7 @@ namespace airplane {
 
 	// Climb Functions
 		double calcExcessPower(double velocity) const;				                           // Assumes Power Curve member vars are set
-		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;        // Gamma in degrees, Returns AoA in rad
-		double calcSteadyClimbAoAApprox(double velocity, double density) const;				   // Small angle approx, so cos(gamma) = 1
+
 
 
 	// Takeoff Functions:
