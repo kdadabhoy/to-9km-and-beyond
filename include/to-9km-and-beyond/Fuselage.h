@@ -29,9 +29,9 @@ namespace airplane {
 
 
 	private:
-		double weight;
+		double weight;  
 		double wettedArea;    // Stored in ft^2
-		double length;
+		double length;        // Stored in ft
 
 
 		// Could take these in as parameters... 

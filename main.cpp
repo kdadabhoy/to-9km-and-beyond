@@ -55,29 +55,36 @@ int main() {
 	double fuselageWeight = .95 * givenAirplaneWeight;									// lbms... we will also store the VT and HT weight in this
 	double nacelleWeight = .025 * givenAirplaneWeight;									// just said each one is 2.5% of fuselage+VT+HT
 	double fuselageLength = 216;														// inches
-	double fuselageWettedArea = 811.55 / 12;                                            // inches
-	Fuselage fuselage(fuselageWeight, fuselageLength, fuselageWettedArea);
+	double fuselageWettedArea = 811.55 * 12;                                            // inches
 	Nacelle nacelle(nacelleWeight);
+	Fuselage fuselage(fuselageWeight, fuselageLength, fuselageWettedArea);
 	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
-	double mainSpan = 100*12;
-	double mainRootChord = 120;
-	double mainTipChord = 36;
-	double mainSweepAngle = 25;
+	double mainSpan = 200;
+	double mainRootChord = 186.7;
+	double mainTipChord = 74.7;
+	double mainSweepAngle = 20;
 	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);      // mainWing weight will be calculated by airplane
 
 	// Airplane we have with everything
 	Airplane Airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 
-
 	double startHeight = 0;
 	double takeOffEndHeight = 500;
 
 	cout << fixed << setprecision(5);
-	//cout << calcTimeTo9km(Airplane, startHeight, 0) << " mins" << endl;
-	//cout << calcTimeTo9km(Airplane, startHeight, takeOffEndHeight) << " mins" << endl;
-
+	cout << "Area: " << mainWing.getArea() << endl;
+	cout << "AR: " << mainWing.getAspectRatio() << endl;
+	cout << "e: " << mainWing.getEllipticalEffic() << endl;
+	cout << "Sweep: " << mainSweepAngle << endl;
+	cout << "MAC: " << mainWing.getMAC() << endl;
+	cout << "Taper Ratio: " << mainWing.getTaperRatio() << endl;
+	cout << "Wing Weight: " << mainWing.getWeight() << endl;
+	cout << "Total Weight lbm: " << Airplane.getWeight() << endl;
+	cout << "Total Weight in kg: " << Airplane.getWeight() / 2.20462 << endl;
+	cout << calcTimeTo9km(Airplane, startHeight, takeOffEndHeight) << " mins" << endl;
+	//Airplane.getPowerCurveCSV(0, "exp.csv");
 
 	return 0;
 }
