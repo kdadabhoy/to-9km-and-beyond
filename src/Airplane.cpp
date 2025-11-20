@@ -685,6 +685,19 @@ namespace airplane {
 
 
 
+	// Calcs the time to 9km (accurately) from h=0 to h = 9km + startHeight (accounts for possibility of not starting at sea level)
+	// Returns time in seconds
+	double Airplane::calcBestTimeTo9km(double startHeight, double takeOffEndHeight) {
+		double END_HEIGHT = 29527.6 + startHeight; // 9km in ft
+		double velocity = 0;                       // Starting from rest
+		double totalTime = 0;
+
+
+		calcTakeoffPropertites(startHeight, takeOffEndHeight, totalTime, velocity);
+		totalTime += calcBestClimbTime(takeOffEndHeight, velocity, END_HEIGHT);
+
+		return totalTime;
+	}
 
 
 
@@ -986,11 +999,65 @@ namespace airplane {
 
 
 
+
+
+// Mutators:
+	void Airplane::setMainWing(Wing& inWing) {
+		assert(mainWing != nullptr);			// Precaution
+		mainWing = &inWing;
+		referenceArea = mainWing->getArea();    // Reference Area depends on mainWing
+		calcAndSetLiftCoeff();					// Lift Coeff depends on mainWing
+		calcAndSetTotalWeight();				// Main Wing Weight depends on total weight before everything else
+
+		if (fabs(mainWing->getWeight()) < .01) {
+			calcAndSetMainWingWeight();				// Now calc main wing weight using Raymond Approx
+			totalWeight += mainWing->getWeight();   // Add mainWingWeight to totalWeight
+		}
+
+		return;
+	}
+
+
+
+
+
+
+
+
+
+	void Airplane::setMainWingWeight(double inWeight) {
+		assert(mainWing != nullptr);			// Precaution
+		mainWing->setWeight(inWeight);
+		calcAndSetTotalWeight();				// Main Wing Weight depends on total weight before everything else
+		return;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
 // Accessors:
 	double Airplane::getWeight() const {
 		return totalWeight;
 	}
 
+
+
+
+
+
+
+
+	double Airplane::getMainWingWeight() const {
+		return mainWing->getWeight();
+	}
 
 
 

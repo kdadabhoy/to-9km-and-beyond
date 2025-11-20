@@ -7,6 +7,7 @@
 #include <cassert>
 using namespace std;
 
+// Make Airfoil not a pointer and then fix everything... make's life simplier
 
 
 namespace airplane {
@@ -93,18 +94,18 @@ namespace airplane {
 	Wing::Wing(const Wing& other) {
 		tipChord = other.tipChord;
 		rootChord = other.rootChord;
-		sweepAngle = other.sweepAngle;
 		span = other.span;
-		taperRatio = other.taperRatio;
-		area = other.area;
-		MAC = other.MAC;
-		aspectRatio = other.aspectRatio;
-		weight = other.weight;
+		sweepAngle = other.sweepAngle;
 		ellipEfficiency = other.ellipEfficiency;
 		airfoil = other.airfoil;					// This could run into pointer errors... and prob needs dynamic memory allocation...
-													// But won't really be using a copy constructor so... :)
-	}
 
+		area = other.area;
+		weight = other.weight;
+		aspectRatio = other.aspectRatio;
+		taperRatio = other.taperRatio;
+		MAC = other.MAC;
+		CL3D = other.CL3D;
+	}
 
 
 
@@ -509,7 +510,8 @@ namespace airplane {
 
 	void Wing::setSpan(double inSpan) {
 		span = inSpan / 12;
-		// weight = 0;    // Airplane Class fixes weight if it's the main wing
+		weight = 0;                      // Airplane Class fixes weight if it's the mainWing
+										 // if not mainWing, have to manually fix this with setWeight()
 		calcAndSetAllProperties();
 		return;
 	}
@@ -554,6 +556,16 @@ namespace airplane {
 
 	double Wing::getAspectRatio() const {
 		return aspectRatio;
+	}
+
+
+
+
+
+
+
+	double Wing::getSpan() const {
+		return span;
 	}
 
 

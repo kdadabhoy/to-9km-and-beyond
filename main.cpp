@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <iomanip>
+#include <cassert>
 #include "to-9km-and-beyond/Airplane.h"
 #include "to-9km-and-beyond/AtmosphereProperties.h"
 #include "to-9km-and-beyond/Wing.h"
@@ -16,7 +17,6 @@ using namespace atmosphere_properties;
 using namespace airplane;
 using namespace kaden_math;
 
-double calcTimeTo9km(Airplane& Airplane, double startHeight, double takeOffEndHeight);
 
 
 /*
@@ -34,6 +34,26 @@ double calcTimeTo9km(Airplane& Airplane, double startHeight, double takeOffEndHe
 		-
 
 */
+
+
+
+
+
+
+struct wingOptimizerResults {
+	// The best wing is in index 0
+	// wing at wingVector[0] has a timeToClimb of timeToClimbVector[0]
+	vector<Wing> wingVector;
+	vector<double> climbTimeVector;
+};
+
+
+void sortWingsByClimbTime(vector<Wing>& wings, vector<double>& climbTimes);
+wingOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight);
+void printUsefulCharacteristics(Wing& inWing, Airplane& inAirplane);
+
+
+
 
 
 
@@ -59,7 +79,7 @@ int main() {
 	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
-	double mainSpan = 1176;
+	double mainSpan = 12 * 12;
 	double mainRootChord = 186.7;
 	double mainTipChord = 74.7;
 	double mainSweepAngle = 20;
@@ -73,6 +93,30 @@ int main() {
 
 
 
+/*
+	printUsefulCharacteristics(mainWing, airplane);
+	cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
+	cout << endl << endl << endl;
+*/
+
+
+	wingOptimizerResults results;
+	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
+	
+	for (int i = 0; i < results.wingVector.size(); i++) {
+		cout << "Time: " << results.climbTimeVector[i]/ 60 << " mins";
+		cout << " Wing Span: " << results.wingVector[i].getSpan() << " ft" << endl;
+		cout << endl << endl;
+	}
+	
+	return 0;
+}
+
+
+
+
+
+
 
 
 // Optimizer Stuff
@@ -82,10 +126,11 @@ int main() {
 		1) Fix ct and cr to reasonable values and optimize span
 		2) Fix span at the top 3 best values and optimize ct and cr (use a nester loop for this)
 		3) Fix all the previous variables and optimize sweep angle
-		4) Re-run from start with different airfoisl
-		
+		4) Re-run from start with new min and max variables
+			- like take top 3 spans from span optimizer.. then optimize other vars... then run run optimizer for span.. 
+
+
 		Notes:
-			- Need to make sure min and max weight are adhered to and airplanes not adhereing are scrapped
 			- Will have to re-run all of the results once I add:
 				- Full plot digitizations (more accuracy)
 				- Weight loss accounted for with engine and time
@@ -100,22 +145,6 @@ int main() {
 				- Other stuff :)
 	*/
 
-	cout << fixed << setprecision(5);
-	cout << "Area: " << mainWing.getArea() << endl;
-	cout << "AR: " << mainWing.getAspectRatio() << endl;
-	cout << "e: " << mainWing.getEllipticalEffic() << endl;
-	cout << "Sweep: " << mainSweepAngle << endl;
-	cout << "MAC: " << mainWing.getMAC() << endl;
-	cout << "Taper Ratio: " << mainWing.getTaperRatio() << endl;
-	cout << "Wing Weight: " << mainWing.getWeight() << endl;
-	cout << "Total Weight lbm: " << airplane.getWeight() << endl;
-	cout << "Total Weight in kg: " << airplane.getWeight() / 2.20462 << endl;
-	cout << calcTimeTo9km(airplane, startHeight, takeOffEndHeight) << " mins" << endl;
-	cout << endl << endl << endl;
-	
-
-	return 0;
-}
 
 
 
@@ -123,38 +152,64 @@ int main() {
 
 
 
-// Calcs the time to 9km (accurately) from h=0 to h = 9km + startHeight (accounts for possibility of not starting at sea level)
-double calcTimeTo9km(Airplane& Airplane, double startHeight, double takeOffEndHeight) {
-	double endHeight = 29527.6 + startHeight; // 9km in ft
-	double totalTime = 0;
-	double velocity = 0;
-
-	Airplane.calcTakeoffPropertites(startHeight, takeOffEndHeight, totalTime, velocity);
-	totalTime += Airplane.calcBestClimbTime(takeOffEndHeight, velocity, endHeight);
-
-	return totalTime / 60;
-}
 
 
 
 
-/*
-vector<Airplane*> spanOptimizer(Airplane& airplane) {
-	double SPAN_MIN = 12 * 12;      // just saying 144 inches rn (in reality higher)
-	double SPAN_MAX = 350 * 12;     // ~265 is the max.. but will let optimizer try up to 350
-	vector<Airplane*> spanOptimizedResults;
+wingOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight) {
+	wingOptimizerResults returnStruct;
+	vector<Wing> wingVector;
+	vector<double> climbTimeVector;
+
+	double MIN_TOTAL_WEIGHT = 25000 * 2.205;     // Need airplane to be at least 25000 lbs
+	double START_HEIGHT = 0;
+	double START_VELOCITY = 0;
+	double TAKE_OFF_END_HEIGHT = 500;
+
+	double SPAN_MIN = 12 * 12;			// Just saying span is 8 ft rn (prob should be higher)
+	double SPAN_MAX = 265 * 12;         // ~265 is the max.. but will let optimizer try up to 350
+	int NUM_STEPS = 25;
 
 
-	int NUM_STEPS = 100;
 	double step = (SPAN_MAX - SPAN_MIN) / NUM_STEPS;
 
-	for (int i = 0; i < NUM_STEPS; i += step) {
+	for (int i = 0; i < NUM_STEPS; i++) {
+		Wing newWing(inWing);					// Calls copy constructor (equivalent to newWing = inWing)
+		newWing.setSpan(SPAN_MIN + (i * step));
+		wingVector.push_back(newWing);
+	}
+
+
+	for (int i = 0; i < wingVector.size(); i++) {
+		Airplane newAirplane(wingVector[i], inHT, inVT, inEngine, inNacelle, inFuselage, inFuelWeight, inPayLoadWeight);
+
+		double totalWeight = newAirplane.getWeight();
+		if (totalWeight < MIN_TOTAL_WEIGHT) {
+			double weightNeeded = MIN_TOTAL_WEIGHT - totalWeight;
+			newAirplane.setMainWingWeight(newAirplane.getMainWingWeight() + weightNeeded);
+		}
+
+		assert(newAirplane.getWeight() >= MIN_TOTAL_WEIGHT - .1);
+
+	
+	// debugging - delete
+		printUsefulCharacteristics(wingVector[i], newAirplane);
+		cout << newAirplane.calcBestTimeTo9km(START_HEIGHT, TAKE_OFF_END_HEIGHT) / 60 << " mins" << endl;
+		cout << endl << endl << endl;
+	//delete
+
+
+		double climbTime = newAirplane.calcBestTimeTo9km(START_HEIGHT, TAKE_OFF_END_HEIGHT);
+		climbTimeVector.push_back(climbTime);
 
 	}
 
-	return spanOptimizedResults;
+	sortWingsByClimbTime(wingVector, climbTimeVector);
+
+	returnStruct.wingVector = wingVector;
+	returnStruct.climbTimeVector = climbTimeVector;
+	return returnStruct;
 }
-*/
 
 
 
@@ -163,6 +218,79 @@ vector<Airplane*> spanOptimizer(Airplane& airplane) {
 
 
 
+
+
+
+
+
+
+
+// Sorts wings by their corresponding climbTimes in ascending order
+void sortWingsByClimbTime(vector<Wing>& wings, vector<double>& climbTimes) {
+
+	vector<int> indices;
+	for (int i = 0; i < wings.size(); i++) {
+		indices.push_back(i);
+	}
+
+
+	// Sort indices based on climbTimes
+	for (int i = 0; i < indices.size() - 1; i++) {
+
+		int minIndex = i;
+		for (int j = i + 1; j < indices.size(); j++) {
+			if (climbTimes[indices[j]] < climbTimes[indices[minIndex]]) {
+				minIndex = j;
+			}
+		}
+
+		// Swap indices
+		int temp = indices[i];
+		indices[i] = indices[minIndex];
+		indices[minIndex] = temp;
+	}
+
+
+
+	// Create sorted copies
+	vector<Wing> sortedWings;
+	vector<double> sortedTimes;
+
+	for (int i = 0; i < indices.size(); i++) {
+		int idx = indices[i];         
+		sortedWings.push_back(wings[idx]);
+		sortedTimes.push_back(climbTimes[idx]);
+	}
+
+
+	// Replace original vectors with sorted versions
+	// std::move essentially makes copying more efficient (why we used index method)
+	wings = move(sortedWings);
+	climbTimes = move(sortedTimes);
+}
+
+
+
+
+
+
+
+
+
+
+void printUsefulCharacteristics(Wing& inWing, Airplane& inAirplane) {
+	cout << fixed << setprecision(5);
+	cout << "Area (ft^2): " << inWing.getArea() << endl;
+	cout << "Span (ft): " << inWing.getSpan() << endl;
+	cout << "AR: " << inWing.getAspectRatio() << endl;
+	cout << "e: " << inWing.getEllipticalEffic() << endl;
+	cout << "MAC (ft) " << inWing.getMAC() << endl;
+	cout << "Taper Ratio: " << inWing.getTaperRatio() << endl;
+	cout << "Wing Weight (lbm): " << inWing.getWeight() << endl;
+	cout << "Total Weight (lbm): " << inAirplane.getWeight() << endl;
+	cout << "Total Weight (kg): " << inAirplane.getWeight() / 2.20462 << endl;
+	return;
+}
 
 
 

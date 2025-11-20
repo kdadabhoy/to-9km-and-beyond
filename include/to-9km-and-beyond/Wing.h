@@ -44,11 +44,12 @@ namespace airplane {
 
 
 	// Accessors
-		double getArea() const;
-		double getMAC() const;
-		double getTaperRatio() const;
-		double getAspectRatio() const;
-		double getWeight() const;
+		double getArea() const;                 // ft^2
+		double getMAC() const;                  // ft
+		double getTaperRatio() const;           
+		double getAspectRatio() const;  
+		double getSpan() const;					// ft
+		double getWeight() const;               // lbm
 		double getEllipticalEffic() const;
 		double getSweepAngle() const;			// Returned in degrees
 		double getSweepAngleRad() const;		// Returned in rad

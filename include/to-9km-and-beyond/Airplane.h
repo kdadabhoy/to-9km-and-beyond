@@ -19,6 +19,8 @@ namespace airplane {
 	class Airplane {
 	public:
 		Airplane();
+		// Note that the constructor takes in addresses... which can be dangerous if you modify components not using the mutators from this class
+			// The reasoning for the address, is to avoid creating 
 		Airplane(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight);
 
 	// Useful Functions:
@@ -37,12 +39,14 @@ namespace airplane {
 
 	// Takeoff Functions
 		// Probably create a struct and return a struct instead of passing by reference
-		void calcTakeoffPropertites(double height, double& endHeight, double& totalTime, double& velocity); // Use this one..
+		void calcTakeoffPropertites(double height, double& endHeight, double& totalTime, double& velocity);  // Use this one.. totalTime should be in seconds
 		double calcTakeoffTime(double height, double endHeight);                                           // Just returns time... less useful
 
 
 	// Climb Functions
-		double calcBestClimbTime(double startHeight, double startVelocity, double endHeight);  
+		double calcBestTimeTo9km(double startHeight, double takeOffEndHeight);     // Returns seconds
+
+		double calcBestClimbTime(double startHeight, double startVelocity, double endHeight);        // Returns seconds 
 		double calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight);   // doesnt do power curve at every height... just some
 
 		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;        // Gamma in degrees, Returns AoA in rad
@@ -54,13 +58,23 @@ namespace airplane {
 		double calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height);
 
 
-
-
 	// Accessors:
-		double getWeight() const;
+		double getWeight() const;							// lbms
+		double getMainWingWeight() const;                   // lbms
 		double getMaxExcessPower() const;					// Assumes power curve is set 
 		double getVelocityMaxExcessPower() const;           // Assumes power curve is set
 		vector<double> getMaxExcessPowerVector() const;     // Assumes power curve is set
+
+
+    // Mutators - not used rn
+		void setMainWing(Wing& inWing);                     // Takes in a new Wing and re-intialized aircraft (does not reset fuel weight)
+		void setMainWingWeight(double inWeight);            // Used for when you want to assign a weight to the mainWing...
+
+
+	// Print Functions
+		void printMainWingCharacteristics() const;          // That long block of cout statements for AR, area, e, taper, etc
+
+
 
 
 	private:
@@ -131,14 +145,16 @@ namespace airplane {
 		void setPlotting(bool plotting, bool plotGammaVsTime, bool plotGammaVsHeight, bool plotMaxExcesssPowerVsTime); // Add all other plotting bools to this
 		void collectDataPoints(double inTime, double inHeight, double inGamma, double inExcessPower);  // This function will call all other collectDataPoint functions... only if their	
 																									   // bool is true
-		void collectTimeDataPoint(double inTime);     // append inTime to time vector
+																									   // 
+		// These functions make the actual functions more readable and avoid repeating code (if plotting, if plotGammaVsTime, time.push_back(inTime) etc etc)
+		void collectTimeDataPoint(double inTime);     // append inTime to time vector 
 		void collectHeightDataPoint(double inHeight); // append inHeight to height vector
 		void collectGammaDataPoint(double inGamma);   // append inGamma to gamma vector
 		// etc
 
-		void printHeaderToFile();                     // appending airplane characterisitcs to top of file
-		void exportDataToCSV();                       // calls printHeaderFile... etc etc... used to get data to a file the python script can use
-		void plotData(string& fileDirectory, string& fileName);    // Call a python script to plot all this stuff and put it in x place
+		void writeHeaderToFile(string& fileDirectory, string& fileName); // appending airplane characterisitcs to top of file
+		void exportDataToCSV(string& fileDirectory, string& fileName);   // calls printHeaderFile... etc etc... used to get data to a file the python script can use
+		void plotData(string& fileDirectory, string& fileName);          // Call a python script to plot all this stuff and put it in x place
 		
 
 
