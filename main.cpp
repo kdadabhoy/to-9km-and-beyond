@@ -72,7 +72,7 @@ int main() {
 	givenAirplaneWeight = givenAirplaneWeight - startingFuelWeight - payLoadWeight - (2 * 1670);     // 1670 lbms is CF34_3B1
 	double fuselageWeight = .95 * givenAirplaneWeight;									// lbms... we will also store the VT and HT weight in this
 	double nacelleWeight = .025 * givenAirplaneWeight;									// just said each one is 2.5% of fuselage+VT+HT
-	double fuselageLength = 216;														// inches
+	double fuselageLength = 621.80;														// inches
 	double fuselageWettedArea = 811.55 * 12;                                            // inches
 	Nacelle nacelle(nacelleWeight);
 	Fuselage fuselage(fuselageWeight, fuselageLength, fuselageWettedArea);
@@ -107,7 +107,7 @@ int main() {
 
 
 	wingOptimizerResults results;
-	//results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
+	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 
 	for (int i = 0; i < results.wingVector.size(); i++) {
 		cout << fixed << setprecision(5);
