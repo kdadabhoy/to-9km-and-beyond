@@ -4,6 +4,7 @@
 <br>
 
 ## Objectives
+### Main Objective 
 Optimize a wing to get an aircraft with given enginge and given min and max wieght to 9km
 (fill in later)
 <br>
@@ -43,15 +44,72 @@ Therefore, for the efficiency, and because I am most comfortable coding in C++, 
 
 <br>
 
-#### Classes:
-
-<br>
-
 #### A Quick Word on Resuability
 By programming using the aforementioned metholodiges, particularly the classes I developed when creating this project, I am also able to re-use these classes for some of my other aero-related personal project (since these classes are, in many ways, black boxes).
 (An aside, some of the classes depend on other classes in this program, so they are not true black boxes... but they are pretty close). This was another reason why the program was developed for robustness.
 
 <br>
 
-## Assumptions (per Class)
+## Classes and Assumptions in Each Class:
+
+<br>
+
+### Airfoil:
+#### Overview:
+#### Assumptions:
+
+<br>
+
+### Airplane:
+#### Overview:
+#### Assumptions:
+
+<br>
+
+### AtmosphereProperties:
+#### Overview:
+#### Assumptions:
+
+<br>
+
+### CF_34_3B1:
+#### Overview:
+#### Assumptions:
+
+<br>
+
+### CF_34_3B1:
+#### Overview:
+#### Assumptions:
+
+<br>
+
+### DragCoeff:
+#### Overview:
+#### Assumptions:
+
+
+<br>
+
+### Fuselage:
+#### Overview:
+#### Assumptions:
+
+<br>
+
+### LiftCoeff:
+#### Overview:
+#### Assumptions:
+
+<br>
+
+### Nacelle:
+#### Overview:
+#### Assumptions:
+
+<br>
+
+### Wing:
+#### Overview:
+#### Assumptions:
 
