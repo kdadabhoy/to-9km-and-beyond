@@ -888,6 +888,7 @@ namespace airplane {
 	// *** Need to account for weight loss ***
 
 	// Incomplete
+	// Assumes we have enough control authority to takeoff, if we can reach V2
 	void Airplane::calcEndRunwayAirplaneProperties(double height, double& totalTime, double& velocity) const {
 
 		//double CL_Stall = mainWing->get...   // Need to code a function that gets this from my airfoil and converts that to 3D
@@ -899,13 +900,13 @@ namespace airplane {
 		double temp = Cond.getTemperature();
 		double kineVisc = Cond.getKinematicVisc();
 
-		double V2 = 1.2 * sqrt((2 * totalWeight) / (density * CL_Stall * mainWing->getArea()));
+		double V2_min = 1.2 * sqrt((2 * totalWeight) / (density * CL_Stall * mainWing->getArea()));
 
 		double Mach, thrust, AoA, drag, lift, rollingFriction, maxAcceleration;
 		double ROLLING_FRIC_COEFF = .02; // A realistic approx
 		double TIME_STEP = 0.05;        // Can Change if too inefficient
 
-		while (velocity < V2) {
+		while (velocity < V2_min) {
 			Mach = calcMach(velocity, temp);
 			AoA = 2 * pi / 180;				 // An Assumption, it is very close to 0... while on runway
 			drag = calcDrag(AoA, velocity, Mach, kineVisc, density);
@@ -918,7 +919,7 @@ namespace airplane {
 			totalTime = totalTime + TIME_STEP;
 		}
 
-		assert(velocity > V2); // Precaution to make sure we accelerated enough
+		assert(velocity > V2_min); // Precaution to make sure we accelerated enough
 	}
 
 

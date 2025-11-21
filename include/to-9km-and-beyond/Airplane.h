@@ -188,8 +188,15 @@ namespace airplane {
 		// Takeoff Functions:
 			// Should prob turn this into a struct
 		void calcEndRunwayAirplaneProperties(double height, double& totalTime, double& velocity) const;   // Modifies the passed by reference totalTime and velocity to what it is 																									        // When the airplane leaves the runway 
-		// Should always pass in velocity = 0 (start from rest)
-		// Should always pass in totalTime = 0 (time starts at 0)
+																										  // Should always pass in velocity = 0 (start from rest)
+																									      // Should always pass in totalTime = 0 (time starts at 0)
+
+		// Checking if the Wing is possible
+		double calcRootMoment() const;            // M_root = pi/8 * W*n*b for ellipitical trapezodial wing
+		double calcSparAllowableMoment() const;  
+		bool isWingPossible() const;              // See if M_root <= M_allowable and see if we can actually takeoff with it
+												  // Rework takeoff function to see if takeoff is possible.. need to calculate Rotational Speed
+
 
 
 	};
