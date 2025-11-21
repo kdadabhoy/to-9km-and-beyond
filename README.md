@@ -26,7 +26,8 @@ Note: It could be helpful to know, now, that in the current Airplane Class imple
 
 
 
-### How Object Oriented Programming (OOP) Enables Robustness w/ Examples (can skip if already familiar with OOP)
+### How Object Oriented Programming (OOP) Enables Robustness w/ Examples  
+#### (Feel Free to  Skip if Already Familiar with OOP)
 This methodology, as those familiar with OOP already know, enables the Airplane class to treat each of these components (class objects) as a "black box." In other words, it does not matter, from the Airplane Class's point of view, how the Wing (for example) object is implemented, just that we have a type Wing, and we can call on it's public member functions. Again, as those familiar with OOP already know, this is an incredibly robust approach, since we are now able to change the implementation of major components, without having to change anything in the Airplane class, as long as the same functions still exist. It is incredibly hard to underscore how useful this is.
 
 For example, if we ever wanted to code an Airplane to go supersonically, we would just need to modify the classes who's implementation changes based on if an an aircraft is subsonic or supersonic (namely the Drag Class).
