@@ -23,7 +23,7 @@ namespace airplane {
 			// The reasoning for the address, is to avoid creating 
 		Airplane(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight);
 
-	// Useful Functions:
+		// Useful Functions:
 		double calcMach(double velocity, double temp) const;
 
 		double calcDragCoeff(double AoA, double velocity, double Mach, double kinematicViscosity) const;				// AoA in Rad
@@ -32,18 +32,18 @@ namespace airplane {
 		double calcLiftCoeff(double AoA) const;																			// AoA in Rad
 		double calcLift(double AoA, double velocity, double density) const;												// AoA in Rad
 
-	// Power Curve
+		// Power Curve
 		void getPowerCurveCSV(double gamma, double height, string fileName) const;           // fileName should have ".csv", no small angle approx
 		void getPowerCurveCSV(double height, string fileName) const;						 // fileName should have ".csv", small angle approx 
 
 
-	// Takeoff Functions
-		// Probably create a struct and return a struct instead of passing by reference
+		// Takeoff Functions
+			// Probably create a struct and return a struct instead of passing by reference
 		void calcTakeoffPropertites(double height, double& endHeight, double& totalTime, double& velocity);  // Use this one.. totalTime should be in seconds
 		double calcTakeoffTime(double height, double endHeight);                                           // Just returns time... less useful
 
 
-	// Climb Functions
+		// Climb Functions
 		double calcBestTimeTo9km(double startHeight, double takeOffEndHeight);     // Returns seconds
 
 		double calcBestClimbTime(double startHeight, double startVelocity, double endHeight);        // Returns seconds 
@@ -51,14 +51,14 @@ namespace airplane {
 
 		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;        // Gamma in degrees, Returns AoA in rad
 		double calcSteadyClimbAoAApprox(double velocity, double density) const;				   // Small angle approx, so cos(gamma) = 1
-		
 
-	// Steady Level Flight Functions (L = W)
+
+		// Steady Level Flight Functions (L = W)
 		double calcSteadyLevelAoA(double velocity, double density) const;
 		double calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height);
 
 
-	// Accessors:
+		// Accessors:
 		double getWeight() const;							// lbms
 		double getMainWingWeight() const;                   // lbms
 		double getMaxExcessPower() const;					// Assumes power curve is set 
@@ -66,19 +66,19 @@ namespace airplane {
 		vector<double> getMaxExcessPowerVector() const;     // Assumes power curve is set
 
 
-    // Mutators - not used rn
+		// Mutators - not used rn
 		void setMainWing(Wing& inWing);                     // Takes in a new Wing and re-intialized aircraft (does not reset fuel weight)
 		void setMainWingWeight(double inWeight);            // Used for when you want to assign a weight to the mainWing...
 
 
-	// Print Functions
+		// Print Functions
 		void printMainWingCharacteristics() const;          // That long block of cout statements for AR, area, e, taper, etc
 
 
 
 
 	private:
-	// Must take in:
+		// Must take in:
 		Wing* HT;                // Full HT (Full Span / Planform)
 		Wing* VT;                // Full VT (Full Span / Planform)
 		Wing* mainWing;          // Full mainWing (Full Span / Planform)
@@ -89,13 +89,13 @@ namespace airplane {
 		double fuelWeight;       // lbm
 
 
-	// Class automatically assigns:
+		// Class automatically assigns:
 		double referenceArea;    // ft^2, Class assigns this the area of the main wing
 		double totalWeight;      // lbm,  Class calculates this
 		LiftCoeff CL;            // CL of the whole plane
 
 
-	// Power Curve Data:
+		// Power Curve Data:
 		vector<double> powerCurveVelocityData;
 		vector<double> powerRequiredData;
 		vector<double> powerAvailableData;
@@ -103,11 +103,11 @@ namespace airplane {
 		double velocityMaxExcessPower = 0;
 
 
-	// Wing Weight Constants (Assumptions)
-		// FAR 25 cert; n = 2.1 + (24000 / MTOW), 2.5 <= n <= 3.8
+		// Wing Weight Constants (Assumptions)
+			// FAR 25 cert; n = 2.1 + (24000 / MTOW), 2.5 <= n <= 3.8
 		static constexpr double RAYMOND_CST = .0051;			          // Raymond constat in Cargo/Transport Weight Eq'n
-		static constexpr double MIN_LIMIT_LOAD_FACTOR = 2.5;    
-		static constexpr double MAX_LIMIT_LOAD_FACTOR = 3.8;	
+		static constexpr double MIN_LIMIT_LOAD_FACTOR = 2.5;
+		static constexpr double MAX_LIMIT_LOAD_FACTOR = 3.8;
 
 		static constexpr double LOAD_SAFETY_FACTOR = 1.5;				  // Typical safety factor 
 		static constexpr double SMUDGE_FACTOR = 0.85;                     // Our wing is an advanced composite... obviously! (Table 15.4 from Raymond book)
@@ -117,20 +117,20 @@ namespace airplane {
 		static constexpr double MIN_MTOW = 25000 * 2.20462;               // lbms, Project specifications / Min limit for this competition
 
 
-	// Power Function's Curve Constants
+		// Power Function's Curve Constants
 		static constexpr double X_MIN = .01;   // This xmin and xmax are used to space out Mach
 		static constexpr double X_MAX = .975;
 		const static int STEPS = 1000;
 
 
-	// Constants
+		// Constants
 		const static int numEngines = 2;
 		static constexpr double GAS_CONSTANT = 1716;
 		static constexpr double pi = 3.141592653589;
 		static constexpr double GRAVITY = 32.2;
 
 
-	// Plotting Variables and Functions:
+		// Plotting Variables and Functions:
 		bool plotting = false;                // If false doesn't matter what others are set to, no plotting happens
 		bool plotGammaVsTime = false;
 		bool plotGammaVsHeight = false;
@@ -144,9 +144,9 @@ namespace airplane {
 		// Obviously need to change some of these to public memember functions... and implement them
 		void setPlotting(bool plotting, bool plotGammaVsTime, bool plotGammaVsHeight, bool plotMaxExcesssPowerVsTime); // Add all other plotting bools to this
 		void collectDataPoints(double inTime, double inHeight, double inGamma, double inExcessPower);  // This function will call all other collectDataPoint functions... only if their	
-																									   // bool is true
-																									   // 
-		// These functions make the actual functions more readable and avoid repeating code (if plotting, if plotGammaVsTime, time.push_back(inTime) etc etc)
+		// bool is true
+		// 
+// These functions make the actual functions more readable and avoid repeating code (if plotting, if plotGammaVsTime, time.push_back(inTime) etc etc)
 		void collectTimeDataPoint(double inTime);     // append inTime to time vector 
 		void collectHeightDataPoint(double inHeight); // append inHeight to height vector
 		void collectGammaDataPoint(double inGamma);   // append inGamma to gamma vector
@@ -155,12 +155,12 @@ namespace airplane {
 		void writeHeaderToFile(string& fileDirectory, string& fileName); // appending airplane characterisitcs to top of file
 		void exportDataToCSV(string& fileDirectory, string& fileName);   // calls printHeaderFile... etc etc... used to get data to a file the python script can use
 		void plotData(string& fileDirectory, string& fileName);          // Call a python script to plot all this stuff and put it in x place
-		
 
 
 
 
-	// calcAndSet Functions:
+
+		// calcAndSet Functions:
 		void calcAndSetTotalWeight();                                   // Used in constructors
 		void calcAndSetLiftCoeff();										// Needed for SteadyClimbAoA... sets Cl
 		void calcAndSetMaxExcessPower();					            // Sets maxExcessPower and velocityExcessPower (assumes priv memb vars are accurate)
@@ -170,7 +170,7 @@ namespace airplane {
 
 
 
-	// Power Curve Functions
+		// Power Curve Functions
 		vector<double> calcPowerCurveMachData() const;						      // Will Always be the same
 		vector<double> calcPowerCurveVelocityData(double height) const;			  // Power Curve needs velocity
 		vector<double> calcPowerAvailableData(double height) const;
@@ -178,18 +178,18 @@ namespace airplane {
 
 		// No Small Angle Approx:	
 		vector<double> calcPowerRequiredData(double gamma, double height) const;   // Gamma in degrees, generates 1000 evenly spaced data points between Mach 0 and 1
-		
 
-	// Climb Functions
+
+		// Climb Functions
 		double calcExcessPower(double velocity) const;				                           // Assumes Power Curve member vars are set
 
 
 
-	// Takeoff Functions:
-		// Should prob turn this into a struct
+		// Takeoff Functions:
+			// Should prob turn this into a struct
 		void calcEndRunwayAirplaneProperties(double height, double& totalTime, double& velocity) const;   // Modifies the passed by reference totalTime and velocity to what it is 																									        // When the airplane leaves the runway 
-																										  // Should always pass in velocity = 0 (start from rest)
-																										  // Should always pass in totalTime = 0 (time starts at 0)
+		// Should always pass in velocity = 0 (start from rest)
+		// Should always pass in totalTime = 0 (time starts at 0)
 
 
 	};

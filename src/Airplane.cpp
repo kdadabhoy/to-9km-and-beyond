@@ -32,8 +32,8 @@ namespace airplane {
 		engine = nullptr;
 		nacelle = nullptr;
 		fuselage = nullptr;
-		fuelWeight = 0; 
-		payLoadWeight = 0; 
+		fuelWeight = 0;
+		payLoadWeight = 0;
 		referenceArea = 0;
 		totalWeight = 0;
 		CL.setCL_Alpha(0);
@@ -54,7 +54,7 @@ namespace airplane {
 	// If I decide none of the objects get modified in this class, then add const here and the pointer won't
 	// allow modificaiton to the passed object
 	// Would also have to change all member vairbales to const Class*
-	Airplane::Airplane(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight){
+	Airplane::Airplane(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight) {
 		mainWing = &inWing;
 		HT = &inHT;
 		VT = &inVT;
@@ -62,12 +62,12 @@ namespace airplane {
 		nacelle = &inNacelle;
 		fuselage = &inFuselage;
 		fuelWeight = inFuelWeight;
-		payLoadWeight = inPayLoadWeight; 
+		payLoadWeight = inPayLoadWeight;
 		assert(mainWing != nullptr);
 		referenceArea = mainWing->getArea();
 		calcAndSetLiftCoeff();
 		calcAndSetTotalWeight();				// Main Wing Weight depends on total weight before everything else
-												// So need to calc that first
+		// So need to calc that first
 
 		if (fabs(mainWing->getWeight()) < .01) {
 			calcAndSetMainWingWeight();				// Now calc main wing weight using Raymond Approx
@@ -158,7 +158,7 @@ namespace airplane {
 
 
 
-// Drag Functions
+	// Drag Functions
 	double Airplane::calcDragCoeff(double AoA, double velocity, double Mach, double kinematicViscosity) const {
 		double totalDrag = 0;
 
@@ -207,7 +207,7 @@ namespace airplane {
 
 
 
-// Lift Functions:
+	// Lift Functions:
 	double Airplane::calcLiftCoeff(double AoA) const {
 		return CL.calcLiftCoefficient(AoA);
 	}
@@ -238,7 +238,7 @@ namespace airplane {
 
 
 
-// Useful Functions:
+	// Useful Functions:
 
 	double Airplane::calcMach(double velocity, double temp) const {
 		return velocity / sqrt(1.4 * GAS_CONSTANT * temp);
@@ -314,7 +314,7 @@ namespace airplane {
 
 
 
-// Power Curve Functions
+	// Power Curve Functions
 
 
 	vector<double> Airplane::calcPowerCurveMachData() const {
@@ -450,7 +450,7 @@ namespace airplane {
 
 
 
-// 100% Accurate (gamma accounted for):
+	// 100% Accurate (gamma accounted for):
 
 	void Airplane::calcAndSetPowerCurveData(double gamma, double height) {
 		if (powerCurveVelocityData.empty()) {
@@ -525,7 +525,7 @@ namespace airplane {
 
 
 
-// Small Angle Approx (cos(gamma) ~= 1)
+	// Small Angle Approx (cos(gamma) ~= 1)
 
 	void Airplane::calcAndSetPowerCurveData(double height) {
 		if (powerCurveVelocityData.empty()) {
@@ -597,10 +597,10 @@ namespace airplane {
 
 
 
-// Climb Functions
+	// Climb Functions
 
-	// *** Need to account for weight loss ***
-	// Uses small angle approx for gamma
+		// *** Need to account for weight loss ***
+		// Uses small angle approx for gamma
 	double Airplane::calcBestClimbTime(double startHeight, double startVelocity, double endHeight) {
 		// Implementing an accelerate/declerate in a straight line then climb at maxExcessPower
 		// Might need to implement AoA < 15 deg or smt checks
@@ -705,7 +705,7 @@ namespace airplane {
 
 
 
-// Steady Level Flight (L=W) Functions
+	// Steady Level Flight (L=W) Functions
 
 	double Airplane::calcSteadyLevelAoA(double velocity, double density) const {
 		assert(velocity > 0.00 && density > 0.00 && CL.getCL_Alpha() > 0.00);
@@ -762,7 +762,7 @@ namespace airplane {
 			} else {
 				// Decelerate
 				engineFactor = .20;	 // Thrust to 20% max thrust (brake using drag)... could use some PID thing instead.. but this is good enough
-									 // Set this to 0% for best possible time... but real life is ~20% of thrust being minimum
+				// Set this to 0% for best possible time... but real life is ~20% of thrust being minimum
 			}
 
 			thrust = numEngines * engine->getThrust(height, velocity) * engineFactor;
@@ -786,11 +786,11 @@ namespace airplane {
 
 
 
-// Takeoff Functions
+	// Takeoff Functions
 
-	// *** Need to account for weight loss ***
-	
-	// See physics derivation in notes
+		// *** Need to account for weight loss ***
+
+		// See physics derivation in notes
 	double Airplane::calcTakeoffTime(double height, double endHeight) {
 		double totalTime = 0;
 		double velocity = 0;  // Start from rest 
@@ -825,7 +825,7 @@ namespace airplane {
 
 		assert(velocity > V2); // Precaution to make sure we accelerated enough
 
-	
+
 		while (height < endHeight) {
 			calcAndSetPowerCurveData(height);
 			double excessPower = calcExcessPower(velocity);
@@ -833,7 +833,7 @@ namespace airplane {
 			totalTime += TIME_STEP;
 			// Just a precaution to make sure AoA never goes above 15 deg (optimisitic)
 			AoA = calcSteadyClimbAoAApprox(velocity, density);
-			assert(fabs(AoA) < (15 * 3.1415) / 180); 
+			assert(fabs(AoA) < (15 * 3.1415) / 180);
 
 		}
 		return totalTime;
@@ -849,7 +849,7 @@ namespace airplane {
 
 
 	// *** Need to account for weight loss ***
-	
+
 	// A modified calcTakeOffTime (same logic)... but "returns" (modifies the passed by reference variables:
 	// endVelocity and totalTime and endHeight... which is often needed
 	// Note: a common FAA endheight is around 500 ft... the best endHeight for climb is 0 ft (with the way the program is written)
@@ -861,7 +861,7 @@ namespace airplane {
 		double density = Cond.getDensity();
 		double TIME_STEP = 0.05;                 // Can Change if too inefficient
 		double AoA = 2 * pi / 180;				 // An Assumption, it is very close to 0... while on runway
-		
+
 
 		while (height < endHeight) {
 			calcAndSetPowerCurveData(height);
@@ -931,7 +931,7 @@ namespace airplane {
 
 
 
-	
+
 	// Wing Weight Approx (Raynmond w/ FAR 25 Cert for n and a 1.5 safety factor)
 	// weight = K * pow(totalWeight * n_ult, 0.557)
 	void Airplane::calcAndSetMainWingWeight() {
@@ -944,7 +944,7 @@ namespace airplane {
 		double thicknessRatio = mainAirfoil->getThicknessRatio();  // t/c
 		double weightEverythingExceptWing = totalWeight;
 
-		double K = RAYMOND_CST * pow(wingArea, 0.649)* sqrt(aspectRatio) * pow(thicknessRatio, -0.4) 
+		double K = RAYMOND_CST * pow(wingArea, 0.649) * sqrt(aspectRatio) * pow(thicknessRatio, -0.4)
 			* pow(1 + taperRatio, 0.1) * (1 / cos(sweepAngle)) * pow(controlArea, 0.1);
 
 
@@ -976,16 +976,16 @@ namespace airplane {
 
 			N_ult = (2.1 + (24000 / (wingWeight + weightEverythingExceptWing))) * LOAD_SAFETY_FACTOR;
 
-			if (N_ult < MIN_LIMIT_LOAD_FACTOR * LOAD_SAFETY_FACTOR){
+			if (N_ult < MIN_LIMIT_LOAD_FACTOR * LOAD_SAFETY_FACTOR) {
 				N_ult = MIN_LIMIT_LOAD_FACTOR;
-			} else if(N_ult > MAX_LIMIT_LOAD_FACTOR * LOAD_SAFETY_FACTOR) {
+			} else if (N_ult > MAX_LIMIT_LOAD_FACTOR * LOAD_SAFETY_FACTOR) {
 				N_ult = MAX_LIMIT_LOAD_FACTOR;
 			}
 
 			outer_iter++;
 		}
-	
-		mainWing->setWeight(wingWeight*SMUDGE_FACTOR);
+
+		mainWing->setWeight(wingWeight * SMUDGE_FACTOR);
 		return;
 	}
 
@@ -1001,7 +1001,7 @@ namespace airplane {
 
 
 
-// Mutators:
+	// Mutators:
 	void Airplane::setMainWing(Wing& inWing) {
 		assert(mainWing != nullptr);			// Precaution
 		mainWing = &inWing;
@@ -1043,7 +1043,7 @@ namespace airplane {
 
 
 
-// Accessors:
+	// Accessors:
 	double Airplane::getWeight() const {
 		return totalWeight;
 	}
@@ -1116,7 +1116,7 @@ namespace airplane {
 
 /*
 	Notes:
-		
+
 	// Climb Functions
 
 		(ROC)_max = (Excess Power)_max / Weight
@@ -1137,14 +1137,14 @@ namespace airplane {
 	// Wing Weight Approx (Raynmond w/ FAR 25 Cert for n and a 1.5 safety factor)
 
 		Equation:
-		weight = RAYMOND_CST * pow(totalWeight * n_ult, 0.557) * pow(wingArea, 0.649) 
-			* sqrt(aspectRatio) * pow(thicknessRatio, -0.4) * pow(1 + taperRatio, 0.1) 
+		weight = RAYMOND_CST * pow(totalWeight * n_ult, 0.557) * pow(wingArea, 0.649)
+			* sqrt(aspectRatio) * pow(thicknessRatio, -0.4) * pow(1 + taperRatio, 0.1)
 			* (1 / cos(sweepAngle)) * pow(controlArea, 0.1);
-	
+
 		weight = K * pow(totalWeight * n_ult, 0.557)
 
 		totalWeight = wingWeight + everything else
-		So need to solve iteratively 
+		So need to solve iteratively
 
 
 
@@ -1152,7 +1152,7 @@ namespace airplane {
 	// calcTakeoffTime():
 		This function assumes we start climbing at V2 = 1.2V_stall = 1.2 * sqrt((2*W) / (rho*CL_max*S))
 		And we climb until we reach 500 ft.. which is on the low end of FAA regs
-			I have doubts that this is the best way to takeoff for a time-to-climb... 
+			I have doubts that this is the best way to takeoff for a time-to-climb...
 			but for realism and the purpose of integrating lec content into this program
 			we will take this approach
 
@@ -1162,10 +1162,10 @@ namespace airplane {
 		 a  = F/m
 			Force = Thrust - Drag - Rolling Resistance
 			F = T - qSC_D - mu*(W-(q*S*C_L))
-		    m = W/g
+			m = W/g
 
 
-	// 
+	//
 
 */
 
@@ -1216,8 +1216,8 @@ namespace airplane {
 
 		return totalLift;
 	}
-	
-	
+
+
 	*/
 
 

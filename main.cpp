@@ -17,7 +17,7 @@ using namespace atmosphere_properties;
 using namespace airplane;
 using namespace kaden_math;
 
-
+//new
 
 /*
 	To Do List:
@@ -94,16 +94,23 @@ int main() {
 
 
 	/*
+		// Debugging 
 		printUsefulCharacteristics(mainWing, airplane);
+		double totalWeight = airplane.getWeight();
+		if (totalWeight < 25000 * 2.205) {
+			double weightNeeded = 25000 * 2.205 - totalWeight;
+			airplane.setMainWingWeight(airplane.getMainWingWeight() + weightNeeded);
+		}
 		cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
 		cout << endl << endl << endl;
 	*/
 
 
 	wingOptimizerResults results;
-	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
+	//results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 
 	for (int i = 0; i < results.wingVector.size(); i++) {
+		cout << fixed << setprecision(5);
 		cout << "Time: " << results.climbTimeVector[i] / 60 << " mins";
 		cout << " Wing Span: " << results.wingVector[i].getSpan() << " ft" << endl;
 		cout << endl << endl;
