@@ -62,7 +62,43 @@ By programming using the aforementioned metholodiges, particularly the classes I
 
 ### Airplane:
 #### Overview:
+
 #### Assumptions:
+1. abc
+2. abcc
+3. abcc
+
+#### Notable Functions:
+
+### void getPowerCurveCSV(double gamma, double height, string fileName) const
+description:
+
+### double calcBestTimeTo9km(double startHeight, double takeOffEndHeight)
+description:
+
+Relies on:
+#### double calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height)
+description:
+
+#### double calcBestClimbTime(double startHeight, double startVelocity, double endHeight);        // Returns seconds 
+description: This also relies upon other functions
+
+
+
+
+### void calcAndSetLiftCoeff()
+description:
+
+### void calcAndSetPowerCurveData(double height)
+description:
+
+
+### void calcAndSetPowerCurveData(double height)
+description:
+
+
+
+
 
 <br>
 
