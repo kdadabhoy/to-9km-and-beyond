@@ -69,7 +69,7 @@ int main() {
 	double givenAirplaneWeight = 23000 * 2.20462;										// lbms, this it the HT + VT + Fuselage + startingFuel + Payload
 	double startingFuelWeight = 1000 * 2.20462;											// lbm
 	double payLoadWeight = 1000 * 2.20462;												// lbm
-	givenAirplaneWeight = givenAirplaneWeight - startingFuelWeight - payLoadWeight - (2*1670);     // 1670 lbms is CF34_3B1
+	givenAirplaneWeight = givenAirplaneWeight - startingFuelWeight - payLoadWeight - (2 * 1670);     // 1670 lbms is CF34_3B1
 	double fuselageWeight = .95 * givenAirplaneWeight;									// lbms... we will also store the VT and HT weight in this
 	double nacelleWeight = .025 * givenAirplaneWeight;									// just said each one is 2.5% of fuselage+VT+HT
 	double fuselageLength = 216;														// inches
@@ -93,22 +93,22 @@ int main() {
 
 
 
-/*
-	printUsefulCharacteristics(mainWing, airplane);
-	cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
-	cout << endl << endl << endl;
-*/
+	/*
+		printUsefulCharacteristics(mainWing, airplane);
+		cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
+		cout << endl << endl << endl;
+	*/
 
 
 	wingOptimizerResults results;
 	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
-	
+
 	for (int i = 0; i < results.wingVector.size(); i++) {
-		cout << "Time: " << results.climbTimeVector[i]/ 60 << " mins";
+		cout << "Time: " << results.climbTimeVector[i] / 60 << " mins";
 		cout << " Wing Span: " << results.wingVector[i].getSpan() << " ft" << endl;
 		cout << endl << endl;
 	}
-	
+
 	return 0;
 }
 
@@ -127,7 +127,7 @@ int main() {
 		2) Fix span at the top 3 best values and optimize ct and cr (use a nester loop for this)
 		3) Fix all the previous variables and optimize sweep angle
 		4) Re-run from start with new min and max variables
-			- like take top 3 spans from span optimizer.. then optimize other vars... then run run optimizer for span.. 
+			- like take top 3 spans from span optimizer.. then optimize other vars... then run run optimizer for span..
 
 
 		Notes:
@@ -190,18 +190,8 @@ wingOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B
 		}
 
 		assert(newAirplane.getWeight() >= MIN_TOTAL_WEIGHT - .1);
-
-	
-	// debugging - delete
-		printUsefulCharacteristics(wingVector[i], newAirplane);
-		cout << newAirplane.calcBestTimeTo9km(START_HEIGHT, TAKE_OFF_END_HEIGHT) / 60 << " mins" << endl;
-		cout << endl << endl << endl;
-	//delete
-
-
 		double climbTime = newAirplane.calcBestTimeTo9km(START_HEIGHT, TAKE_OFF_END_HEIGHT);
 		climbTimeVector.push_back(climbTime);
-
 	}
 
 	sortWingsByClimbTime(wingVector, climbTimeVector);
@@ -257,7 +247,7 @@ void sortWingsByClimbTime(vector<Wing>& wings, vector<double>& climbTimes) {
 	vector<double> sortedTimes;
 
 	for (int i = 0; i < indices.size(); i++) {
-		int idx = indices[i];         
+		int idx = indices[i];
 		sortedWings.push_back(wings[idx]);
 		sortedTimes.push_back(climbTimes[idx]);
 	}
