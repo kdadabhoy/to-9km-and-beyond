@@ -30,20 +30,10 @@ struct wingSpanOptimizerResults {
 
 
 
-
-
-
-
-
 void printUsefulCharacteristics(Wing& inWing, Airplane& inAirplane);
-
 wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight);
 void sortWingsByClimbTime(vector<double>& wingSpans, vector<double>& climbTimes);
 void spanOptimizerResultsToCSV(wingSpanOptimizerResults& results, string fileName);
-
-
-
-
 
 
 
@@ -72,34 +62,76 @@ int main() {
 
 	// Main Wing Stuff, this is what will be optimized
 	double mainSpan = 20 * 12;
-	double mainRootChord = 186.7;
-	double mainTipChord = 74.7;
+	double mainRootChord = 12 * 12;
+	double mainTipChord = 7*12;
 	double mainSweepAngle = 20;
-	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);      // mainWing weight will be calculated by airplane
 
+	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);      // mainWing weight will be calculated by airplane
 	Airplane airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 
+	AtmosphereProperties Cond(0);
 
-	/*
+	
+
 		// Debugging 
 		double startHeight = 0;
 		double takeOffEndHeight = 500;
 		double totalWeight = airplane.getWeight();
+
+		cout << "Feasibly? " << airplane.isWingPossible() << endl;
+
+
+
+		double limitLift = airplane.calcLimitLift();
+		double taperRatio = mainWing.getTaperRatio();
+		double thicknessRatio = NACA2412.getThicknessRatio();
+
+		double rootMomentfromOutside = (limitLift * mainWing.getSpan() * (1 + (2*mainWing.getTaperRatio())) / (6* (1 + mainWing.getTaperRatio())));
+
+		double inertia = (.2/12) * (mainWing.getRootChord()) * (thicknessRatio * mainWing.getRootChord()) * (thicknessRatio * mainWing.getRootChord()) / 2;
+		double C_CST = (thicknessRatio * mainWing.getRootChord()) / 2;
+		double sigma = rootMomentfromOutside * C_CST / inertia;
+
+
+
+		cout << "Limit Lift Outside " << limitLift << endl;
+		cout << "Outside Root moment " << rootMomentfromOutside << endl;
+		cout << "Outside C cst " << C_CST << endl;
+		cout << "Outside inertia " << inertia << endl;
+		cout << "Outside airfoil thick " << thicknessRatio << endl;
+		cout << "Outside root stress (ksi) " << sigma * 0.006944 / 1000 << endl;
+
+		cout << endl << endl;
+		cout << "From Function Calls: " << endl;
+		cout << "Root Moment (lbf*ft) " << airplane.calcRootLimitMoment() << endl;
+		cout << "C constant " << mainWing.calc_C_ForRootStress() << endl;
+		cout << "Inertia " << mainWing.calcRootInertiaEstimate() << endl;
+		cout << "Root Stress (ksi) " << airplane.calcRootLimitStress() << endl;
+
+
+
+
+
+		/*
 		if (totalWeight < 25000 * 2.205) {
 			double weightNeeded = 25000 * 2.205 - totalWeight;
 			airplane.setMainWingWeight(airplane.getMainWingWeight() + weightNeeded);
 		}
-		printUsefulCharacteristics(mainWing, airplane);
+		//printUsefulCharacteristics(mainWing, airplane);
 		cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
 		cout << endl << endl << endl;
 		//airplane.getPowerCurveCSV(10000, "example.csv");
 	*/
 
 
-	wingSpanOptimizerResults results;
-	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
-	spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
 
+
+
+
+	//wingSpanOptimizerResults results;
+	//results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
+	//spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
+	/*
 	for (int i = 0; i < results.wingSpanVector.size(); i++) {
 		cout << fixed << setprecision(5);
 		cout << "Time: " << results.climbTimeVector[i] << " mins";
@@ -107,7 +139,7 @@ int main() {
 		cout << endl;
 
 	}
-
+	*/
 	return 0;
 }
 
@@ -130,9 +162,9 @@ int main() {
 wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight) {
 
 	// Adjustable Constants:
-	double SPAN_MIN = 12 * 12;			// Just saying span is 12 ft rn (prob should be higher)
+	double SPAN_MIN = 20 * 12;			// Raymond's Wing weight approx dictates this min
 	double SPAN_MAX = 100 * 12;			// Run it high, then adjust (*12 to convert to inches)
-	int NUM_STEPS = 100;				// NUM_STEPS = 100 takes about 1 min and 15s to run
+	int NUM_STEPS = 1;				// NUM_STEPS = 100 takes about 1 min and 15s to run
 
 	double TAKE_OFF_END_HEIGHT = 500;   // Change to 0, 10, or 50ft when wanting to get best possible plane
 	double START_HEIGHT = 0;            // Don't change

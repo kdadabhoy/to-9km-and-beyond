@@ -58,6 +58,17 @@ namespace airplane {
 		double calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height);
 
 
+		// Feasability of Wing
+		bool isWingPossible() const;                       // Returns true if the mainWing can withstand the load & takeoff
+
+
+		// Make below Private
+		double calcLimitLift() const;			           // Capped by n_limit.. in theory could be capped by n_ult (if allow plastic deformation)
+		double calcRootLimitMoment() const;                // Returns lbf*ft
+		double calcRootLimitStress() const;                // Returns ksi
+		double calcMinSpanNeeded(double maxRootStressKSI) const; // Returns ft, takes in ksi
+
+
 		// Accessors:
 		double getWeight() const;							// lbms
 		double getMainWingWeight() const;                   // lbms
@@ -91,7 +102,8 @@ namespace airplane {
 
 		// Class automatically assigns:
 		double referenceArea;    // ft^2, Class assigns this the area of the main wing
-		double totalWeight;      // lbm,  Class calculates this
+		double totalWeight;      // lbm,  Class calculates this (and uses it to reset
+		double MTOW;             // lbm,  Class assigns this when the object is created or reset (Max Takeoff Weight)
 		LiftCoeff CL;            // CL of the whole plane
 
 
@@ -113,8 +125,10 @@ namespace airplane {
 		static constexpr double SMUDGE_FACTOR = 0.85;                     // Our wing is an advanced composite... obviously! (Table 15.4 from Raymond book)
 		static constexpr double PERCENT_CONTROL_SURFACE_AREA = 0.10;      // % Control Surface Area of main Wing (Approx 10%)
 
-		static constexpr double MAX_MTOW = 35000 * 2.20462;               // lbms, Project specifications / Max limit for this competition
-		static constexpr double MIN_MTOW = 25000 * 2.20462;               // lbms, Project specifications / Min limit for this competition
+		//static constexpr double MAX_MTOW = 35000 * 2.20462;              // lbms, Project specifications / Max limit for this competition
+		//static constexpr double MIN_MTOW = 25000 * 2.20462;              // lbms, Project specifications / Min limit for this competition
+
+		double N_ULT;                                                     // Calculated and set in Wing Weight (n_lim*LOAD_SAFETY_FACTOR)
 
 
 		// Power Function's Curve Constants
@@ -130,31 +144,10 @@ namespace airplane {
 		static constexpr double GRAVITY = 32.2;
 
 
-		// Plotting Variables and Functions:
-		bool plotting = false;                // If false doesn't matter what others are set to, no plotting happens
-		bool plotGammaVsTime = false;
-		bool plotGammaVsHeight = false;
-		bool plotMaxExcesssPowerVsTime = false;
-		vector<double> time;
-		vector<double> gamma;
-		vector<double> height;
-		vector<double> excessPower;
-		// etc
-
-		// Obviously need to change some of these to public memember functions... and implement them
-		void setPlotting(bool plotting, bool plotGammaVsTime, bool plotGammaVsHeight, bool plotMaxExcesssPowerVsTime); // Add all other plotting bools to this
-		void collectDataPoints(double inTime, double inHeight, double inGamma, double inExcessPower);  // This function will call all other collectDataPoint functions... only if their	
-		// bool is true
-		// 
-// These functions make the actual functions more readable and avoid repeating code (if plotting, if plotGammaVsTime, time.push_back(inTime) etc etc)
-		void collectTimeDataPoint(double inTime);     // append inTime to time vector 
-		void collectHeightDataPoint(double inHeight); // append inHeight to height vector
-		void collectGammaDataPoint(double inGamma);   // append inGamma to gamma vector
-		// etc
-
-		void writeHeaderToFile(string& fileDirectory, string& fileName); // appending airplane characterisitcs to top of file
-		void exportDataToCSV(string& fileDirectory, string& fileName);   // calls printHeaderFile... etc etc... used to get data to a file the python script can use
-		void plotData(string& fileDirectory, string& fileName);          // Call a python script to plot all this stuff and put it in x place
+		// Feasibility of Wing Constants
+		static constexpr double SIGMA_YIELD_COMPOSITE = 101.526;    // ksi (700MPa) (rough estimate), NOTE: Composites have higher sigma than steel, while also having less weight
+		static constexpr double PSF_TO_PSI = 0.006944;				// psf * PSF_TO_PSI = psi
+		static constexpr double PSI_TO_KSI = .001;                  // psi * PSI_TO_KSI = ksi
 
 
 
@@ -190,15 +183,12 @@ namespace airplane {
 		void calcEndRunwayAirplaneProperties(double height, double& totalTime, double& velocity) const;   // Modifies the passed by reference totalTime and velocity to what it is 																									        // When the airplane leaves the runway 
 																										  // Should always pass in velocity = 0 (start from rest)
 																									      // Should always pass in totalTime = 0 (time starts at 0)
-
+		/* // Make private
 		// Checking if the Wing is possible
-		double calcRootMoment() const;            // M_root = pi/8 * W*n*b for ellipitical trapezodial wing
-		double calcSparAllowableMoment() const;  
-		bool isWingPossible() const;              // See if M_root <= M_allowable and see if we can actually takeoff with it
-												  // Rework takeoff function to see if takeoff is possible.. need to calculate Rotational Speed
-
-
-
+		double calcLimitLift() const;			  // Capped by n_limit.. in theory could be capped by n_ult (if allow plastic deformation)
+		double calcRootLimitMoment() const;            // M_root = pi/8 * W*n*b for ellipitical trapezodial wing
+		double calcRootLimitStress() const;
+		*/
 	};
 
 
@@ -210,6 +200,38 @@ namespace airplane {
 #endif
 
 
+
+/* Plotting Stuff (maybe add later)
+
+		// Plotting Variables and Functions:
+		bool plotting = false;                // If false doesn't matter what others are set to, no plotting happens
+		bool plotGammaVsTime = false;
+		bool plotGammaVsHeight = false;
+		bool plotMaxExcesssPowerVsTime = false;
+		vector<double> time;
+		vector<double> gamma;
+		vector<double> height;
+		vector<double> excessPower;
+		// etc
+
+
+		// Obviously need to change some of these to public memember functions... and implement them
+		void setPlotting(bool plotting, bool plotGammaVsTime, bool plotGammaVsHeight, bool plotMaxExcesssPowerVsTime); // Add all other plotting bools to this
+		void collectDataPoints(double inTime, double inHeight, double inGamma, double inExcessPower);  // This function will call all other collectDataPoint functions... only if their
+		// bool is true
+		//
+// These functions make the actual functions more readable and avoid repeating code (if plotting, if plotGammaVsTime, time.push_back(inTime) etc etc)
+		void collectTimeDataPoint(double inTime);     // append inTime to time vector
+		void collectHeightDataPoint(double inHeight); // append inHeight to height vector
+		void collectGammaDataPoint(double inGamma);   // append inGamma to gamma vector
+		// etc
+
+		void writeHeaderToFile(string& fileDirectory, string& fileName); // appending airplane characterisitcs to top of file
+		void exportDataToCSV(string& fileDirectory, string& fileName);   // calls printHeaderFile... etc etc... used to get data to a file the python script can use
+		void plotData(string& fileDirectory, string& fileName);          // Call a python script to plot all this stuff and put it in x place
+
+
+*/
 
 
 

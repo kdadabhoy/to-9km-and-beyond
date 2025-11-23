@@ -490,6 +490,75 @@ namespace airplane {
 
 
 
+	// Moment Approx Functions
+
+
+
+	double Wing::calcRootMoment(double Lift) const {
+		// Assumes trapezodial Wing with linear taper
+		// M_root_limit = L_limit * b * (1 + 2*taper) / (6 * (1 + taper) for trapezodial wings
+
+		return (Lift * span * (1 + (2 * taperRatio))) / (6 * (1 + taperRatio));   // lbf*ft
+	}
+
+
+
+
+
+
+
+
+	double Wing::calcRootInertiaEstimate() const {
+		// Assumes the root is a thin box (neglecting spars)
+		// Uses Naghshineh-Pour's (Virgina Polytech) Thesis
+		// Structural Optimization and Design of a Strut-Braced Wing Aircraft equation
+		// I_root = t(y) * c(y) * (d(y))^2 / 2
+		// t = skin thickness, c = local chord, d ~= (t/c)_airfoil * local chord
+
+		double t_root = .2 / 12;               // An assumption that the skin is .2 inches thick                             
+		double d_root = airfoil->getThicknessRatio() * rootChord;
+		return t_root * rootChord * d_root * d_root / 2;        // ft
+	}
+
+
+
+
+
+
+
+	double Wing::calc_C_ForRootStress() const {
+		// Assumes the root is a thin box
+		// c ~= d_root / 2 if assuming box
+		return airfoil->getThicknessRatio() * rootChord / 2;        // ft
+	}
+
+
+
+
+
+
+
+
+
+	double Wing::calcLocalChord(double distanceFromRoot) const {
+		// For trapezodial wing (straight-taper wing)
+		// c(y) = c_r[1-(1-taper)*(2y/b)], b is half span
+		// 0<= distanceFromRoot <= b/2
+		return rootChord * (1 - ((1 - taperRatio) * ((2*distanceFromRoot) / span)));
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -521,6 +590,13 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
 // Accessors:
 	double Wing::getArea() const {
 		return area;
@@ -538,6 +614,15 @@ namespace airplane {
 	}
 
 
+
+
+
+
+
+
+	double Wing::getRootChord() const {
+		return rootChord;
+	}
 
 
 

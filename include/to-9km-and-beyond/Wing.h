@@ -29,6 +29,11 @@ namespace airplane {
 		double calcLiftCoeff(double AoA_rad) const;													 
 		double calcMcc(double AoA_rad) const; 
 
+	// Moment Approxs
+		double calcRootMoment(double Lift) const;              // Returns lbf*ft
+		double calcRootInertiaEstimate() const;                // Returns ft^4
+		double calcLocalChord(double distanceFromRoot) const;  // Returns ft
+		double calc_C_ForRootStress() const;                   // Returns ft
 
 	// Maybe Useful Functions, Assume Trapezodial Wing
 		double calcArea(double inSpan, double inRootChord, double inTaperRatio) const;                
@@ -46,7 +51,8 @@ namespace airplane {
 	// Accessors
 		double getArea() const;                 // ft^2
 		double getMAC() const;                  // ft
-		double getTaperRatio() const;           
+		double getRootChord() const;            // ft
+		double getTaperRatio() const;    
 		double getAspectRatio() const;  
 		double getSpan() const;					// ft
 		double getWeight() const;               // lbm

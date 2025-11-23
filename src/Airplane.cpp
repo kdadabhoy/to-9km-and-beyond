@@ -36,6 +36,8 @@ namespace airplane {
 		payLoadWeight = 0;
 		referenceArea = 0;
 		totalWeight = 0;
+		MTOW = totalWeight;
+		N_ULT = 0;
 		CL.setCL_Alpha(0);
 		CL.setCL_Knott(0);
 	}
@@ -73,7 +75,7 @@ namespace airplane {
 			calcAndSetMainWingWeight();				// Now calc main wing weight using Raymond Approx
 			totalWeight += mainWing->getWeight();   // Add mainWingWeight to totalWeight
 		}
-
+		MTOW = totalWeight;
 	}
 
 
@@ -933,7 +935,8 @@ namespace airplane {
 
 
 
-	// Wing Weight Approx (Raynmond w/ FAR 25 Cert for n and a 1.5 safety factor)
+	// Wing Weight Approx (Raynmond Cargo/Transport Approx)
+	// (w/ FAR 25 Cert for n and a 1.5 safety factor)
 	// weight = K * pow(totalWeight * n_ult, 0.557)
 	void Airplane::calcAndSetMainWingWeight() {
 		double wingArea = mainWing->getArea() * (1 - PERCENT_CONTROL_SURFACE_AREA); // wingArea = totalArea - control surface area
@@ -986,8 +989,101 @@ namespace airplane {
 			outer_iter++;
 		}
 
+		N_ULT = N_ult;
 		mainWing->setWeight(wingWeight * SMUDGE_FACTOR);
 		return;
+	}
+
+
+
+
+
+
+
+
+	// Wing Feasability Functions:
+
+
+	double Airplane::calcLimitLift() const {
+		// L_lim = n_lim * MTOW 
+		return (N_ULT / LOAD_SAFETY_FACTOR) * MTOW;
+	}
+
+
+
+
+
+
+	double Airplane::calcRootLimitMoment() const {
+		double limitLift = calcLimitLift();
+		return mainWing->calcRootMoment(limitLift);
+	}
+
+
+
+
+
+
+
+	double Airplane::calcRootLimitStress() const {
+		// sigma_limit = M_root,_limit * c / I
+		// c = distance from neutral axis to the outermost fiber of the cross section
+		double sigma = calcRootLimitMoment() * mainWing->calc_C_ForRootStress() / mainWing->calcRootInertiaEstimate(); // psf
+		return sigma * PSF_TO_PSI * PSI_TO_KSI;  // returns ksi
+	}
+
+
+
+
+
+
+
+	// Maybe dumb
+	double Airplane::calcMinSpanNeeded(double maxRootStressKSI) const {
+		// sigma_limit = M_root,_limit * c / I
+		// c = distance from neutral axis to the outermost fiber of the cross section
+		double sigma = calcRootLimitMoment() * mainWing->calc_C_ForRootStress() / mainWing->calcRootInertiaEstimate(); // psf
+		return sigma * PSF_TO_PSI * PSI_TO_KSI;  // returns ksi
+	}
+
+
+
+
+
+
+
+
+
+	bool Airplane::isWingPossible() const {
+		// Need to see if Wing can
+		// 1) Material can withstand the maximum root load
+		// 2) If we have enough span
+		// 3) Actually Takeoff (?)
+		bool canWithStandLoad = false;
+		bool canTakeoff = true; // delete / set to false... set to true for testing purposes
+
+		double maxRootStress = calcRootLimitStress();
+		double maxLift = calcLimitLift();
+		double inertia = mainWing->calcRootInertiaEstimate();
+		double c_cst = mainWing->calc_C_ForRootStress();
+		double sigma_needed_ft = maxRootStress * 1000 * 144;
+		double taper = mainWing->getTaperRatio();
+		double spanNeeded = (6 * (1+taper) * sigma_needed_ft * inertia) / (maxLift * c_cst);
+
+		cout << "Span needed: " << spanNeeded << endl; // del
+
+		double currentSpan = mainWing->getSpan();
+
+		if (maxRootStress <= SIGMA_YIELD_COMPOSITE && spanNeeded >= currentSpan) {
+			canWithStandLoad = true;
+
+			if (canTakeoff) {
+				return true;
+			}
+
+		}
+
+		return false;
 	}
 
 
@@ -1002,7 +1098,13 @@ namespace airplane {
 
 
 
+
+
+
+
 	// Mutators:
+	
+	// This function completely resets the airplane with the new wing (weight goes back to MTOW)
 	void Airplane::setMainWing(Wing& inWing) {
 		assert(mainWing != nullptr);			// Precaution
 		mainWing = &inWing;
@@ -1015,6 +1117,7 @@ namespace airplane {
 			totalWeight += mainWing->getWeight();   // Add mainWingWeight to totalWeight
 		}
 
+		MTOW = totalWeight;
 		return;
 	}
 

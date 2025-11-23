@@ -137,7 +137,6 @@
     <ClCompile Include="src\Nacelle.cpp" />
     <ClCompile Include="src\TurboFan.cpp" />
     <ClCompile Include="src\Wing.cpp" />
-    <ClCompile Include="test_main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\to-9km-and-beyond\Airfoil.h" />
