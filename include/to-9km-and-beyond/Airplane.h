@@ -83,7 +83,7 @@ namespace airplane {
 
 
 		// Print Functions
-		void printMainWingCharacteristics() const;          // That long block of cout statements for AR, area, e, taper, etc
+		//void printMainWingCharacteristics() const;          // That long block of cout statements for AR, area, e, taper, etc
 
 
 

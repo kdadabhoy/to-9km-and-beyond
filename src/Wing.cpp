@@ -496,9 +496,11 @@ namespace airplane {
 
 	double Wing::calcRootMoment(double Lift) const {
 		// Assumes trapezodial Wing with linear taper
-		// M_root_limit = L_limit * b * (1 + 2*taper) / (6 * (1 + taper) for trapezodial wings
+		// From MIT Paper Lab 11 Lec Notes
+		// M_root = (N*W*b*(1+2*taper)) / (12(1+taper))
+			// N*W = Lift (N usually = 1)... 
 
-		return (Lift * span * (1 + (2 * taperRatio))) / (6 * (1 + taperRatio));   // lbf*ft
+		return (Lift * span * (1 + (2 * taperRatio))) / (12 * (1 + taperRatio));   // lbf*ft
 	}
 
 
@@ -506,18 +508,44 @@ namespace airplane {
 
 
 
-
-
+	/*
+	// Cap Way
 	double Wing::calcRootInertiaEstimate() const {
-		// Assumes the root is a thin box (neglecting spars)
-		// Uses Naghshineh-Pour's (Virgina Polytech) Thesis
-		// Structural Optimization and Design of a Strut-Braced Wing Aircraft equation
-		// I_root = t(y) * c(y) * (d(y))^2 / 2
-		// t = skin thickness, c = local chord, d ~= (t/c)_airfoil * local chord
+		// Assumes trapezodial Wing with linear taper
+		// Books claim that most of inertia comes from the cap
+			// Need to cite a book here
 
-		double t_root = .2 / 12;               // An assumption that the skin is .2 inches thick                             
-		double d_root = airfoil->getThicknessRatio() * rootChord;
-		return t_root * rootChord * d_root * d_root / 2;        // ft
+		double thicknessRatio = airfoil->getThicknessRatio();
+		double capThickness = .15 / 12; // Asume 1/8th of an inch
+		double capWidthFracOfChord = 0.3; // Assume .3*rootChord = capWidth
+
+		double inertia = 2 * capThickness * (capWidthFracOfChord * rootChord) * (.9 * thicknessRatio * rootChord);
+
+		return inertia;
+
+	}
+	*/
+
+
+
+
+
+
+
+	// MIT Way (Way higher Inertia)
+	double Wing::calcRootInertiaEstimate() const {
+		// Assumes trapezodial Wing with linear taper
+		// From MIT Paper Lab 11 Lec Notes
+		// I = .036*c_r^4 * (t/c) * ( (t/c)^2 + (h/c)^2)
+		// t/c = thickness ratio from airfoil
+		// h/c = max camber of airfoil divided by chord
+
+		double thicknessRatio = airfoil->getThicknessRatio();
+		double maxCamberRatio = airfoil->getMaxCamberRatio();
+
+		cout << "Inertia " << 0.036 * pow(rootChord, 4) * thicknessRatio * (pow(thicknessRatio, 2) + pow(maxCamberRatio, 2)) << endl; // 1.3255 ft
+
+		return 0.036 * pow(rootChord, 4) * thicknessRatio * (pow(thicknessRatio, 2) + pow(maxCamberRatio, 2));     // ft
 	}
 
 
@@ -525,13 +553,44 @@ namespace airplane {
 
 
 
+	// MIT Way
+	double Wing::calc_C_ForRootStress() const {
+		// sigma = Mc / I, c = h/2 
+		double thicknessRatio = airfoil->getThicknessRatio();
 
+		return 0.90 * thicknessRatio * rootChord;        // ft
+	}
+
+
+
+
+/*
+	// Cap Way
+	double Wing::calc_C_ForRootStress() const {
+		// sigma = M/C, C = Area_cap * h
+
+		double thicknessRatio = airfoil->getThicknessRatio();
+		double capThickness = .15 / 12; // Asume 1/8th of an inch
+		double capWidthFracOfChord = 0.3; // Assume .3*rootChord = capWidth
+
+
+		return capThickness * (capWidthFracOfChord * rootChord) * (.9 * thicknessRatio * rootChord);        // ft
+	}
+*/
+
+
+
+
+
+
+/*
+	// Old
 	double Wing::calc_C_ForRootStress() const {
 		// Assumes the root is a thin box
 		// c ~= d_root / 2 if assuming box
 		return airfoil->getThicknessRatio() * rootChord / 2;        // ft
 	}
-
+*/
 
 
 

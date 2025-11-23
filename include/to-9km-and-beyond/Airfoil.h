@@ -34,6 +34,7 @@ namespace airplane {
 		double getCl_KnottTerm() const;             // No one really cares about this
 		double getCl_alphaZeroLift() const;			// Radians
 		double getThicknessRatio() const;           // Returns t/c as a fraction
+		double getMaxCamberRatio() const;           // Returns h/c as a fraction
 		std::string getName() const;
 		void printName() const;
 
@@ -41,7 +42,7 @@ namespace airplane {
 
 	private:
 		std::string NACA;               
-		double maxCamber;									// Maximum camber (% of chord), 1st digit
+		double maxCamber;									// Maximum camber (h/c) (% of chord), 1st digit
 		double posMaxCamber;								// Location of maximum camber (% of chord), 2nd digit
 		double maxThickness;								// This is t/c; maximum thickness (% of chord), last 2 digits
 		LiftCoeff Cl;										// Stored in radians

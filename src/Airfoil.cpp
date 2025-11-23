@@ -106,6 +106,10 @@ namespace airplane {
 		return maxThickness;
 	}
 
+	double Airfoil::getMaxCamberRatio() const {
+		return maxCamber;
+	}
+
 	void Airfoil::printName() const {
 		std::cout << "NACA: " << NACA << std::endl;
 	}

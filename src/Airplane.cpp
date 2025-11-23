@@ -1025,13 +1025,55 @@ namespace airplane {
 
 
 
+	// MIT way
 	double Airplane::calcRootLimitStress() const {
 		// sigma_limit = M_root,_limit * c / I
-		// c = distance from neutral axis to the outermost fiber of the cross section
-		double sigma = calcRootLimitMoment() * mainWing->calc_C_ForRootStress() / mainWing->calcRootInertiaEstimate(); // psf
+
+		double sigma = (calcRootLimitMoment() * mainWing->calc_C_ForRootStress()) / mainWing->calcRootInertiaEstimate(); // psf
 		return sigma * PSF_TO_PSI * PSI_TO_KSI;  // returns ksi
 	}
 
+
+
+
+
+
+
+
+
+/*
+	// Cap Way
+	double Airplane::calcRootLimitStress() const {
+		// sigma_limit = M_root,_limit * c / I
+		// c = distance from neutral axis to the outermost fiber of the cross section 
+		double sigma = calcRootLimitMoment() / mainWing->calc_C_ForRootStress();
+		return sigma * PSF_TO_PSI * PSI_TO_KSI;  // returns ksi
+	}
+*/
+
+
+
+
+
+	
+
+
+
+
+
+
+
+	/* // Old
+		double Airplane::calcRootLimitStress() const {
+		// sigma_limit = M_root,_limit * c / I
+		// c = distance from neutral axis to the outermost fiber of the cross section 
+
+		double sigma = calcRootLimitMoment() * mainWing->calc_C_ForRootStress() / mainWing->calcRootInertiaEstimate(); // psf
+		return sigma * PSF_TO_PSI * PSI_TO_KSI;  // returns ksi
+	}
+	
+	
+	*/
 
 
 

@@ -61,7 +61,7 @@ int main() {
 	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
-	double mainSpan = 20 * 12;
+	double mainSpan = 50 * 12;
 	double mainRootChord = 12 * 12;
 	double mainTipChord = 7*12;
 	double mainSweepAngle = 20;
@@ -78,9 +78,9 @@ int main() {
 		double takeOffEndHeight = 500;
 		double totalWeight = airplane.getWeight();
 
+
+/*
 		cout << "Feasibly? " << airplane.isWingPossible() << endl;
-
-
 
 		double limitLift = airplane.calcLimitLift();
 		double taperRatio = mainWing.getTaperRatio();
@@ -104,34 +104,37 @@ int main() {
 		cout << endl << endl;
 		cout << "From Function Calls: " << endl;
 		cout << "Root Moment (lbf*ft) " << airplane.calcRootLimitMoment() << endl;
-		cout << "C constant " << mainWing.calc_C_ForRootStress() << endl;
+		//cout << "C constant " << mainWing.calc_C_ForRootStress() << endl;
 		cout << "Inertia " << mainWing.calcRootInertiaEstimate() << endl;
 		cout << "Root Stress (ksi) " << airplane.calcRootLimitStress() << endl;
+*/
 
 
 
 
 
-		/*
+
+
+
 		if (totalWeight < 25000 * 2.205) {
 			double weightNeeded = 25000 * 2.205 - totalWeight;
 			airplane.setMainWingWeight(airplane.getMainWingWeight() + weightNeeded);
 		}
-		//printUsefulCharacteristics(mainWing, airplane);
+		printUsefulCharacteristics(mainWing, airplane);
 		cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
 		cout << endl << endl << endl;
 		//airplane.getPowerCurveCSV(10000, "example.csv");
-	*/
 
 
 
 
 
 
-	//wingSpanOptimizerResults results;
-	//results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
-	//spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
-	/*
+
+	wingSpanOptimizerResults results;
+	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
+	spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
+	
 	for (int i = 0; i < results.wingSpanVector.size(); i++) {
 		cout << fixed << setprecision(5);
 		cout << "Time: " << results.climbTimeVector[i] << " mins";
@@ -139,7 +142,7 @@ int main() {
 		cout << endl;
 
 	}
-	*/
+
 	return 0;
 }
 
@@ -162,9 +165,9 @@ int main() {
 wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight) {
 
 	// Adjustable Constants:
-	double SPAN_MIN = 20 * 12;			// Raymond's Wing weight approx dictates this min
+	double SPAN_MIN = 12 * 12;			// Prob need to figure out a realistic min and set it here (will prob end up being the best wing)
 	double SPAN_MAX = 100 * 12;			// Run it high, then adjust (*12 to convert to inches)
-	int NUM_STEPS = 1;				// NUM_STEPS = 100 takes about 1 min and 15s to run
+	int NUM_STEPS = 100;				// NUM_STEPS = 100 takes about 1 min and 15s to run
 
 	double TAKE_OFF_END_HEIGHT = 500;   // Change to 0, 10, or 50ft when wanting to get best possible plane
 	double START_HEIGHT = 0;            // Don't change
