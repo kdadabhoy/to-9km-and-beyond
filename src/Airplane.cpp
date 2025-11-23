@@ -1079,7 +1079,7 @@ namespace airplane {
 
 
 
-
+/*
 	// Maybe dumb
 	double Airplane::calcMinSpanNeeded(double maxRootStressKSI) const {
 		// sigma_limit = M_root,_limit * c / I
@@ -1087,7 +1087,7 @@ namespace airplane {
 		double sigma = calcRootLimitMoment() * mainWing->calc_C_ForRootStress() / mainWing->calcRootInertiaEstimate(); // psf
 		return sigma * PSF_TO_PSI * PSI_TO_KSI;  // returns ksi
 	}
-
+*/
 
 
 

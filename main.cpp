@@ -61,7 +61,7 @@ int main() {
 	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
-	double mainSpan = 50 * 12;
+	double mainSpan = 20 * 12;
 	double mainRootChord = 12 * 12;
 	double mainTipChord = 7*12;
 	double mainSweepAngle = 20;
@@ -69,7 +69,7 @@ int main() {
 	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);      // mainWing weight will be calculated by airplane
 	Airplane airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 
-	AtmosphereProperties Cond(0);
+	//AtmosphereProperties Cond(0);
 
 	
 
@@ -165,7 +165,7 @@ int main() {
 wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight) {
 
 	// Adjustable Constants:
-	double SPAN_MIN = 12 * 12;			// Prob need to figure out a realistic min and set it here (will prob end up being the best wing)
+	double SPAN_MIN = 13 * 12;			// Breaks below 12; Prob need to figure out a realistic min and set it here (will prob end up being the best wing)
 	double SPAN_MAX = 100 * 12;			// Run it high, then adjust (*12 to convert to inches)
 	int NUM_STEPS = 100;				// NUM_STEPS = 100 takes about 1 min and 15s to run
 
@@ -187,6 +187,9 @@ wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF3
 	for (int i = 0; i < NUM_STEPS; i++) {
 		double newSpan = SPAN_MIN + (i * step);
 		newWing.setSpan(newSpan);
+
+		cout << "Span: " << newSpan << endl; // delete
+
 		Airplane newAirplane(newWing, inHT, inVT, inEngine, inNacelle, inFuselage, inFuelWeight, inPayLoadWeight);
 
 		double totalWeight = newAirplane.getWeight();
