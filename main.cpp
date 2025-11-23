@@ -62,21 +62,34 @@ int main() {
 
 	// Main Wing Stuff, this is what will be optimized
 	double mainSpan = 20 * 12;
-	double mainRootChord = 12 * 12;
-	double mainTipChord = 7*12;
+	double mainRootChord = 186.7;
+	double mainTipChord = 74.7;
 	double mainSweepAngle = 20;
-
 	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);      // mainWing weight will be calculated by airplane
-	Airplane airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 
-	//AtmosphereProperties Cond(0);
+	Airplane airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 
 	
 
-		// Debugging 
+	/*
+		// Debugging
 		double startHeight = 0;
 		double takeOffEndHeight = 500;
 		double totalWeight = airplane.getWeight();
+		if (totalWeight < 25000 * 2.205) {
+			double weightNeeded = 25000 * 2.205 - totalWeight;
+			airplane.setMainWingWeight(airplane.getMainWingWeight() + weightNeeded);
+		}
+		printUsefulCharacteristics(mainWing, airplane);
+		cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
+		cout << endl << endl << endl;
+		//airplane.getPowerCurveCSV(10000, "example.csv");
+	*/
+
+
+
+
+
 
 
 /*
@@ -116,25 +129,12 @@ int main() {
 
 
 
-		if (totalWeight < 25000 * 2.205) {
-			double weightNeeded = 25000 * 2.205 - totalWeight;
-			airplane.setMainWingWeight(airplane.getMainWingWeight() + weightNeeded);
-		}
-		printUsefulCharacteristics(mainWing, airplane);
-		cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
-		cout << endl << endl << endl;
-		//airplane.getPowerCurveCSV(10000, "example.csv");
-
-
-
-
-
 
 
 	wingSpanOptimizerResults results;
 	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 	spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
-	
+
 	for (int i = 0; i < results.wingSpanVector.size(); i++) {
 		cout << fixed << setprecision(5);
 		cout << "Time: " << results.climbTimeVector[i] << " mins";
@@ -165,7 +165,7 @@ int main() {
 wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight) {
 
 	// Adjustable Constants:
-	double SPAN_MIN = 13 * 12;			// Breaks below 12; Prob need to figure out a realistic min and set it here (will prob end up being the best wing)
+	double SPAN_MIN = 12 * 12;			// Breaks below 12; Prob need to figure out a realistic min and set it here (will prob end up being the best wing)
 	double SPAN_MAX = 100 * 12;			// Run it high, then adjust (*12 to convert to inches)
 	int NUM_STEPS = 100;				// NUM_STEPS = 100 takes about 1 min and 15s to run
 
