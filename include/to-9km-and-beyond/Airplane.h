@@ -27,9 +27,18 @@ namespace airplane {
 
 		// Structs for helper functions
 		struct SteadyLevelAccelerationTimeProperties {
-			double timeTaken = 0;         // stored in seconds
-			double finalVelocity = 0;     // stored in ft/s
+			double timeTaken = 0;         // seconds
+			double finalVelocity = 0;     // ft/s
 			bool canReachFinalVel = true; // returns false if it can't reach final vel
+		};
+
+
+
+		struct TakeoffProperties {
+			double timeTaken = 0;          // seconds, total Time taken
+			double height = 0;             // ft, final height
+			double finalVelocity = 0;      // ft/s, final velocity
+			double finalWeight = 0;        // lbm, returns finalWeight of Airplane
 		};
 
 
@@ -50,16 +59,16 @@ namespace airplane {
 
 		// Takeoff Functions
 			// Probably create a struct and return a struct instead of passing by reference
-		void calcTakeoffPropertites(double height, double& endHeight, double& totalTime, double& velocity);  // Use this one.. totalTime should be in seconds
-		double calcTakeoffTime(double height, double endHeight);                                           // Just returns time... less useful
+		TakeoffProperties calcTakeoffPropertites(double startHeight, double endHeight, double startVelocity, double startWeight);  // Use this one.. totalTime should be in seconds
+		double calcTakeoffTime(double height, double endHeight);                                             // Just returns time... less useful
 
 
 		// Climb Functions
-		double calcBestTimeTo9km(double startHeight, double takeOffEndHeight);       // Returns seconds, more CPU intensive (but more accurate)
-		double calcBestTimeTo9kmApprox(double startHeight, double takeOffEndHeight); // Returns seconds, less CPU intensive (but less accurate)
+		double calcBestTimeTo9km(double startHeight, double takeOffEndHeight);       // Returns seconds, more CPU intensive (but more accurate), updates totalWeight
+		double calcBestTimeTo9kmApprox(double startHeight, double takeOffEndHeight); // Returns seconds, less CPU intensive (but less accurate), updates totalWeight
 
-		double calcBestClimbTime(double startHeight, double startVelocity, double endHeight);        // Returns seconds 
-		double calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight);   // doesnt do power curve at every height... just some
+		double calcBestClimbTime(double startHeight, double startVelocity, double endHeight);        // Returns seconds, updates totalWeight 
+		double calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight);   // doesnt do power curve at every height... just some, updates totalWeight
 
 		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;        // Gamma in degrees, Returns AoA in rad
 		double calcSteadyClimbAoAApprox(double velocity, double density) const;				   // Small angle approx, so cos(gamma) = 1
@@ -67,11 +76,18 @@ namespace airplane {
 
 		// Steady Level Flight Functions (L = W)
 		double calcSteadyLevelAoA(double velocity, double density) const;
-		SteadyLevelAccelerationTimeProperties calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height);
+		SteadyLevelAccelerationTimeProperties calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height); // updates totalWeight
+
+
+
+
 
 
 		// Feasability of Wing
 		bool isWingPossible() const;                       // Returns true if the mainWing can withstand the load & takeoff
+
+
+
 
 
 		// Make below Private
@@ -193,10 +209,11 @@ namespace airplane {
 
 
 		// Takeoff Functions:
-			// Should prob turn this into a struct
-		void calcEndRunwayAirplaneProperties(double height, double& totalTime, double& velocity) const;   // Modifies the passed by reference totalTime and velocity to what it is 																									        // When the airplane leaves the runway 
-																										  // Should always pass in velocity = 0 (start from rest)
-																									      // Should always pass in totalTime = 0 (time starts at 0)
+	
+
+		TakeoffProperties calcEndRunwayAirplaneProperties(double height, double startVelocity, double startWeight) const; // startVelocity should = 0 usually
+
+
 		/* // Make private
 		// Checking if the Wing is possible
 		double calcLimitLift() const;			  // Capped by n_limit.. in theory could be capped by n_ult (if allow plastic deformation)

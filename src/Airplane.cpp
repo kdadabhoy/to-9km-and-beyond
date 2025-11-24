@@ -636,6 +636,7 @@ namespace airplane {
 			calcAndSetMaxExcessPower();
 
 			if (fabs(velocity - velocityMaxExcessPower) > VELOCITY_ERROR && canReachMaxVelocity) {
+				// calcSteadyLevelAccel also updates Weight
 				accelProperties = calcSteadyLevelAccelerationTime(velocity, velocityMaxExcessPower, height);
 				totalTime += accelProperties.timeTaken;
 				velocity = accelProperties.finalVelocity;
@@ -669,6 +670,13 @@ namespace airplane {
 					// Want to try reach maxExcessVel again
 					canReachMaxVelocity = true; 
 				}
+
+
+				// Weight Loss Consideration
+				// totalWeight -= engine->calcFuelLoss2(TIME_STEP, height, velocity); // uncomment this
+
+
+
 
 				/*
 					// If you want to see how gamma changes during flight
@@ -725,6 +733,7 @@ namespace airplane {
 			}
 
 			if (fabs(velocity - velocityMaxExcessPower) > VELOCITY_ERROR && canReachMaxVelocity) {
+				// calcSteadyLevelAccel also updates Weight
 				accelProperties = calcSteadyLevelAccelerationTime(velocity, velocityMaxExcessPower, height);
 				totalTime += accelProperties.timeTaken;
 				velocity = accelProperties.finalVelocity;
@@ -758,6 +767,9 @@ namespace airplane {
 					// Want to try reach maxExcessVel again
 					canReachMaxVelocity = true; 
 				}
+
+				// Weight Loss Consideration
+				// totalWeight -= engine->calcFuelLoss2(TIME_STEP, height, velocity); // uncomment this
 			}
 		}
 		return totalTime;
@@ -773,10 +785,16 @@ namespace airplane {
 	double Airplane::calcBestTimeTo9km(double startHeight, double takeOffEndHeight) {
 		double END_HEIGHT = 29527.6 + startHeight; // 9km in ft
 		double velocity = 0;                       // Starting from rest
-		double totalTime = 0;
 
+		TakeoffProperties takeoffProperties = calcTakeoffPropertites(startHeight, takeOffEndHeight, velocity, totalWeight);
 
-		calcTakeoffPropertites(startHeight, takeOffEndHeight, totalTime, velocity);
+		double totalTime = takeoffProperties.timeTaken;
+		velocity = takeoffProperties.finalVelocity;
+		takeOffEndHeight = takeoffProperties.height;
+
+		// Weight Loss Consideration
+		//totalWeight = takeoffProperties.finalWeight; // uncomment this
+
 		totalTime += calcBestClimbTime(takeOffEndHeight, velocity, END_HEIGHT);
 
 		return totalTime; // Returns time in seconds
@@ -792,9 +810,16 @@ namespace airplane {
 	double Airplane::calcBestTimeTo9kmApprox(double startHeight, double takeOffEndHeight) {
 		double END_HEIGHT = 29527.6 + startHeight; // 9km in ft
 		double velocity = 0;                       // Starting from rest
-		double totalTime = 0;
 
-		calcTakeoffPropertites(startHeight, takeOffEndHeight, totalTime, velocity);
+		TakeoffProperties takeoffProperties = calcTakeoffPropertites(startHeight, takeOffEndHeight, velocity, totalWeight);
+
+		double totalTime = takeoffProperties.timeTaken;
+		velocity = takeoffProperties.finalVelocity;
+		takeOffEndHeight = takeoffProperties.height;
+
+		// Weight Loss Consideration
+		//totalWeight = takeoffProperties.finalWeight; // uncomment
+
 		totalTime += calcBestClimbTimeApprox(takeOffEndHeight, velocity, END_HEIGHT);
 
 		return totalTime; // Returns time in seconds
@@ -905,9 +930,9 @@ namespace airplane {
 
 	// Takeoff Functions
 
-		// *** Need to account for weight loss ***
-
-		// See physics derivation in notes
+	// *** Need to account for weight loss ***
+	// See physics derivation in notes
+	// Old - doesnt account for totalWeightLoss
 	double Airplane::calcTakeoffTime(double height, double endHeight) {
 		double totalTime = 0;
 		double velocity = 0;  // Start from rest 
@@ -965,32 +990,46 @@ namespace airplane {
 
 
 
-	// *** Need to account for weight loss ***
 
-	// A modified calcTakeOffTime (same logic)... but "returns" (modifies the passed by reference variables:
-	// endVelocity and totalTime and endHeight... which is often needed
 	// Note: a common FAA endheight is around 500 ft... the best endHeight for climb is 0 ft (with the way the program is written)
 		// Technically 0 ft shouldn't be the best... unless you were somehow able to get rid of your wheels...
 		// But with the assumption you are able to steady level accelerate at 0 ft... and ignoring ground effect... 0 ft is the best
-	void Airplane::calcTakeoffPropertites(double height, double& endHeight, double& totalTime, double& velocity) {
-		calcEndRunwayAirplaneProperties(height, totalTime, velocity);
-		AtmosphereProperties Cond(height);
-		double density = Cond.getDensity();
-		double TIME_STEP = 0.05;                 // Can Change if too inefficient
-		double AoA = 2 * pi / 180;				 // An Assumption, it is very close to 0... while on runway
+	// Assumes startingWeight of aircraft = it's stored totalWeight (just know that when calling the function... it's true 99% of the time)
+	Airplane::TakeoffProperties Airplane::calcTakeoffPropertites(double startHeight, double endHeight, double startVelocity, double startWeight) {
+		double weight = startWeight;
+		// Runway Stuff
+		TakeoffProperties runwayProp = calcEndRunwayAirplaneProperties(startHeight, startVelocity, weight);
+		double timeSoFar = runwayProp.timeTaken;
+		double velocity = runwayProp.finalVelocity;
+		weight = runwayProp.finalWeight;
 
+		// Climbing after Runway
+		double height = startHeight;
+		AtmosphereProperties Cond(height);
+		double TIME_STEP = 0.05;                 // Can Change if too inefficient
 
 		while (height < endHeight) {
+			double density = Cond.getDensity();
 			calcAndSetPowerCurveData(height);
 			double excessPower = calcExcessPower(velocity);
-			height += (excessPower / totalWeight) * TIME_STEP; // small angle approx method
-			totalTime += TIME_STEP;
-			// Just a precaution to make sure AoA never goes above 15 deg (optimisitic)
-			AoA = calcSteadyClimbAoAApprox(velocity, density);
-			assert(fabs(AoA) < (15 * 3.1415) / 180);
+			height += (excessPower / weight) * TIME_STEP; // small angle approx method
+			timeSoFar += TIME_STEP;
 
+			// Weight Loss Consideration
+			// weight -= engine->calcFuelLoss2(TIME_STEP, height, velocity); // uncomment this
+
+			// Just a precaution to make sure AoA never goes above 15 deg (optimisitic)
+			double AoA = calcSteadyClimbAoAApprox(velocity, density);
+			assert(fabs(AoA) < (15 * 3.1415) / 180);
 		}
-		endHeight = height;
+
+
+		TakeoffProperties returnStrut;
+		returnStrut.height = height;
+		returnStrut.timeTaken = timeSoFar;
+		returnStrut.finalVelocity = velocity;
+		returnStrut.finalWeight = weight;
+		return returnStrut;
 	}
 
 
@@ -1006,9 +1045,8 @@ namespace airplane {
 
 	// Incomplete
 	// Assumes we have enough control authority to takeoff, if we can reach V2
-	void Airplane::calcEndRunwayAirplaneProperties(double height, double& totalTime, double& velocity) const {
+	Airplane::TakeoffProperties Airplane::calcEndRunwayAirplaneProperties(double height, double startVelocity, double startWeight) const {
 
-		//double CL_Stall = mainWing->get...   // Need to code a function that gets this from my airfoil and converts that to 3D
 		double AoA_Stall = 15 * pi / 180;      // Just using a realistic, arbirtary AoA rn
 		double CL_Stall = calcLiftCoeff(AoA_Stall);
 
@@ -1017,9 +1055,13 @@ namespace airplane {
 		double temp = Cond.getTemperature();
 		double kineVisc = Cond.getKinematicVisc();
 
-		double V2_min = 1.2 * sqrt((2 * totalWeight) / (density * CL_Stall * mainWing->getArea()));
+		double V2_min = 1.2 * sqrt((2 * startWeight) / (density * CL_Stall * mainWing->getArea()));
 
+		double weight = startWeight;
+		double velocity = startVelocity;
+		double timeSoFar = 0;
 		double Mach, thrust, AoA, drag, lift, rollingFriction, maxAcceleration;
+	
 		double ROLLING_FRIC_COEFF = .02; // A realistic approx
 		double TIME_STEP = 0.05;        // Can Change if too inefficient
 
@@ -1028,15 +1070,25 @@ namespace airplane {
 			AoA = 2 * pi / 180;				 // An Assumption, it is very close to 0... while on runway
 			drag = calcDrag(AoA, velocity, Mach, kineVisc, density);
 			lift = calcLift(AoA, velocity, density);
-			rollingFriction = ROLLING_FRIC_COEFF * (totalWeight - lift);
+			rollingFriction = ROLLING_FRIC_COEFF * (weight - lift);
 
 			thrust = numEngines * engine->getThrust(height, velocity);
-			maxAcceleration = ((thrust - drag - rollingFriction) * GRAVITY) / totalWeight;   // Don't forget gravity... bc imperial!
+			maxAcceleration = ((thrust - drag - rollingFriction) * GRAVITY) / weight;   // Don't forget gravity... bc imperial!
 			velocity = (maxAcceleration * TIME_STEP) + velocity;
-			totalTime = totalTime + TIME_STEP;
+			timeSoFar += TIME_STEP;
+
+			// Accounting for Weight Loss
+			weight -= engine->calcFuelLoss2(TIME_STEP, height, velocity);
+
 		}
 
 		assert(velocity > V2_min); // Precaution to make sure we accelerated enough
+
+		TakeoffProperties returnStrut;
+		returnStrut.finalVelocity = velocity;
+		returnStrut.timeTaken = timeSoFar;
+		returnStrut.finalWeight = weight;
+		return returnStrut;
 	}
 
 
