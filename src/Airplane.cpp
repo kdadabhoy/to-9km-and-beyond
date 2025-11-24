@@ -460,8 +460,14 @@ namespace airplane {
 		}
 
 		powerRequiredData = calcPowerRequiredData(gamma, height);
+		cout << "Calculated power Req successfully for height: " << height << endl; // delete
+
 		powerAvailableData = calcPowerAvailableData(height);
+		cout << "Calculated power avail successfully for height: " << height << endl; // delete
+
 		calcAndSetMaxExcessPower();
+		cout << "Calculated maxExcess power successfully: " << height << endl; // delete
+
 
 		return;
 	}
@@ -630,6 +636,9 @@ namespace airplane {
 					cout << "gamma (deg): " << gamma * 180 / 3.1415 << endl;
 				*/
 			}
+
+
+			cout << "in calcBestClimbTime, current height: " << height << endl; // delete
 		}
 		return totalTime;
 	}
@@ -772,6 +781,14 @@ namespace airplane {
 			velocity = (maxAcceleration * TIME_STEP) + velocity;
 			totalTime = totalTime + TIME_STEP;
 			velDifference = finalVelocity - velocity;
+
+
+			cout << "In Steady Level Acceleration at height: " << height << endl; // delete
+			cout << "In Steady Level Acceleration Vel Different: " << fabs(velDifference) << endl; // delete
+			cout << "In Steady Level Acceleration Vel_want, Vel,have: " << velocity << " , " << finalVelocity << endl; // delete
+			cout << "In Steady Level Acceleration , Max Acceleration: " << maxAcceleration << " , " << finalVelocity << endl; // delete
+
+
 
 			assert(fabs(AoA) < (20 * 3.1415) / 180);                                    // Just a precaution to make sure AoA never goes above 20 deg (optimisitic)
 		}
