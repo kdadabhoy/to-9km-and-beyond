@@ -612,9 +612,21 @@ namespace airplane {
 	double Airplane::calcBestClimbTime(double startHeight, double startVelocity, double endHeight) {
 		// Implementing an accelerate/declerate in a straight line then climb at maxExcessPower
 		// Might need to implement AoA < 15 deg or smt checks
+
+		// Re-work notes: changed calcSteadyLevelAccelerationTime to return a struct
+			// This is because there were cases with small wing spans, when we were getting infinite loops
+			// Because we weren't able to reach the velocity we needed for maxExcessPower (not enough acceleration)
+		// This results in the else loop having to call a getExcessPower for these cases when we aren't at ExcessPower (but are as close as possible)
+			// Technically there might be a more optimial point, but we will ignore that case for now
+
 		double totalTime = 0;
 		double height = startHeight;
 		double velocity = startVelocity;
+		SteadyLevelAccelerationTimeProperties accelProperties;
+		double currentExcessPower;
+		bool canReachMaxVelocity = true;
+		double lastMaxExcessVelcTryHeight = 0;
+		double TRY_AGAIN_EXCESS_VEL_INTERVAL = 2000;     // how many ft before trying to reach maxExcessVel again (so we save some efficiency)
 		double VELOCITY_ERROR = .5;						// Can Change if too inefficient
 		double TIME_STEP = .1;							// Can Change if too inefficient
 
@@ -623,12 +635,40 @@ namespace airplane {
 			calcAndSetPowerCurveData(height);
 			calcAndSetMaxExcessPower();
 
-			if (fabs(velocity - velocityMaxExcessPower) > VELOCITY_ERROR) {
-				totalTime += calcSteadyLevelAccelerationTime(velocity, velocityMaxExcessPower, height);
-				velocity = velocityMaxExcessPower;
+			if (fabs(velocity - velocityMaxExcessPower) > VELOCITY_ERROR && canReachMaxVelocity) {
+				accelProperties = calcSteadyLevelAccelerationTime(velocity, velocityMaxExcessPower, height);
+				totalTime += accelProperties.timeTaken;
+				velocity = accelProperties.finalVelocity;
+
+				canReachMaxVelocity = accelProperties.canReachFinalVel;
+
+				if (!canReachMaxVelocity) {
+					// Will only try to reach maxExcessVel after climbing 500ft or smt
+					// This if block is used for that purpose
+					lastMaxExcessVelcTryHeight = height;
+				}
+
 			} else {
-				height += (maxExcessPower / totalWeight) * TIME_STEP; // small angle approx method
+				currentExcessPower = calcExcessPower(velocity); // can't juse use maxExcess power.. it typically is... but there are cases when it's not
+
+				height += (currentExcessPower / totalWeight) * TIME_STEP; // small angle approx method
 				totalTime += TIME_STEP;
+
+				if (fabs(currentExcessPower) < 0.001) {
+					// Plane can't reach 8km case
+					totalTime = 1e10;
+					cout << "Plane with Wing Span (ft): " << mainWing->getSpan() <<
+						" and taper: " << mainWing->getTaperRatio() << " could not reach 9km. "
+						<< "total time for this plane set to a very large number!" << endl;
+					break;
+
+				}
+
+
+				if (((height - lastMaxExcessVelcTryHeight) > TRY_AGAIN_EXCESS_VEL_INTERVAL) && !canReachMaxVelocity) {
+					// Want to try reach maxExcessVel again
+					canReachMaxVelocity = true; 
+				}
 
 				/*
 					// If you want to see how gamma changes during flight
@@ -637,9 +677,9 @@ namespace airplane {
 				*/
 			}
 
-
-			cout << "in calcBestClimbTime, current height: " << height << endl; // delete
 		}
+
+
 		return totalTime;
 	}
 
@@ -662,6 +702,7 @@ namespace airplane {
 		double totalTime = 0;
 		double height = startHeight;
 		double velocity = startVelocity;
+		SteadyLevelAccelerationTimeProperties accelProperties;
 		double VELOCITY_ERROR = .5;						// Can Change if too inefficient
 		double TIME_STEP = .1;                      // Can Change if too inefficient
 
@@ -680,8 +721,9 @@ namespace airplane {
 			}
 
 			if (fabs(velocity - velocityMaxExcessPower) > VELOCITY_ERROR) {
-				totalTime += calcSteadyLevelAccelerationTime(velocity, velocityMaxExcessPower, height);
-				velocity = velocityMaxExcessPower;
+				accelProperties = calcSteadyLevelAccelerationTime(velocity, velocityMaxExcessPower, height);
+				totalTime += accelProperties.timeTaken;
+				velocity = accelProperties.finalVelocity;
 			} else {
 				height += (maxExcessPower / totalWeight) * TIME_STEP;
 				totalTime += TIME_STEP;
@@ -748,9 +790,15 @@ namespace airplane {
 		// Max Acceleration = (ThrustAvail - Drag) / weight
 		// change in v = acceleration * dt
 		// change in v = (acceleration - v0) / time
-	double Airplane::calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height) {
+	Airplane::SteadyLevelAccelerationTimeProperties Airplane::calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height) {
+		// Re-work Notes: changed return type to a struct, because we had infinite loop cases
+			// If we get to acceleration = 0, we won't be able to reach maxExcessPower, so we need to return the finalVel and timeTaken
+
 		double totalTime = 0;
 		double velocity = startVelocity;
+		SteadyLevelAccelerationTimeProperties returnStruct;
+		returnStruct.canReachFinalVel = true;
+		double MAX_ACCLERATION_CUTOFF = .5; // When to say we can't reach finalVel... smaller is more accurate... but adds a lot of non climb time
 
 		AtmosphereProperties Cond(height);
 		double temp = Cond.getTemperature();
@@ -761,6 +809,7 @@ namespace airplane {
 		double TIME_STEP = 0.05;        // Can Change if too inefficient
 		double VELOCITY_ERROR = .5;		  // Can Change if too inefficient
 		double velDifference = finalVelocity - startVelocity;
+
 
 		while (fabs(velDifference) > VELOCITY_ERROR) {
 			Mach = calcMach(velocity, temp);
@@ -782,18 +831,19 @@ namespace airplane {
 			totalTime = totalTime + TIME_STEP;
 			velDifference = finalVelocity - velocity;
 
-
-			cout << "In Steady Level Acceleration at height: " << height << endl; // delete
-			cout << "In Steady Level Acceleration Vel Different: " << fabs(velDifference) << endl; // delete
-			cout << "In Steady Level Acceleration Vel_want, Vel,have: " << velocity << " , " << finalVelocity << endl; // delete
-			cout << "In Steady Level Acceleration , Max Acceleration: " << maxAcceleration << " , " << finalVelocity << endl; // delete
-
+			if (fabs(maxAcceleration) < .05) {
+				// We can't reach finalVelocity case
+				returnStruct.canReachFinalVel = false;
+				break;
+			}
 
 
 			assert(fabs(AoA) < (20 * 3.1415) / 180);                                    // Just a precaution to make sure AoA never goes above 20 deg (optimisitic)
 		}
 
-		return totalTime;
+		returnStruct.finalVelocity = velocity;
+		returnStruct.timeTaken = totalTime;
+		return returnStruct; 
 	}
 
 

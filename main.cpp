@@ -64,7 +64,7 @@ int main() {
 	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
-	double mainSpan = 12 * 12;
+	double mainSpan = 20 * 12;
 	double mainRootChord = 186.7;
 	double mainTipChord = 74.7;
 	double mainSweepAngle = 20;

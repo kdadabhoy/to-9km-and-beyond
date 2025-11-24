@@ -23,6 +23,17 @@ namespace airplane {
 			// The reasoning for the address, is to avoid creating 
 		Airplane(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight);
 
+
+
+		// Structs for helper functions
+		struct SteadyLevelAccelerationTimeProperties {
+			double timeTaken = 0;         // stored in seconds
+			double finalVelocity = 0;     // stored in ft/s
+			bool canReachFinalVel = true; // returns false if it can't reach final vel
+		};
+
+
+
 		// Useful Functions:
 		double calcMach(double velocity, double temp) const;
 
@@ -55,7 +66,7 @@ namespace airplane {
 
 		// Steady Level Flight Functions (L = W)
 		double calcSteadyLevelAoA(double velocity, double density) const;
-		double calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height);
+		SteadyLevelAccelerationTimeProperties calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height);
 
 
 		// Feasability of Wing
@@ -83,8 +94,7 @@ namespace airplane {
 
 
 		// Print Functions
-		//void printMainWingCharacteristics() const;          // That long block of cout statements for AR, area, e, taper, etc
-
+		void printMainWingCharacteristics() const;          // That long block of cout statements for AR, area, e, taper, etc
 
 
 
@@ -148,6 +158,9 @@ namespace airplane {
 		static constexpr double SIGMA_YIELD_COMPOSITE = 101.526;    // ksi (700MPa) (rough estimate), NOTE: Composites have higher sigma than steel, while also having less weight
 		static constexpr double PSF_TO_PSI = 0.006944;				// psf * PSF_TO_PSI = psi
 		static constexpr double PSI_TO_KSI = .001;                  // psi * PSI_TO_KSI = ksi
+
+
+	
 
 
 
