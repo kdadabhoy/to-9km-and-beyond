@@ -101,6 +101,7 @@ namespace airplane {
 		// Accessors:
 		double getWeight() const;							// lbms
 		double getMainWingWeight() const;                   // lbms
+		double getMTOW() const;                             // lbms
 		double getMaxExcessPower() const;					// Assumes power curve is set 
 		double getVelocityMaxExcessPower() const;           // Assumes power curve is set
 		vector<double> getMaxExcessPowerVector() const;     // Assumes power curve is set
@@ -114,7 +115,7 @@ namespace airplane {
 		// Print Functions
 		void printMainWingCharacteristics() const;          // That long block of cout statements for AR, area, e, taper, etc
 
-
+		double randomTest = 0; // delete
 
 	private:
 		// Must take in:
@@ -177,11 +178,10 @@ namespace airplane {
 		static constexpr double PSF_TO_PSI = 0.006944;				// psf * PSF_TO_PSI = psi
 		static constexpr double PSI_TO_KSI = .001;                  // psi * PSI_TO_KSI = ksi
 
+		// calcTime9km Constas
+		static constexpr double VELOCITY_ERROR = .5;               // Used in calcSteadyLevelAccelerationTime, calcBestClimbTime, & calcBestClimbTimeApprox
 
 	
-
-
-
 
 
 		// calcAndSet Functions:
@@ -230,6 +230,17 @@ namespace airplane {
 
 
 #endif
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -66,15 +66,13 @@ int main() {
 	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
-	double mainSpan = 20 * 12;
+	double mainSpan = 40 * 12;
 	double mainRootChord = 186.7;
 	double mainTipChord = 74.7;
 	double mainSweepAngle = 20;
 	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);      // mainWing weight will be calculated by airplane
-	Wing mainWing2(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);      // mainWing weight will be calculated by airplane
 
 	Airplane airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
-	Airplane airplane2(mainWing2, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight); // del
 
 
 
@@ -83,7 +81,6 @@ int main() {
 	double startHeight = 0;
 	double takeOffEndHeight = 500;
 	double totalWeight = airplane.getWeight();
-	double totalWeight2 = airplane2.getWeight();
 
 
 	if (totalWeight < 25000 * 2.205) {
@@ -92,29 +89,14 @@ int main() {
 	}
 
 	
-	if (totalWeight2 < 25000 * 2.205) {
-		double weightNeeded = 25000 * 2.205 - totalWeight2;
-		airplane2.setMainWingWeight(airplane2.getMainWingWeight() + weightNeeded); // del
-	}
-
-
 	printUsefulCharacteristics(mainWing, airplane);
-	cout << endl << endl << endl;
+	cout << endl << endl;
 
-	
 	cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
-	cout << airplane.getWeight() << " Weight after 9km Airplane 1 " << endl;
+	cout << airplane.randomTest / 60 << endl;
+	cout << airplane.getMTOW() - airplane.getWeight() << " Weight Lost after 9km" << endl;
 	cout << endl << endl << endl;
 
-
-	printUsefulCharacteristics(mainWing, airplane2);
-	cout << endl << endl << endl;
-	cout << airplane2.calcBestTimeTo9kmApprox(startHeight, takeOffEndHeight, 200) / 60 << " mins" << endl;
-	cout << airplane2.getWeight() << " 2 Weight after 9km  Airplane 2" << endl;
-
-
-
-	cout << endl << endl << endl;
 	//airplane.getPowerCurveCSV(10000, "example.csv");
 
 

@@ -608,7 +608,6 @@ namespace airplane {
 
 	// Climb Functions
 
-		// *** Need to account for weight loss ***
 		// Uses small angle approx for gamma
 	double Airplane::calcBestClimbTime(double startHeight, double startVelocity, double endHeight) {
 		// Implementing an accelerate/declerate in a straight line then climb at maxExcessPower
@@ -628,7 +627,7 @@ namespace airplane {
 		bool canReachMaxVelocity = true;
 		double lastMaxExcessVelcTryHeight = 0;
 		double TRY_AGAIN_EXCESS_VEL_INTERVAL = 2000;     // how many ft before trying to reach maxExcessVel again (so we save some efficiency)
-		double VELOCITY_ERROR = .5;						// Can Change if too inefficient
+		// double VELOCITY_ERROR = .5; // global constant now
 		double TIME_STEP = .1;							// Can Change if too inefficient
 
 
@@ -674,7 +673,7 @@ namespace airplane {
 
 
 				// Weight Loss Consideration
-				totalWeight -= engine->calcFuelLoss2(TIME_STEP, height, velocity);
+				totalWeight -= numEngines * engine->calcFuelLoss2(TIME_STEP, height, velocity);
 
 
 
@@ -716,7 +715,7 @@ namespace airplane {
 		bool canReachMaxVelocity = true;
 		double lastMaxExcessVelcTryHeight = 0;
 		double TRY_AGAIN_EXCESS_VEL_INTERVAL = 2000;     // how many ft before trying to reach maxExcessVel again (so we save some efficiency)
-		double VELOCITY_ERROR = .5;						 // Can Change if too inefficient
+		//double VELOCITY_ERROR = .5; // global const now
 		double TIME_STEP = .1;                           // Can Change if too inefficient
 
 
@@ -770,7 +769,7 @@ namespace airplane {
 				}
 
 				// Weight Loss Consideration
-				totalWeight -= engine->calcFuelLoss2(TIME_STEP, height, velocity);
+				totalWeight -= numEngines * engine->calcFuelLoss2(TIME_STEP, height, velocity);
 			}
 		}
 		return totalTime;
@@ -881,7 +880,7 @@ namespace airplane {
 		double Mach, thrust, AoA, drag, maxAcceleration, engineFactor;
 
 		double TIME_STEP = 0.05;        // Can Change if too inefficient
-		double VELOCITY_ERROR = 0.5;		  // Can Change if too inefficient
+		//double VELOCITY_ERROR = 5.0;  // global constant now
 		double velDifference = finalVelocity - startVelocity;
 
 
@@ -896,7 +895,7 @@ namespace airplane {
 			} else {
 				// Decelerate
 				engineFactor = .20;	 // Thrust to 20% max thrust (brake using drag)... could use some PID thing instead.. but this is good enough
-				// Set this to 0% for best possible time... but real life is ~20% of thrust being minimum
+				// Set this to 0% for best possible time... but real life is ~20% of thrust being minimum.. but we are climbing so we technically just adjust pitch...
 			}
 
 			thrust = numEngines * engine->getThrust(height, velocity) * engineFactor;
@@ -911,12 +910,34 @@ namespace airplane {
 				break;
 			}
 
+			// Weight Loss Consideration
+			//totalWeight -= numEngines * engine->calcFuelLoss2(TIME_STEP, height, velocity); // this is breaking like 40ft span, but helping 46ft
+
+			/*
+			cout << "totalWeight in Horiz Acceleration " << totalWeight << endl; //delete
+			cout << "vel diff " << velDifference << endl; // delete
+			*/
+
+			cout << "height " << height << endl; // delete
+			cout << "vel diff " << velDifference << endl; // delete
 
 			assert(fabs(AoA) < (20 * 3.1415) / 180);                                    // Just a precaution to make sure AoA never goes above 20 deg (optimisitic)
 		}
 
+
 		returnStruct.finalVelocity = velocity;
 		returnStruct.timeTaken = totalTime;
+
+		// Approxing weight loss because if weight loss is implemented with TIME_STEP, it causes weird behavior for certain spans (longer loop times)
+		// This is due to overshooting and then coming back for longer... which wouldnt happen in an actual climb...
+			// Since an actual climb would just change pitch angle to gain velocity... which we avoided bc the dynamics are a lot harder to optimize
+		//totalWeight -= numEngines * engine->calcFuelLoss2(totalTime, height, (velocity + startVelocity / 2));
+		randomTest += totalTime; // delete
+		cout << "height " << height << endl; // delete
+		cout << " totalWeight Loss " << numEngines * engine->calcFuelLoss2(totalTime, height, (velocity + startVelocity / 2)) << endl; // delete
+		cout << "time taken " << totalTime << endl; // delete
+		cout << endl << endl << endl; // delete
+
 		return returnStruct; 
 	}
 
@@ -1017,7 +1038,7 @@ namespace airplane {
 			timeSoFar += TIME_STEP;
 
 			// Weight Loss Consideration
-			weight -= engine->calcFuelLoss2(TIME_STEP, height, velocity);
+			weight -= numEngines * engine->calcFuelLoss2(TIME_STEP, height, velocity);
 
 			// Just a precaution to make sure AoA never goes above 15 deg (optimisitic)
 			double AoA = calcSteadyClimbAoAApprox(velocity, density);
@@ -1079,7 +1100,7 @@ namespace airplane {
 			timeSoFar += TIME_STEP;
 
 			// Accounting for Weight Loss
-			weight -= engine->calcFuelLoss2(TIME_STEP, height, velocity);
+			weight -= numEngines * engine->calcFuelLoss2(TIME_STEP, height, velocity);
 
 		}
 
@@ -1344,6 +1365,7 @@ namespace airplane {
 		assert(mainWing != nullptr);		// Precaution
 		mainWing->setWeight(inWeight);
 		calcAndSetTotalWeight();
+		MTOW = totalWeight;
 		return;
 	}
 
@@ -1373,6 +1395,20 @@ namespace airplane {
 	double Airplane::getMainWingWeight() const {
 		return mainWing->getWeight();
 	}
+
+
+
+
+
+
+
+
+
+	double Airplane::getMTOW() const {
+		return MTOW;
+	}
+
+
 
 
 
