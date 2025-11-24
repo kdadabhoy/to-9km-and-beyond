@@ -703,6 +703,10 @@ namespace airplane {
 		double height = startHeight;
 		double velocity = startVelocity;
 		SteadyLevelAccelerationTimeProperties accelProperties;
+		double currentExcessPower;
+		bool canReachMaxVelocity = true;
+		double lastMaxExcessVelcTryHeight = 0;
+		double TRY_AGAIN_EXCESS_VEL_INTERVAL = 2000;     // how many ft before trying to reach maxExcessVel again (so we save some efficiency)
 		double VELOCITY_ERROR = .5;						// Can Change if too inefficient
 		double TIME_STEP = .1;                      // Can Change if too inefficient
 
@@ -720,13 +724,40 @@ namespace airplane {
 				oldHeight = height;
 			}
 
-			if (fabs(velocity - velocityMaxExcessPower) > VELOCITY_ERROR) {
+			if (fabs(velocity - velocityMaxExcessPower) > VELOCITY_ERROR && canReachMaxVelocity) {
 				accelProperties = calcSteadyLevelAccelerationTime(velocity, velocityMaxExcessPower, height);
 				totalTime += accelProperties.timeTaken;
 				velocity = accelProperties.finalVelocity;
+
+				canReachMaxVelocity = accelProperties.canReachFinalVel;
+
+				if (!canReachMaxVelocity) {
+					// Will only try to reach maxExcessVel after climbing 500ft or smt
+					// This if block is used for that purpose
+					lastMaxExcessVelcTryHeight = height;
+				}
+
 			} else {
-				height += (maxExcessPower / totalWeight) * TIME_STEP;
+				currentExcessPower = calcExcessPower(velocity); // can't juse use maxExcess power.. it typically is... but there are cases when it's not
+
+				height += (currentExcessPower / totalWeight) * TIME_STEP; // small angle approx method
 				totalTime += TIME_STEP;
+
+				if (fabs(currentExcessPower) < 0.001) {
+					// Plane can't reach 8km case
+					totalTime = 1e10;
+					cout << "Plane with Wing Span (ft): " << mainWing->getSpan() <<
+						" and taper: " << mainWing->getTaperRatio() << " could not reach 9km. "
+						<< "total time for this plane set to a very large number!" << endl;
+					break;
+
+				}
+
+
+				if (((height - lastMaxExcessVelcTryHeight) > TRY_AGAIN_EXCESS_VEL_INTERVAL) && !canReachMaxVelocity) {
+					// Want to try reach maxExcessVel again
+					canReachMaxVelocity = true; 
+				}
 			}
 		}
 		return totalTime;
@@ -739,7 +770,6 @@ namespace airplane {
 
 
 	// Calcs the time to 9km (accurately) from h=0 to h = 9km + startHeight (accounts for possibility of not starting at sea level)
-	// Returns time in seconds
 	double Airplane::calcBestTimeTo9km(double startHeight, double takeOffEndHeight) {
 		double END_HEIGHT = 29527.6 + startHeight; // 9km in ft
 		double velocity = 0;                       // Starting from rest
@@ -749,7 +779,25 @@ namespace airplane {
 		calcTakeoffPropertites(startHeight, takeOffEndHeight, totalTime, velocity);
 		totalTime += calcBestClimbTime(takeOffEndHeight, velocity, END_HEIGHT);
 
-		return totalTime;
+		return totalTime; // Returns time in seconds
+	}
+
+
+
+
+
+
+
+	// Calcs the time to 9km (approx) from h=0 to h = 9km + startHeight (accounts for possibility of not starting at sea level)
+	double Airplane::calcBestTimeTo9kmApprox(double startHeight, double takeOffEndHeight) {
+		double END_HEIGHT = 29527.6 + startHeight; // 9km in ft
+		double velocity = 0;                       // Starting from rest
+		double totalTime = 0;
+
+		calcTakeoffPropertites(startHeight, takeOffEndHeight, totalTime, velocity);
+		totalTime += calcBestClimbTimeApprox(takeOffEndHeight, velocity, END_HEIGHT);
+
+		return totalTime; // Returns time in seconds
 	}
 
 

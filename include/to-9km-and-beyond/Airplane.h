@@ -55,7 +55,8 @@ namespace airplane {
 
 
 		// Climb Functions
-		double calcBestTimeTo9km(double startHeight, double takeOffEndHeight);     // Returns seconds
+		double calcBestTimeTo9km(double startHeight, double takeOffEndHeight);       // Returns seconds, more CPU intensive (but more accurate)
+		double calcBestTimeTo9kmApprox(double startHeight, double takeOffEndHeight); // Returns seconds, less CPU intensive (but less accurate)
 
 		double calcBestClimbTime(double startHeight, double startVelocity, double endHeight);        // Returns seconds 
 		double calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight);   // doesnt do power curve at every height... just some

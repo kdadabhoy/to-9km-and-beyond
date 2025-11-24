@@ -64,7 +64,7 @@ int main() {
 	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
-	double mainSpan = 20 * 12;
+	double mainSpan = 8 * 12;
 	double mainRootChord = 186.7;
 	double mainTipChord = 74.7;
 	double mainSweepAngle = 20;
@@ -85,6 +85,8 @@ int main() {
 	}
 	printUsefulCharacteristics(mainWing, airplane);
 	cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
+	cout << airplane.calcBestTimeTo9kmApprox(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
+
 	cout << endl << endl << endl;
 	//airplane.getPowerCurveCSV(10000, "example.csv");
 
