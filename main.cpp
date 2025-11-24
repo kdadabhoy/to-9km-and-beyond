@@ -74,7 +74,8 @@ int main() {
 
 	Airplane airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
 
-	
+
+
 
 
 	// Debugging
@@ -106,6 +107,7 @@ int main() {
 		cout << endl;
 
 	}
+	
 
 	return 0;
 }
