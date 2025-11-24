@@ -12,8 +12,9 @@ using std::vector;
 
 // Assumes that plane is symmetric and has 2 engines (wings are symmetrical)
 // Assumes VT makes negligible lift and drag
+// DO NOT HAVE CREATED OBJECTS SHARE THE SAME PASSED IN PARAMETER, SINCE THIS CLASS USES
+	// POINTERS FOR EFFICIENCY... IT WILL LEAD TO UNEXPECTED BEHAVIOR!
 
-// Can rewrite takeoff property function with a strut 
 
 namespace airplane {
 	class Airplane {
@@ -64,11 +65,11 @@ namespace airplane {
 
 
 		// Climb Functions
-		double calcBestTimeTo9km(double startHeight, double takeOffEndHeight);       // Returns seconds, more CPU intensive (but more accurate), updates totalWeight
-		double calcBestTimeTo9kmApprox(double startHeight, double takeOffEndHeight); // Returns seconds, less CPU intensive (but less accurate), updates totalWeight
+		double calcBestTimeTo9km(double startHeight, double takeOffEndHeight);                          // Returns seconds, more CPU intensive (but more accurate), updates totalWeight
+		double calcBestTimeTo9kmApprox(double startHeight, double takeOffEndHeight, double heightStep); // Returns seconds, less CPU intensive (but less accurate), updates totalWeight
 
-		double calcBestClimbTime(double startHeight, double startVelocity, double endHeight);        // Returns seconds, updates totalWeight 
-		double calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight);   // doesnt do power curve at every height... just some, updates totalWeight
+		double calcBestClimbTime(double startHeight, double startVelocity, double endHeight);           // Returns seconds, updates totalWeight 
+		double calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight, double heightSteps);   // does powerCurve every heightStep, updates totalWeight
 
 		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;        // Gamma in degrees, Returns AoA in rad
 		double calcSteadyClimbAoAApprox(double velocity, double density) const;				   // Small angle approx, so cos(gamma) = 1

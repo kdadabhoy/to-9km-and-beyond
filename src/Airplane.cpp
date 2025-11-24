@@ -75,6 +75,7 @@ namespace airplane {
 			calcAndSetMainWingWeight();				// Now calc main wing weight using Raymond Approx
 			totalWeight += mainWing->getWeight();   // Add mainWingWeight to totalWeight
 		}
+
 		MTOW = totalWeight;
 	}
 
@@ -673,7 +674,7 @@ namespace airplane {
 
 
 				// Weight Loss Consideration
-				// totalWeight -= engine->calcFuelLoss2(TIME_STEP, height, velocity); // uncomment this
+				totalWeight -= engine->calcFuelLoss2(TIME_STEP, height, velocity);
 
 
 
@@ -705,7 +706,7 @@ namespace airplane {
 
 	// *** Need to account for weight loss ***
 	// Only evalutes Power Curves when height changes by 500
-	double Airplane::calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight) {
+	double Airplane::calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight, double heightSteps) {
 		// Implementing an accelerate/declerate in a straight line then climb at maxExcessPower
 		double totalTime = 0;
 		double height = startHeight;
@@ -715,12 +716,12 @@ namespace airplane {
 		bool canReachMaxVelocity = true;
 		double lastMaxExcessVelcTryHeight = 0;
 		double TRY_AGAIN_EXCESS_VEL_INTERVAL = 2000;     // how many ft before trying to reach maxExcessVel again (so we save some efficiency)
-		double VELOCITY_ERROR = .5;						// Can Change if too inefficient
-		double TIME_STEP = .1;                      // Can Change if too inefficient
+		double VELOCITY_ERROR = .5;						 // Can Change if too inefficient
+		double TIME_STEP = .1;                           // Can Change if too inefficient
 
 
 		double oldHeight = startHeight;
-		double HEIGHT_STEP = 500;
+		double HEIGHT_STEP = heightSteps;                  // 0 = same as other function. As you increase this, 
 
 		calcAndSetPowerCurveData(height);
 		calcAndSetMaxExcessPower();
@@ -769,7 +770,7 @@ namespace airplane {
 				}
 
 				// Weight Loss Consideration
-				// totalWeight -= engine->calcFuelLoss2(TIME_STEP, height, velocity); // uncomment this
+				totalWeight -= engine->calcFuelLoss2(TIME_STEP, height, velocity);
 			}
 		}
 		return totalTime;
@@ -793,7 +794,7 @@ namespace airplane {
 		takeOffEndHeight = takeoffProperties.height;
 
 		// Weight Loss Consideration
-		//totalWeight = takeoffProperties.finalWeight; // uncomment this
+		totalWeight = takeoffProperties.finalWeight;
 
 		totalTime += calcBestClimbTime(takeOffEndHeight, velocity, END_HEIGHT);
 
@@ -807,7 +808,7 @@ namespace airplane {
 
 
 	// Calcs the time to 9km (approx) from h=0 to h = 9km + startHeight (accounts for possibility of not starting at sea level)
-	double Airplane::calcBestTimeTo9kmApprox(double startHeight, double takeOffEndHeight) {
+	double Airplane::calcBestTimeTo9kmApprox(double startHeight, double takeOffEndHeight, double heightSteps) {
 		double END_HEIGHT = 29527.6 + startHeight; // 9km in ft
 		double velocity = 0;                       // Starting from rest
 
@@ -818,9 +819,9 @@ namespace airplane {
 		takeOffEndHeight = takeoffProperties.height;
 
 		// Weight Loss Consideration
-		//totalWeight = takeoffProperties.finalWeight; // uncomment
+		totalWeight = takeoffProperties.finalWeight;
 
-		totalTime += calcBestClimbTimeApprox(takeOffEndHeight, velocity, END_HEIGHT);
+		totalTime += calcBestClimbTimeApprox(takeOffEndHeight, velocity, END_HEIGHT, heightSteps);
 
 		return totalTime; // Returns time in seconds
 	}
@@ -880,7 +881,7 @@ namespace airplane {
 		double Mach, thrust, AoA, drag, maxAcceleration, engineFactor;
 
 		double TIME_STEP = 0.05;        // Can Change if too inefficient
-		double VELOCITY_ERROR = .5;		  // Can Change if too inefficient
+		double VELOCITY_ERROR = 0.5;		  // Can Change if too inefficient
 		double velDifference = finalVelocity - startVelocity;
 
 
@@ -904,7 +905,7 @@ namespace airplane {
 			totalTime = totalTime + TIME_STEP;
 			velDifference = finalVelocity - velocity;
 
-			if (fabs(maxAcceleration) < .05) {
+			if (fabs(maxAcceleration) < .10) {
 				// We can't reach finalVelocity case
 				returnStruct.canReachFinalVel = false;
 				break;
@@ -1016,7 +1017,7 @@ namespace airplane {
 			timeSoFar += TIME_STEP;
 
 			// Weight Loss Consideration
-			// weight -= engine->calcFuelLoss2(TIME_STEP, height, velocity); // uncomment this
+			weight -= engine->calcFuelLoss2(TIME_STEP, height, velocity);
 
 			// Just a precaution to make sure AoA never goes above 15 deg (optimisitic)
 			double AoA = calcSteadyClimbAoAApprox(velocity, density);
@@ -1316,6 +1317,7 @@ namespace airplane {
 	// This function completely resets the airplane with the new wing (weight goes back to MTOW)
 	void Airplane::setMainWing(Wing& inWing) {
 		assert(mainWing != nullptr);			// Precaution
+
 		mainWing = &inWing;
 		referenceArea = mainWing->getArea();    // Reference Area depends on mainWing
 		calcAndSetLiftCoeff();					// Lift Coeff depends on mainWing
@@ -1324,7 +1326,7 @@ namespace airplane {
 		if (fabs(mainWing->getWeight()) < .01) {
 			calcAndSetMainWingWeight();				// Now calc main wing weight using Raymond Approx
 			totalWeight += mainWing->getWeight();   // Add mainWingWeight to totalWeight
-		}
+		} 
 
 		MTOW = totalWeight;
 		return;
@@ -1339,9 +1341,9 @@ namespace airplane {
 
 
 	void Airplane::setMainWingWeight(double inWeight) {
-		assert(mainWing != nullptr);			// Precaution
+		assert(mainWing != nullptr);		// Precaution
 		mainWing->setWeight(inWeight);
-		calcAndSetTotalWeight();				// Main Wing Weight depends on total weight before everything else
+		calcAndSetTotalWeight();
 		return;
 	}
 
