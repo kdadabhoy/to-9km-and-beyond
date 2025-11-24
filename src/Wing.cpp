@@ -3,12 +3,15 @@
 #include "to-9km-and-beyond/Airfoil.h"
 #include "to-9km-and-beyond/LiftCoeff.h"
 #include "to-9km-and-beyond/DragCoeff.h"
+#include "to-9km-and-beyond/kadenMath.h"
 #include <cmath>
 #include <cassert>
+#include <vector>
 using namespace std;
+using std::vector;
+using kaden_math::evaluateFunction;
 
 // Make Airfoil not a pointer and then fix everything... make's life simplier
-
 
 namespace airplane {
 
@@ -385,79 +388,64 @@ namespace airplane {
 
 
 
-	// Incomplete - Need to finish digitalization
+	// Currently implemented with no interpolation (anything in between gets rounded up)
+	// which is a conservative approach.. and fairly accurate
+	// CL > .60 gets approxed with CL = .60 curve
 	double Wing::calcMccZeroSweep(double AoA_rad) const {
 		double CL = fabs(CL3D.calcLiftCoefficient(AoA_rad));	// NOT SURE IF THIS WORKS, NEEDED BC SOMETIMES HAVE NEGATIVE CL
-		double TR = airfoil->getThicknessRatio();           // thickness ratio, called TR for simplicity
-		double Mcc = 0;
-		double ferror = .01;                                // Error for comparisons of doubles
-		assert(CL > 0 && TR > .06 - ferror);
+		double thicknessRatio = airfoil->getThicknessRatio();  
+ 
+		double ferror = .01;                                    // Error for comparisons of doubles
+		assert(CL > 0);	// Graph only for postive CL
+		assert((thicknessRatio > .06 - ferror) && (thicknessRatio < .16 + ferror)); // Takes care of bounds for most curves
 
-		// Currently implemented with no interpolation (anything in between gets rounded up)
-		// which is a conservative approach.. and fairly accurate
 
 		if (CL < ferror) {
-			// CL = 0 Case, Mcc = 0.972 + -2.2x + 4.46x^2
-			assert(TR > .08 - ferror);							// Might want to comment this out or make a special exception for this case
-			Mcc = 0.972 + (-2.2 * TR) + (4.46 * TR * TR);
-			return Mcc;
-		} else{
-			// Very optimistic rn.. bc didnt digitize the rest lol
-			Mcc = 0.911 + (-1.48 * TR) + (1.79 * TR * TR);
-			return Mcc;
-		}
+			// CL = 0 Case
+			assert(thicknessRatio > .08 - ferror);         // CL = 0 curve has unique bounds
+			return evaluateFunction(CL0, thicknessRatio);
 
+		} else if (CL <= .20 + ferror) {
+			// CL <= .20 case
+			return evaluateFunction(CL20, thicknessRatio);
 
-
-	/*
-		//Implement the rest once we digitized the whole plot
-
-		}else if (CL <= .20 + ferror) {
-			// CL <= .20 case, Mcc = 0.911 + -1.48x + 1.79x^2
-			Mcc = 0.911 + (-1.48 * TR) + (1.79 * TR * TR);
-			return Mcc;
-		}
-
-		} else if (CL <= .25 + ferror) {
+		} else if (CL <= .25 + ferror){
 			// CL <=  to .25 case, 
+			return evaluateFunction(CL25, thicknessRatio);
 
-			return Mcc;
 		} else if (CL <= .30 + ferror) {
 			// CL <=  to .30 case
+			return evaluateFunction(CL30, thicknessRatio);
 
-			return Mcc;
 		} else if (CL <= .35 + ferror) {
 			// CL <=  to .35 case
+			return evaluateFunction(CL35, thicknessRatio);
 
-			return Mcc;
 		} else if (CL <= .40 + ferror) {
 			// CL <=  to .40 case
+			return evaluateFunction(CL40, thicknessRatio);
 
-			return Mcc;
 		} else if (CL <= .45 + ferror) {
 			// CL <=  to .45 case
+			return evaluateFunction(CL45, thicknessRatio);
 
-			return Mcc;
 		} else if (CL <= .50 + ferror) {
 			// CL <=  to .50 case
+			return evaluateFunction(CL50, thicknessRatio);
 
-			return Mcc;
 		} else if (CL <= .55 + ferror) {
 			// CL <=  to .55 case
+			return evaluateFunction(CL55, thicknessRatio);
 
-			return Mcc;
 		} else if (CL <= .60 + ferror) {
 			// CL <= .60 case
+			return evaluateFunction(CL60, thicknessRatio);
 
-			return Mcc;
 		} else {
 			// Error case
-			cout << "CL for Mcc0 > .60. Approx only goes to .60" << endl;
-			return 0;
+			//cout << "CL for Mcc0 > .60. Approx only goes to .60" << endl;
+			return evaluateFunction(CL60, thicknessRatio);   // Approxing it as CL = .60 case for now
 		}
-
-	*/
-
 
 	}
 

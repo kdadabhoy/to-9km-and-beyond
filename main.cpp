@@ -66,7 +66,7 @@ int main() {
 	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
-	double mainSpan = 8 * 12;
+	double mainSpan = 20 * 12;
 	double mainRootChord = 186.7;
 	double mainTipChord = 74.7;
 	double mainSweepAngle = 20;
@@ -96,7 +96,7 @@ int main() {
 
 
 	wingSpanOptimizerResults results;
-	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, 8, 100, 50);
+	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, 10, 100, 50);
 	spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
 
 	for (int i = 0; i < results.wingSpanVector.size(); i++) {

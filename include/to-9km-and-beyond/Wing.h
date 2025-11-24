@@ -2,6 +2,8 @@
 #define WING_H
 #include "to-9km-and-beyond/Airfoil.h"
 #include "to-9km-and-beyond/LiftCoeff.h"
+#include <vector>
+using std::vector;
 /*
 	Notes:
 		- Weight of main wing is calculated in Airplane Class because it requires knowledge of MTOW
@@ -87,6 +89,19 @@ namespace airplane {
 	// Constants
 		static constexpr double pi = 3.141592653589;
 		static constexpr double GAS_CONSTANT = 1716;
+
+	// MccZeroSweep Constants (CL20 -> CL = .20)
+		const vector<double> CL0 =  { 4.46 , -2.20 , 0.972 };		// 0.972 + -2.2x + 4.46x^2          
+		const vector<double> CL20 = { 1.12 , -1.28 , 0.877 };       // 0.877 + -1.28x + 1.12x^2
+		const vector<double> CL25 = { 2.23 , -1.51 , 0.876 };       // 0.876 + -1.51x + 2.23x^2
+		const vector<double> CL30 = { 1.38 , -1.33 , 0.857 };       // 0.857 + -1.33x + 1.38x^2
+		const vector<double> CL35 = { 3.13 , -1.68 , 0.864 };       // 0.864 + -1.68x + 3.13x^2 
+		const vector<double> CL40 = { 1.70 , -1.31 , 0.833 };       // 0.833 + -1.31x + 1.70x^2
+		const vector<double> CL45 = { 1.96 , -1.34 , 0.824 };       // 0.824 + -1.34x + 1.96x^2
+		const vector<double> CL50 = { 2.90 , -1.53 , 0.824 };       // 0.824 + -1.53x + 2.90x^2
+		const vector<double> CL55 = { 2.68 , -1.46 , 0.810 };       // 0.810 + -1.46x + 2.68x^2
+		const vector<double> CL60 = { 2.32 , -1.34 , 0.792 };       // 0.792 + -1.34x + 2.32x^2
+
 
 
 	// calcAndSet Functions, Assumes Trapezodial Wing

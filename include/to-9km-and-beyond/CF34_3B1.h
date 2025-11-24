@@ -29,8 +29,8 @@ namespace airplane {
 			// (Thrust/SSL Thrust) = PowerFunc(Mach) for a set height
 			// h0 -> h = 0 ft Power func
 			// h30k -> h = 30,000 ft Power func
-		const vector<double> h0PowerFunc =   { 0.723 , -0.962 , 1 };		   // 1 + -0.962x + 0.723x^2
-		const vector<double> h5kPowerFunc =  { 0.563 , -0.775 , 0.906 };       // 0.906 + -0.775x + 0.563x^2
+		const vector<double> h0PowerFunc   = { 0.723 , -0.962 , 1.000 };	   // 1.000 + -0.962x + 0.723x^2
+		const vector<double> h5kPowerFunc  = { 0.563 , -0.775 , 0.906 };       // 0.906 + -0.775x + 0.563x^2
 		const vector<double> h10kPowerFunc = { 0.469 , -0.672 , 0.804 };       // 0.804 + -0.672x + 0.469x^2
 		const vector<double> h15kPowerFunc = { 0.433 , -0.580 , 0.700 };       // 0.700 + -0.580x + 0.433x^2
 		const vector<double> h20kPowerFunc = { 0.310 , -0.508 , 0.594 };       // 0.594 + -0.508x + 0.310x^2
