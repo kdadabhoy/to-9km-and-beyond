@@ -461,15 +461,8 @@ namespace airplane {
 		}
 
 		powerRequiredData = calcPowerRequiredData(gamma, height);
-		cout << "Calculated power Req successfully for height: " << height << endl; // delete
-
 		powerAvailableData = calcPowerAvailableData(height);
-		cout << "Calculated power avail successfully for height: " << height << endl; // delete
-
 		calcAndSetMaxExcessPower();
-		cout << "Calculated maxExcess power successfully: " << height << endl; // delete
-
-
 		return;
 	}
 
@@ -913,31 +906,13 @@ namespace airplane {
 			// Weight Loss Consideration
 			//totalWeight -= numEngines * engine->calcFuelLoss2(TIME_STEP, height, velocity); // this is breaking like 40ft span, but helping 46ft
 
-			/*
-			cout << "totalWeight in Horiz Acceleration " << totalWeight << endl; //delete
-			cout << "vel diff " << velDifference << endl; // delete
-			*/
 
-			cout << "height " << height << endl; // delete
-			cout << "vel diff " << velDifference << endl; // delete
-
-			assert(fabs(AoA) < (20 * 3.1415) / 180);                                    // Just a precaution to make sure AoA never goes above 20 deg (optimisitic)
+			assert(fabs(AoA) < (20 * 3.1415) / 180); // Just a precaution to make sure AoA never goes above 20 deg (optimisitic)
 		}
 
 
 		returnStruct.finalVelocity = velocity;
 		returnStruct.timeTaken = totalTime;
-
-		// Approxing weight loss because if weight loss is implemented with TIME_STEP, it causes weird behavior for certain spans (longer loop times)
-		// This is due to overshooting and then coming back for longer... which wouldnt happen in an actual climb...
-			// Since an actual climb would just change pitch angle to gain velocity... which we avoided bc the dynamics are a lot harder to optimize
-		//totalWeight -= numEngines * engine->calcFuelLoss2(totalTime, height, (velocity + startVelocity / 2));
-		randomTest += totalTime; // delete
-		cout << "height " << height << endl; // delete
-		cout << " totalWeight Loss " << numEngines * engine->calcFuelLoss2(totalTime, height, (velocity + startVelocity / 2)) << endl; // delete
-		cout << "time taken " << totalTime << endl; // delete
-		cout << endl << endl << endl; // delete
-
 		return returnStruct; 
 	}
 
@@ -952,9 +927,10 @@ namespace airplane {
 
 	// Takeoff Functions
 
+	/*
+	// Old - doesnt account for totalWeightLoss
 	// *** Need to account for weight loss ***
 	// See physics derivation in notes
-	// Old - doesnt account for totalWeightLoss
 	double Airplane::calcTakeoffTime(double height, double endHeight) {
 		double totalTime = 0;
 		double velocity = 0;  // Start from rest 
@@ -1002,7 +978,7 @@ namespace airplane {
 		}
 		return totalTime;
 	}
-
+	*/
 
 
 

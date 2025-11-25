@@ -66,10 +66,19 @@ int main() {
 	CF34_3B1 CF34_3B1;
 
 	// Main Wing Stuff, this is what will be optimized
+	double mainSpan = 64.5 * 12;
+	double mainRootChord = 10.24 * 12;
+	double mainTipChord = 4.10 * 12;
+	double mainSweepAngle = 22;
+
+
+
+	/*
 	double mainSpan = 40 * 12;
 	double mainRootChord = 186.7;
 	double mainTipChord = 74.7;
 	double mainSweepAngle = 20;
+	*/
 	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);      // mainWing weight will be calculated by airplane
 
 	Airplane airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
@@ -93,8 +102,9 @@ int main() {
 	cout << endl << endl;
 
 	cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
-	cout << airplane.randomTest / 60 << endl;
-	cout << airplane.getMTOW() - airplane.getWeight() << " Weight Lost after 9km" << endl;
+	cout << endl << endl;
+	//cout << airplane.randomTest / 60 << endl;
+	//cout << airplane.getMTOW() - airplane.getWeight() << " Weight Lost after 9km" << endl;
 	cout << endl << endl << endl;
 
 	//airplane.getPowerCurveCSV(10000, "example.csv");
@@ -102,11 +112,14 @@ int main() {
 
 
 
+	
+
+
 
 
 
 	wingSpanOptimizerResults results;
-	//results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, 10, 100, 50);
+	//results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, 15, 100, 50);
 	//spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
 
 	for (int i = 0; i < results.wingSpanVector.size(); i++) {
