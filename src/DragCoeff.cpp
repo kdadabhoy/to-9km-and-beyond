@@ -48,7 +48,7 @@ namespace airplane {
 	double DragCoeff::calcTotalDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const {
 		AoA = fabs(AoA); // needed bc drag should always be positive
 		if (Wing) {
-			return calcParasiteCoeff(Reynolds, wetAreaRatio) + calcCompressibilityCoeff(Mach, AoA) +calcInducedCoeff(AoA);
+			return calcParasiteCoeff(Reynolds, wetAreaRatio) + calcCompressibilityCoeff(Mach, AoA) + calcInducedCoeff(AoA);
 		} else if (Fuselage) {
 			double parasiteTemp;
 			parasiteTemp = calcParasiteCoeff(Reynolds, wetAreaRatio);
@@ -68,7 +68,7 @@ namespace airplane {
 	double DragCoeff::calcParasiteCoeff(double Reynolds, double wetAreaRatio) const {
 		assert(Wing != nullptr || Fuselage != nullptr);
 
-		if (Reynolds >= 5e5) {
+		if (Reynolds >= CRITICAL_REYNOLDS_NUMBER) {
 			return wetAreaRatio * .455 / pow(log10(Reynolds), 2.58);
 		} else if (Reynolds > .001) {
 			return wetAreaRatio * 1.328 / sqrt(Reynolds);

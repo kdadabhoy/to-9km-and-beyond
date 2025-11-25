@@ -261,7 +261,7 @@ The purpose of this class is so that a user is able to easily get desired charac
 ## AtmosphereProperties:
 
 ### Overview:
-The purpose of this class is enable the calculations of AtmosphereProperties in a simple manner. ```A user will be able to create an object, set the height of that object, and instantly be able to get the atmosphere properties (imperial units) with basic function calls on the object.``` In general, and particularly because of the amount of classes in this project, this is extermely beneficial, for readability and removing excess code (without this class you'd need to implement these functions in every class that you would need them in). 
+The purpose of the Atmosphere Properties Class is enable the calculations of atmosphere properties in a simple manner. ```A user will be able to create an object, set the height of that object, and instantly be able to get the atmosphere properties (imperial units) with basic function calls on the object.``` In general, and particularly because of the amount of classes in this project, this is extermely beneficial, for readability and removing excess code (without this class you'd need to implement these functions in every class that you would need them in). 
 
 ### Disclosures / Assumptions:
 1. This class ```relies on the NASA emperical equations``` for the troposphere and stratosphere
@@ -311,14 +311,35 @@ The purpose of this class is enable the calculations of AtmosphereProperties in 
 ## CF_34_3B1:
 
 ### Overview:
+```The main purposes of the CF_34_3B1 Class is to be able to calculate the current thrust, the current thrust curve function, and the current fuel loss, in a simple and readable manner. The performance map (thrust and fuel loss) was digitized for this engine. This class does rely on kadenMath functions in order to evalute the polynomial equations.```
+ - ___For this class (and other classes that use continous polynomial functions), I developed a way of storing them in a vector. The coefficient of the largest term is stored in the lowest index, then the coefficient of the largest degree - 1, ... , then constant. My evaluateFunction in kadenMath, can evalute any degree polynomial function efficiently and accurately.___
+    - ___The thrust curve and fuel loss functions are stored as const vector<double> private data members, using the above format___
+ 
+<br>
+Note: This class is derived from the TurboFan Class. We will ignore this implementation detail, and talk about it as if it was a stand alone class. It is derived from the TurboFan Class because it is a specific TurboFan engine. By deriving it, it would be easier to implement different types of TurboFan engines into the Airplane object. (However, the base class is fairly useless right now, since I simply implemented the functions (and private data members) in the CF_34_3B1 Class, since changing the engine is difficult - due to the amount of curves that have to be digitized). Still, even having this structure, allows modularity - in the future - to be enchanced without too much thought. 
 
-### Assumptions:
+### Disclosures / Assumptions:
+1. ```Swtiches Thrust Curve and Fuel Loss functions half way between the two (rounds up).```
+    - This is to avoid having to interpolate. Interpolation can be implemented, but it is a fairly minor approx.
+2. The Thrust Curve is fitted to a second degree polynomial with R^2 > .98 (but it could still be a bit off)
+3. The Fuel Loss Curve is fitted to a linear line with R^2 > .99 (but it could still be a bit off)
+
 
 ### Notable Functions:
 
-1. ```void ;```
-    - This function
+1. ```vector<double> getThrustCurveFunction(double height) const```
+    - This function returns the correct thrust curve function for the given height, in the format for polynomial functions previously described. 
+    - Note: This function is needs to be multipled by SSL Thrust of the engine in order to give the correct thrust
 
+2. ```double getThrust(double height, double velocity) const;```
+    - This function gets the current thrust produced by this engine at the given height and velocity.
+
+3. ```vector<double> getFuelLossFunction(double height) const;```
+    - This function returns the correct fuel loss function for the given height, in the format for polynomial functions previously described. 
+
+4. ```double calcFuelLoss2(double timeInterval_Seconds, double height, double velocity) const;```
+    - This function returns the amount of fuel lost in the timeInterval (seconds) at the given height and velocity
+    - calcFuelLoss() is a different function, that takes in a timeInterval in hours... But in this program, and most programs I can think of, calcFuelLoss2 is easier to use.
 
 
 <br>
@@ -328,13 +349,52 @@ The purpose of this class is enable the calculations of AtmosphereProperties in 
 ## DragCoeff:
 
 ### Overview:
+```The purpose of the DragCoeff Class is to be able to calculate the drag on a wing or fuselage easily. This class is able to calculate the parasite drag coefficient, induced drag coefficient, compressibility drag coefficient, and form coefficient. ```
 
-### Assumptions:
+```- Drag Coeff for Wing = parasite drag coefficient + induced drag coefficient + compressibility drag coefficient```
+```- Drag Coeff for Fuselage = parasite drag coefficient + compressibility drag coefficient```
+
+```This Class is primarily used in the Fuselage and Wing Classes, for those class's specific calcTotalDragCoeff() functions.```
+
+### Disclosures / Assumptions:
+1. ```This class is dependent on Wing and Fuselage Class.```
+    - The Wing and Fuselage Objects must have certain member functions including, but not limited to:
+        - Wing: getEllipticalEffic(), getAspectRatio(), calcLiftCoeff(AoA), calcMcc(AoA), getSweepAngleRad()
+        - Fuselage: getFormFactor()
+
+2. Compressibility Coefficient is based on Shevell's methods 
+    - This graph was digitized and fitted with an exponetial function.
 
 ### Notable Functions:
 
-1. ```void ;```
-    - This function
+1. ```double calcCompressibilityCoeff(double Mach, double AoA) const```
+    - Can only handle Wing objects
+    - Compressibility Coefficient is based on Shevell's methods: Reading a graph 
+        - The x-axis of the graph is Freestream Mach / Crest Critical Mach
+            - Crest Critical Mach is calculated by the Wing Object
+        - The y-axis of the graph is C_Dc / cos^3(sweepAngle_quarterChord)
+    - ```If the Freestream Mach / Crest Critical Mach < 0.75, we assume compressibility drag is 0```
+        - Since the graph says's 0.75 is ~= 0
+
+2. ```double calcParasiteCoeff(double Renyolds, double wetAreaRatio) const```
+    - Can handle both Wing and Fuselage objects
+    - Based on the Reynold's number, calculates the dragParasiteCoeff.
+    - ```The assumed critical Reynolds number (for laminar vs turblent) is 500,000```
+
+3. ```double calcInducedCoeff(double AoA) const```
+    - Can only handle Wing objects
+    - First has the Wing object calculate it's CL at that AoA
+    - Then calculates the induced drag coeff: (CL^2 / (pi * e * AR))
+
+4. ```double calcFormDragCoeff(double Cf) const```
+    - Can handle both Wing and Fuselage objects
+    - formDragCoeff = k*skinFrictionCoeff;
+
+5. ```double calcTotalDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const```
+    - ***This is the most used function***
+    - Can handle both Wing and Fuselage objects
+    - ```Depending on if the object is a Fuselage or a Wing, it calls on the needed functions in order to calculate the totalDragCoeff for that object.```
+
 
 
 
@@ -345,25 +405,45 @@ The purpose of this class is enable the calculations of AtmosphereProperties in 
 ## Fuselage:
 
 ### Overview:
+The purpose of the Fuselage Class is to provide the functionality needed to calculate a total Airplane weight, lift coefficient, and drag coefficient. Therefore, the functionality of this class is fairly limited, but still sufficient for most purposes. 
 
-### Assumptions:
+### Disclosures / Assumptions:
+1. ```Assuming the form factor of every fuselage object is 1.2```
+2. ```Assuming the CL_alpha of every fuselage object is 0.20```
+3. ```Assuming the CL_knott of every fuselage object is 0.00```
 
 ### Notable Functions:
 
-1. ```void ;```
-    - This function
+1. ```double calcReynolds(double velocity, double kinematicViscosity) const```
+    - This function calculates the Reynolds number of the fuselage using the length of the fuselage
+        - This function is needed for Parasite Drag
+
+2. ```double calcWetRatio(double referenceArea) const```
+    - This function returns fuselage's wettedArea / referenceArea
+        - This function is needed for Parasite Drag
+
+3.  ```double calcLiftCoeff(double AoA) const;```
+    - ***This is commonly used function***
+    - This function returns the liftCoeff of the fuselage at a given AoA
+
+4. ```double calcDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const;```
+    - ***This is the most used function***
+    - This function uses the DragCoeff Class to calculate the fuselage's total drag coeff at the given conditions
+
 
 
 
 <br>
 <br>
 <br>
+
 
 ## LiftCoeff:
 
+
 ### Overview:
 
-### Assumptions:
+### Disclosures / Assumptions:
 
 ### Notable Functions:
 
@@ -372,31 +452,44 @@ The purpose of this class is enable the calculations of AtmosphereProperties in 
 
 
 
+
+
+
+
 <br>
 <br>
 <br>
+
 
 ## Nacelle:
 
 ### Overview:
+Every Airplane has Nacelles. ```Currently this class is just a placeholder.``` All it can do is store the weight of a Nacelle. ```It was implemented so that the Airplane Class could be implemented modularly, so that if drag and lift from the Nacelle's wanted to be implemented, it could be fairly easily.```
 
-### Assumptions:
+### Disclosures / Assumptions:
+1. Currently we are assuming the Nacelle has a negligible (no) contribution to lift and drag
 
 ### Notable Functions:
 
-1. ```void ;```
-    - This function
+1. ```void setWeight(double inWeight)```
+    - This mutator modifies the Nacelle's weight private data member.
+    - ```The Nacelle's weight is still calculated in the Airplane object's total weight.```
+
+
 
 
 <br>
 <br>
 <br>
+
+
 
 ## Wing:
 
 ### Overview:
 
-### Assumptions:
+
+### Disclosures / Assumptions:
 
 
 ### Notable Functions:

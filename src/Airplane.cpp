@@ -163,14 +163,14 @@ namespace airplane {
 
 	// Drag Functions
 	double Airplane::calcDragCoeff(double AoA, double velocity, double Mach, double kinematicViscosity) const {
-		double totalDrag = 0;
+		double totalDragCoeff = 0;
 
-		totalDrag += mainWing->calcDragCoeff(AoA, mainWing->calcReynolds(velocity, kinematicViscosity), Mach, mainWing->calcWetRatio(referenceArea));
-		totalDrag += HT->calcDragCoeff(AoA, HT->calcReynolds(velocity, kinematicViscosity), Mach, HT->calcWetRatio(referenceArea));
-		totalDrag += fuselage->calcDragCoeff(AoA, fuselage->calcReynolds(velocity, kinematicViscosity), Mach, fuselage->calcWetRatio(referenceArea));
+		totalDragCoeff += mainWing->calcDragCoeff(AoA, mainWing->calcReynolds(velocity, kinematicViscosity), Mach, mainWing->calcWetRatio(referenceArea));
+		totalDragCoeff += HT->calcDragCoeff(AoA, HT->calcReynolds(velocity, kinematicViscosity), Mach, HT->calcWetRatio(referenceArea));
+		totalDragCoeff += fuselage->calcDragCoeff(AoA, fuselage->calcReynolds(velocity, kinematicViscosity), Mach, fuselage->calcWetRatio(referenceArea));
 		// Might need to add drag for VT, but just the parasite drag (inducded drag acts horizontally?)
 
-		return totalDrag;
+		return totalDragCoeff;
 	}
 
 

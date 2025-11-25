@@ -31,6 +31,7 @@ namespace airplane {
 
 	// Constants:
 		static constexpr double pi = 3.141592653589;
+		static constexpr double CRITICAL_REYNOLDS_NUMBER = 5e5;                  
 
 	};
 }
