@@ -119,8 +119,8 @@ int main() {
 
 
 	wingSpanOptimizerResults results;
-	//results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, 15, 100, 50);
-	//spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
+	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, 15, 100, 50);
+	spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
 
 	for (int i = 0; i < results.wingSpanVector.size(); i++) {
 		cout << fixed << setprecision(5);
