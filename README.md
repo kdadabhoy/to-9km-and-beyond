@@ -1,7 +1,7 @@
 <div align="center">
 
 # to-9km-and-beyond 
-## Time to Climb Project (Wing Optimization for a Subsonic Aircraft)
+## Time to Climb Project (Wing Optimization Program for a Subsonic Aircraft)
 ## by Kaden Dadabhoy
 
 </div>
@@ -13,6 +13,9 @@
 ### Main Objective 
 ```The main objective is to optimize a wing to get an aircraft with given engine and given min and max wieght to 9km```
 (fill in later)
+
+
+<br>
 <br>
 
 
@@ -24,6 +27,10 @@
 So, each of the corresponding main components (everything that isn't a single float or integer variable) have their own classes. (Note: these classes are not derived from Airplane, because they a "has-a," not an "is-a" relationship).
 
 Note: It could be helpful to know, now, that in the current Airplane Class implementation every Airplane has two identical engines and two identical nacelles.
+
+
+<br>
+<br>
 
 
 
@@ -51,6 +58,9 @@ Another example, is currently the Wing class operates under the assumption that 
 This cost is worth it for me, as will be explained in "Why C++."
 
 
+<br>
+<br>
+
 
 
 ### Why C++
@@ -67,14 +77,49 @@ Therefore, for the efficiency, and because I am most comfortable coding in C++, 
 
 
 
+<br>
+<br>
+
 
 
 ### A Quick Word on Reusability
 By programming using the aforementioned methodologies, the classes I developed in this project are, in many ways black boxes. (An aside, some of the classes depend on other classes in this program, so they are not true black boxes... but they are pretty close.) Therefore, these classes are very re-usable, which is valuable to me because it saves me the time and effort of developing them for my other aero-related personal projects. Additionally, I developed each class to be very readable (to a person familar with C++), which makes it easier to add to or change their respective implementations. This was another compelling reason to develop this program in C++.
 
 
+<br>
+<br>
+<br>
 
-# Classes and Assumptions in Each Class:
+# main() function - Optimizing the mainWing
+
+## Overview / Approach:
+- Rework to be more of an overview (more laymans terms)
+
+The classes, which will be described in much more detail in the "Classes and Assumptions" section, whole purpose is to make it easier, among other things (readbility, modularity, etc), to code an optimizer. The main function first intializes an Airplane (by first initializing all the objects that compose and airplane) with the specific characteristics given in the project description (for objects like mainWing and Airfoil, which aren't given, we intialize them with realistic values). The main function then passes these objects into the optimizers. The optimizers run a simulation (based on a user defined amount of steps from a user defined minimum to a user defined maximum for that parameter) and return the sorted data (in ascending climb order) in a vector. After the last optimizer is called, the main function then calls a function to export the data into an excel sheet, so the user can visually see it (and keep it).
+
+
+
+## Functions:
+
+
+<br>
+
+## Results:
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+
+# Classes and Assumptions
+
+
 
 ## Airfoil:
 ### Overview:
@@ -93,7 +138,7 @@ The purpose of this class is so that a user is able to easily get desired charac
 2. ```The class uses pointers behind the scenes. In fact all objects passed in are by reference, and are subject to modification.```
     - So, do NOT try assigning the same objects (like mainWing) to different airplane objects. It can lead to unexpected behavior and is a headache to debug.
 
-### Major Assumptions Within this Class 
+### Major Assumptions 
 #### Note: Assumptions from other classes used within this class may not be specified but do apply.
 1. The Wing weight is approximated using a method from Raymond 
     - The Class only runs this approx for the mainWing (and only if the mainWing has a weight of 0 when passed in)
@@ -198,12 +243,12 @@ The purpose of this class is so that a user is able to easily get desired charac
     - Returns the climbTime in seconds.
 
 
-9. ```double calcBestTimeTo9km(double startHeight, double takeOffEndHeight);```
+10. ```double calcBestTimeTo9km(double startHeight, double takeOffEndHeight);```
     - ***The most important function for the purposes of this project***
     - This function calls on the calcTakeoffPropertites() and calcBestClimbTime() to get the total amount of time it takes for the Airplane to climb to 9km from rest on a runway (assuming it can instantly have max power in the engines).
     - This function is one that is called 
 
-10. Typical Accessors (but not for every private data memeber) are also available
+11. Typical Accessors (but not for every private data memeber) are also available
     - Namely for weights 
 
 
@@ -214,49 +259,149 @@ The purpose of this class is so that a user is able to easily get desired charac
 <br>
 
 ## AtmosphereProperties:
+
 ### Overview:
-### Assumptions:
+The purpose of this class is enable the calculations of AtmosphereProperties in a simple manner. ```A user will be able to create an object, set the height of that object, and instantly be able to get the atmosphere properties (imperial units) with basic function calls on the object.``` In general, and particularly because of the amount of classes in this project, this is extermely beneficial, for readability and removing excess code (without this class you'd need to implement these functions in every class that you would need them in). 
+
+### Disclosures / Assumptions:
+1. This class ```relies on the NASA emperical equations``` for the troposphere and stratosphere
+    - ```This class will only work accurately in the troposphere and stratosphere```
+        - ```Troposphere is from 0ft - 36152 ft```
+        - ```Stratosphere is from 36152ft - 82345ft```
+2. The Sutherland equation is used for viscosity calculation
+3. ```Again this class only works with imperial units```
+    - It takes in feet 
+    - It returns the imperial unit you would expect... if unsure, just look at the header comment.
+
+
+### Notable Functions:
+
+1. ```void setHeight(double inHeight);```
+    - This function recalculates all the atmosphere properties of the object for the new height.
+    - A lot of the time you will just initialize the object with the height and not need to call this function, but there are a handful of times this mutator is useful.
+2. ```double getDensity() const;```
+    - Returns Density in slug/ft^3
+3. ```double getViscosity()  const;```
+    - Returns Viscosity in slug/(ft*s)
+
+4. ```double getKinematicVisc()  const;```
+    - Returns Kinematic Viscosity in ft^2/s
+    
+5. ```double getStaticPressure()  const;```
+    - Returns Static Pressure in lb/ft^2 
+
+6. ```double getTemperature()  const;```
+    - Returns Temperature in deg R
+
+7. ```double getSpeedOfSound()  const;```
+    - Returns SpeedOfSound in ft/s
+
+8. ```double getHeight()  const;```
+    - Returns height in ft (not sure when you'd need this, but there for modularity)
+
+9. ```Note: There are also calc"WantedProperty" for all the properties there are getters for.```
+    - Use setHeight() mutator if you want to re-calc all properties... it is more efficient and recommended (over say using the calc functions for every property).
+
 
 <br>
-
-## CF_34_3B1:
-### Overview:
-### Assumptions:
-
+<br>
 <br>
 
+
 ## CF_34_3B1:
+
 ### Overview:
+
 ### Assumptions:
 
+### Notable Functions:
+
+1. ```void ;```
+    - This function
+
+
+
+<br>
+<br>
 <br>
 
 ## DragCoeff:
+
 ### Overview:
+
 ### Assumptions:
 
+### Notable Functions:
 
+1. ```void ;```
+    - This function
+
+
+
+<br>
+<br>
 <br>
 
 ## Fuselage:
+
 ### Overview:
+
 ### Assumptions:
 
+### Notable Functions:
+
+1. ```void ;```
+    - This function
+
+
+
+<br>
+<br>
 <br>
 
 ## LiftCoeff:
+
 ### Overview:
+
 ### Assumptions:
 
+### Notable Functions:
+
+1. ```void ;```
+    - This function
+
+
+
+<br>
+<br>
 <br>
 
 ## Nacelle:
+
 ### Overview:
+
 ### Assumptions:
 
+### Notable Functions:
+
+1. ```void ;```
+    - This function
+
+
+<br>
+<br>
 <br>
 
 ## Wing:
+
 ### Overview:
+
 ### Assumptions:
+
+
+### Notable Functions:
+
+1. ```void ;```
+    - This function
+
 

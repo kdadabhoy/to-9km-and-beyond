@@ -22,6 +22,7 @@ namespace atmosphere_properties {
 		double getHeight() const;                   // ft
 
 
+
 	// Other functions - Suggested to just use setHeight and accessors (more efficient)
 		double calcTemperature(double inHeight) const;        // Rankine      Using NASA Model (sea level -> h=0)
 		double calcDensity(double inHeight) const;            // slug/ft^3,   Using P=rho*R*T
