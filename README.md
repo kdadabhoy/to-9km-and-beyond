@@ -491,11 +491,71 @@ Every Airplane has Nacelles. ```Currently this class is just a placeholder.``` A
 
 
 ### Disclosures / Assumptions:
-
+1. Assumes linearly tapered trapezoidal wing
+2. CL Mcc >.6 assume .6 function
+3. Shevell method for Mcc
+4.
 
 ### Notable Functions:
 
-1. ```void ;```
+1. ```double calcReynolds(double velocity, double kinematicViscosity) const```
+    - This function
+
+1. ```double calcWettedArea() const```
+    - This function
+
+1. ```double calcWetRatio(double referenceArea) const```
+    - This function
+
+1. ```double calcDragCoeff(double AoA_rad, double Reynolds, double Mach, double wetAreaRatio) const```
+    - This function
+
+1. ```double calcLiftCoeff(double AoA_rad) const```
+    - This function
+
+1. ```double calcMcc(double AoA_rad) const```
+    - This function
+
+1. ```double calcMccZeroSweep(double AoA_rad) const```
+    - This function
+
+1. ```double calcMccZeroSweep(double AoA_rad) const```
+    - This function
+
+1. ```double calcSweptMExponent(double AoA_rad) const```
+    - This function
+
+1. ```double calcRootInertiaEstimate() const```
+    - This function
+
+1. ```double calc_C_ForRootStress() const```
+    - This function
+
+1. ```double calcLocalChord(double distanceFromRoot) const```
+    - This function
+
+1. ```double calcArea(double inSpan, double inRootChord, double inTaperRatio) const```
+    - This function
+
+1. ```double calcMAC(double inRootChord, double inTaperRatio) const;```
+    - This function
+
+1. ```double calcAspectRatio(double inSpan, double inArea) const```
+    - This function
+
+1. ```double calcEllipEfficiency(double inSweepAngleRad, double inAspectRatio, double inTaperRatio) const```
+    - This function
+
+1. ```void calcAndSetCL3D()```
+    - This function
+
+
+1. ```void calcAndSetAllProperties()```
+    - This function
+
+
+
+1. ```Accessors```
     - This function
 
 
