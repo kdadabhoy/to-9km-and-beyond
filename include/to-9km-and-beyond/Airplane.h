@@ -15,16 +15,9 @@ using std::vector;
 // DO NOT HAVE CREATED OBJECTS SHARE THE SAME PASSED IN PARAMETER, SINCE THIS CLASS USES
 	// POINTERS FOR EFFICIENCY... IT WILL LEAD TO UNEXPECTED BEHAVIOR!
 
-
 namespace airplane {
 	class Airplane {
 	public:
-		Airplane();
-		// Note that the constructor takes in addresses... which can be dangerous if you modify components not using the mutators from this class
-			// The reasoning for the address, is to avoid creating 
-		Airplane(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight);
-
-
 
 		// Structs for helper functions
 		struct SteadyLevelAccelerationTimeProperties {
@@ -44,14 +37,19 @@ namespace airplane {
 
 
 
+		Airplane();
+		Airplane(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight);
+
+
 		// Useful Functions:
 		double calcMach(double velocity, double temp) const;
 
 		double calcDragCoeff(double AoA, double velocity, double Mach, double kinematicViscosity) const;				// AoA in Rad
-		double calcDrag(double AoA, double velocity, double Mach, double kinematicViscosity, double density) const;     // AoA in Rad
+		double calcDrag(double AoA, double velocity, double Mach, double kinematicViscosity, double density) const;     // AoA in Rad, returns lbf
 
 		double calcLiftCoeff(double AoA) const;																			// AoA in Rad
 		double calcLift(double AoA, double velocity, double density) const;												// AoA in Rad
+
 
 		// Power Curve
 		void getPowerCurveCSV(double gamma, double height, string fileName) const;           // fileName should have ".csv", no small angle approx
@@ -59,9 +57,8 @@ namespace airplane {
 
 
 		// Takeoff Functions
-			// Probably create a struct and return a struct instead of passing by reference
 		TakeoffProperties calcTakeoffPropertites(double startHeight, double endHeight, double startVelocity, double startWeight);  // Use this one.. totalTime should be in seconds
-		double calcTakeoffTime(double height, double endHeight);                                             // Just returns time... less useful
+		double calcTakeoffTime(double height, double endHeight);  // Just returns time... less useful
 
 
 		// Climb Functions
@@ -71,31 +68,13 @@ namespace airplane {
 		double calcBestClimbTime(double startHeight, double startVelocity, double endHeight);           // Returns seconds, updates totalWeight 
 		double calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight, double heightSteps);   // does powerCurve every heightStep, updates totalWeight
 
-		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;        // Gamma in degrees, Returns AoA in rad
-		double calcSteadyClimbAoAApprox(double velocity, double density) const;				   // Small angle approx, so cos(gamma) = 1
-
 
 		// Steady Level Flight Functions (L = W)
-		double calcSteadyLevelAoA(double velocity, double density) const;
 		SteadyLevelAccelerationTimeProperties calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height); // updates totalWeight
-
-
-
-
 
 
 		// Feasability of Wing
 		bool isWingPossible() const;                       // Returns true if the mainWing can withstand the load & takeoff
-
-
-
-
-
-		// Make below Private
-		double calcLimitLift() const;			           // Capped by n_limit.. in theory could be capped by n_ult (if allow plastic deformation)
-		double calcRootLimitMoment() const;                // Returns lbf*ft
-		double calcRootLimitStress() const;                // Returns ksi
-		double calcMinSpanNeeded(double maxRootStressKSI) const; // Returns ft, takes in ksi
 
 
 		// Accessors:
@@ -107,15 +86,13 @@ namespace airplane {
 		vector<double> getMaxExcessPowerVector() const;     // Assumes power curve is set
 
 
-		// Mutators - not used rn
+		// Mutators
 		void setMainWing(Wing& inWing);                     // Takes in a new Wing and re-intialized aircraft (does not reset fuel weight)
 		void setMainWingWeight(double inWeight);            // Used for when you want to assign a weight to the mainWing...
 
 
 		// Print Functions
-		void printMainWingCharacteristics() const;          // That long block of cout statements for AR, area, e, taper, etc
-
-		double randomTest = 0; // delete
+		//void printMainWingCharacteristics() const;          // That long block of cout statements for AR, area, e, taper, etc
 
 	private:
 		// Must take in:
@@ -153,11 +130,7 @@ namespace airplane {
 		static constexpr double LOAD_SAFETY_FACTOR = 1.5;				  // Typical safety factor 
 		static constexpr double SMUDGE_FACTOR = 0.85;                     // Our wing is an advanced composite... obviously! (Table 15.4 from Raymond book)
 		static constexpr double PERCENT_CONTROL_SURFACE_AREA = 0.10;      // % Control Surface Area of main Wing (Approx 10%)
-
-		//static constexpr double MAX_MTOW = 35000 * 2.20462;              // lbms, Project specifications / Max limit for this competition
-		//static constexpr double MIN_MTOW = 25000 * 2.20462;              // lbms, Project specifications / Min limit for this competition
-
-		double N_ULT;                                                     // Calculated and set in Wing Weight (n_lim*LOAD_SAFETY_FACTOR)
+		double N_ULT = 0;                                                     // Calculated and set in Wing Weight (n_lim*LOAD_SAFETY_FACTOR)
 
 
 		// Power Function's Curve Constants
@@ -179,7 +152,7 @@ namespace airplane {
 		static constexpr double PSI_TO_KSI = .001;                  // psi * PSI_TO_KSI = ksi
 
 		// calcTime9km Constas
-		static constexpr double VELOCITY_ERROR = 5.0;               // Used in calcSteadyLevelAccelerationTime, calcBestClimbTime, & calcBestClimbTimeApprox
+		static constexpr double VELOCITY_ERROR = 20.0;               // Used in calcSteadyLevelAccelerationTime, calcBestClimbTime, & calcBestClimbTimeApprox
 
 	
 
@@ -191,7 +164,6 @@ namespace airplane {
 		void calcAndSetPowerCurveData(double gamma, double height);		// No small angle approx, Used for setting all data
 		void calcAndSetPowerCurveData(double height);					// Small angle approx, Used for setting all data
 		void calcAndSetMainWingWeight();								// Raymond Cargo Method, with some assumptions
-
 
 
 		// Power Curve Functions
@@ -206,21 +178,24 @@ namespace airplane {
 
 		// Climb Functions
 		double calcExcessPower(double velocity) const;				                           // Assumes Power Curve member vars are set
+		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;        // Gamma in degrees, Returns AoA in rad
+		double calcSteadyClimbAoAApprox(double velocity, double density) const;				   // Small angle approx, so cos(gamma) = 1
 
+
+		// Steady Level Acceleration Functions:
+		double calcSteadyLevelAoA(double velocity, double density) const;
 
 
 		// Takeoff Functions:
-	
-
 		TakeoffProperties calcEndRunwayAirplaneProperties(double height, double startVelocity, double startWeight) const; // startVelocity should = 0 usually
 
 
-		/* // Make private
-		// Checking if the Wing is possible
-		double calcLimitLift() const;			  // Capped by n_limit.. in theory could be capped by n_ult (if allow plastic deformation)
-		double calcRootLimitMoment() const;            // M_root = pi/8 * W*n*b for ellipitical trapezodial wing
-		double calcRootLimitStress() const;
-		*/
+		// Feasability of Wing Helpfer Functions
+		double calcLimitLift() const;			           // Capped by n_limit.. in theory could be capped by n_ult (if allow plastic deformation)
+		double calcRootLimitMoment() const;                // Returns lbf*ft
+		double calcRootLimitStress() const;                // Returns ksi
+		//double calcMinSpanNeeded(double maxRootStressKSI) const; // Returns ft, takes in ksi
+
 	};
 
 

@@ -670,9 +670,6 @@ namespace airplane {
 				// Weight Loss Consideration
 				totalWeight -= numEngines * engine->calcFuelLoss2(TIME_STEP, height, velocity);
 
-
-
-
 				/*
 					// If you want to see how gamma changes during flight
 					double gamma = asin(maxExcessPower / (totalWeight * velocityMaxExcessPower));
@@ -1192,7 +1189,6 @@ namespace airplane {
 	// MIT way
 	double Airplane::calcRootLimitStress() const {
 		// sigma_limit = M_root,_limit * c / I
-
 		double sigma = (calcRootLimitMoment() * mainWing->calc_C_ForRootStress()) / mainWing->calcRootInertiaEstimate(); // psf
 		return sigma * PSF_TO_PSI * PSI_TO_KSI;  // returns ksi
 	}
@@ -1264,7 +1260,7 @@ namespace airplane {
 		// Need to see if Wing can
 		// 1) Material can withstand the maximum root load
 		// 2) If we have enough span
-		// 3) Actually Takeoff (?)
+		// 3) Actually Takeoff (?) - not implemented currently
 		bool canWithStandLoad = false;
 		bool canTakeoff = true; // delete / set to false... set to true for testing purposes
 

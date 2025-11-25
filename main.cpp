@@ -93,7 +93,6 @@ int main() {
 	cout << endl << endl;
 
 	cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
-	cout << airplane.randomTest / 60 << endl;
 	cout << airplane.getMTOW() - airplane.getWeight() << " Weight Lost after 9km" << endl;
 	cout << endl << endl << endl;
 
@@ -106,8 +105,8 @@ int main() {
 
 
 	wingSpanOptimizerResults results;
-	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, 10, 100, 50);
-	spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
+	//results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, 10, 100, 50);
+	//spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
 
 	for (int i = 0; i < results.wingSpanVector.size(); i++) {
 		cout << fixed << setprecision(5);
