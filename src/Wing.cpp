@@ -354,9 +354,6 @@ namespace airplane {
 
 	double Wing::calcDragCoeff(double AoA_rad, double Reynolds, double Mach, double wetAreaRatio) const {
 		assert(Mach <= .99);
-
-		
-
 		DragCoeff CD_Total(*this);
 		return CD_Total.calcTotalDragCoeff(AoA_rad, Reynolds, Mach, wetAreaRatio);
 	}

@@ -13,7 +13,7 @@ namespace airplane {
 		Wing = nullptr;
 		Fuselage = nullptr;
 	}
-
+	
 
 
 
@@ -46,12 +46,9 @@ namespace airplane {
 
 
 	double DragCoeff::calcTotalDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const {
+		AoA = fabs(AoA); // needed bc drag should always be positive
 		if (Wing) {
-
-			//cout << "Inducded drag coeff at mach " << Mach << " and Aoa " << AoA * 180 / 3.14 << " is " << calcInducedCoeff(AoA) << endl; // del
-			AoA = fabs(AoA);
-			return calcParasiteCoeff(Reynolds, wetAreaRatio) + calcCompressibilityCoeff(Mach, AoA) + calcInducedCoeff(AoA);
-
+			return calcParasiteCoeff(Reynolds, wetAreaRatio) + calcCompressibilityCoeff(Mach, AoA) +calcInducedCoeff(AoA);
 		} else if (Fuselage) {
 			double parasiteTemp;
 			parasiteTemp = calcParasiteCoeff(Reynolds, wetAreaRatio);
@@ -90,7 +87,7 @@ namespace airplane {
 	double DragCoeff::calcInducedCoeff(double AoA) const {
 		assert(Wing != nullptr);
 		double CL = Wing->calcLiftCoeff(AoA);
-		return (CL * CL) / (pi * Wing->getEllipticalEffic() * Wing->getAspectRatio());
+		return (CL*CL) / (pi * Wing->getEllipticalEffic() * Wing->getAspectRatio());
 	}
 
 
@@ -106,11 +103,11 @@ namespace airplane {
 		if (Mach < .3) {
 			// Compressibility drag negligble 
 			return 0;
-		}
+		} 
 
 
 		double machRatio = Mach / Wing->calcMcc(AoA);      // M_freestream / Mcc
-		//cout << "Mach Ratio " << machRatio << endl << endl; // delete later
+
 		if (machRatio < .75) {
 			// Assuming compressibility negligible bc Shevell graph doesn't cover it
 			return 0;
@@ -180,7 +177,7 @@ namespace airplane {
 		// Eliminating this from Compressibility Function gives a more continous Power Required Curve
 		// The Cdc = .025 was messing it up...
 
-
+	
 		} else if (r <= 1.08) {
 			assert(r >= .75 && r <= 1.08); // This function only works if r >= .75 or <= 1.08
 			double Cdc = 0;

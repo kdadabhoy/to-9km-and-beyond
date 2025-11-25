@@ -463,6 +463,8 @@ namespace airplane {
 		powerRequiredData = calcPowerRequiredData(gamma, height);
 		powerAvailableData = calcPowerAvailableData(height);
 		calcAndSetMaxExcessPower();
+
+
 		return;
 	}
 
@@ -661,7 +663,7 @@ namespace airplane {
 
 				if (((height - lastMaxExcessVelcTryHeight) > TRY_AGAIN_EXCESS_VEL_INTERVAL) && !canReachMaxVelocity) {
 					// Want to try reach maxExcessVel again
-					canReachMaxVelocity = true;
+					canReachMaxVelocity = true; 
 				}
 
 
@@ -758,7 +760,7 @@ namespace airplane {
 
 				if (((height - lastMaxExcessVelcTryHeight) > TRY_AGAIN_EXCESS_VEL_INTERVAL) && !canReachMaxVelocity) {
 					// Want to try reach maxExcessVel again
-					canReachMaxVelocity = true;
+					canReachMaxVelocity = true; 
 				}
 
 				// Weight Loss Consideration
@@ -873,7 +875,6 @@ namespace airplane {
 		double Mach, thrust, AoA, drag, maxAcceleration, engineFactor;
 
 		double TIME_STEP = 0.05;        // Can Change if too inefficient
-		//double VELOCITY_ERROR = 5.0;  // global constant now
 		double velDifference = finalVelocity - startVelocity;
 
 
@@ -906,14 +907,13 @@ namespace airplane {
 			// Weight Loss Consideration
 			//totalWeight -= numEngines * engine->calcFuelLoss2(TIME_STEP, height, velocity); // this is breaking like 40ft span, but helping 46ft
 
-
-			assert(fabs(AoA) < (20 * 3.1415) / 180); // Just a precaution to make sure AoA never goes above 20 deg (optimisitic)
+			assert(fabs(AoA) < (20 * 3.1415) / 180);                                    // Just a precaution to make sure AoA never goes above 20 deg (optimisitic)
 		}
 
 
 		returnStruct.finalVelocity = velocity;
 		returnStruct.timeTaken = totalTime;
-		return returnStruct;
+		return returnStruct; 
 	}
 
 
@@ -927,13 +927,12 @@ namespace airplane {
 
 	// Takeoff Functions
 
-	/*
-	// Old - doesnt account for totalWeightLoss
 	// *** Need to account for weight loss ***
 	// See physics derivation in notes
+	// Old - doesnt account for totalWeightLoss
 	double Airplane::calcTakeoffTime(double height, double endHeight) {
 		double totalTime = 0;
-		double velocity = 0;  // Start from rest
+		double velocity = 0;  // Start from rest 
 
 		//double CL_Stall = mainWing->get...   // Need to code a function that gets this from my airfoil and converts that to 3D
 		double AoA_Stall = 15 * pi / 180;      // Just using a realistic, arbirtary AoA rn
@@ -978,7 +977,7 @@ namespace airplane {
 		}
 		return totalTime;
 	}
-	*/
+
 
 
 
@@ -1059,7 +1058,7 @@ namespace airplane {
 		double velocity = startVelocity;
 		double timeSoFar = 0;
 		double Mach, thrust, AoA, drag, lift, rollingFriction, maxAcceleration;
-
+	
 		double ROLLING_FRIC_COEFF = .02; // A realistic approx
 		double TIME_STEP = 0.05;        // Can Change if too inefficient
 
@@ -1206,21 +1205,21 @@ namespace airplane {
 
 
 
-	/*
-		// Cap Way
-		double Airplane::calcRootLimitStress() const {
-			// sigma_limit = M_root,_limit * c / I
-			// c = distance from neutral axis to the outermost fiber of the cross section
-			double sigma = calcRootLimitMoment() / mainWing->calc_C_ForRootStress();
-			return sigma * PSF_TO_PSI * PSI_TO_KSI;  // returns ksi
-		}
-	*/
+/*
+	// Cap Way
+	double Airplane::calcRootLimitStress() const {
+		// sigma_limit = M_root,_limit * c / I
+		// c = distance from neutral axis to the outermost fiber of the cross section 
+		double sigma = calcRootLimitMoment() / mainWing->calc_C_ForRootStress();
+		return sigma * PSF_TO_PSI * PSI_TO_KSI;  // returns ksi
+	}
+*/
 
 
 
 
 
-
+	
 
 
 
@@ -1231,28 +1230,28 @@ namespace airplane {
 	/* // Old
 		double Airplane::calcRootLimitStress() const {
 		// sigma_limit = M_root,_limit * c / I
-		// c = distance from neutral axis to the outermost fiber of the cross section
+		// c = distance from neutral axis to the outermost fiber of the cross section 
 
 		double sigma = calcRootLimitMoment() * mainWing->calc_C_ForRootStress() / mainWing->calcRootInertiaEstimate(); // psf
 		return sigma * PSF_TO_PSI * PSI_TO_KSI;  // returns ksi
 	}
-
-
+	
+	
 	*/
 
 
 
 
 
-	/*
-		// Maybe dumb
-		double Airplane::calcMinSpanNeeded(double maxRootStressKSI) const {
-			// sigma_limit = M_root,_limit * c / I
-			// c = distance from neutral axis to the outermost fiber of the cross section
-			double sigma = calcRootLimitMoment() * mainWing->calc_C_ForRootStress() / mainWing->calcRootInertiaEstimate(); // psf
-			return sigma * PSF_TO_PSI * PSI_TO_KSI;  // returns ksi
-		}
-	*/
+/*
+	// Maybe dumb
+	double Airplane::calcMinSpanNeeded(double maxRootStressKSI) const {
+		// sigma_limit = M_root,_limit * c / I
+		// c = distance from neutral axis to the outermost fiber of the cross section
+		double sigma = calcRootLimitMoment() * mainWing->calc_C_ForRootStress() / mainWing->calcRootInertiaEstimate(); // psf
+		return sigma * PSF_TO_PSI * PSI_TO_KSI;  // returns ksi
+	}
+*/
 
 
 
@@ -1275,7 +1274,7 @@ namespace airplane {
 		double c_cst = mainWing->calc_C_ForRootStress();
 		double sigma_needed_ft = maxRootStress * 1000 * 144;
 		double taper = mainWing->getTaperRatio();
-		double spanNeeded = (6 * (1 + taper) * sigma_needed_ft * inertia) / (maxLift * c_cst);
+		double spanNeeded = (6 * (1+taper) * sigma_needed_ft * inertia) / (maxLift * c_cst);
 
 		cout << "Span needed: " << spanNeeded << endl; // del
 
@@ -1310,7 +1309,7 @@ namespace airplane {
 
 
 	// Mutators:
-
+	
 	// This function completely resets the airplane with the new wing (weight goes back to MTOW)
 	void Airplane::setMainWing(Wing& inWing) {
 		assert(mainWing != nullptr);			// Precaution
@@ -1323,7 +1322,7 @@ namespace airplane {
 		if (fabs(mainWing->getWeight()) < .01) {
 			calcAndSetMainWingWeight();				// Now calc main wing weight using Raymond Approx
 			totalWeight += mainWing->getWeight();   // Add mainWingWeight to totalWeight
-		}
+		} 
 
 		MTOW = totalWeight;
 		return;

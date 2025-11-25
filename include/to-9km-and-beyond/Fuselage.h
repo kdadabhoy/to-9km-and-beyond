@@ -37,7 +37,7 @@ namespace airplane {
 		// Could take these in as parameters... 
 			// but they're fairly consistent across fuselages (approxs anyway)
 		double formFactor = 1.2;       // formFactor is ~1.2-1.5
-		double CL_alpha = .10;          // CL_alpha ~.1-.3
+		double CL_alpha = .2;          // CL_alpha ~.1-.3
 		double CL_knott = 0;           // CL_knott ~ 0... 
 	
 	};
