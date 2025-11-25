@@ -11,7 +11,7 @@
 ## Overview and Coding Methodology
 
 ### Main Objective 
-```The main objective is to optimize a wing to get an aircraft with given engine and given min and max wieght to 9km```
+```The main objective is to optimize a wing to get an aircraft with given engine and given min and max weight to 9km```
 (fill in later)
 
 
