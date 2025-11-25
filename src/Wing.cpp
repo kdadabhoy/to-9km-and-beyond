@@ -392,7 +392,7 @@ namespace airplane {
 	// which is a conservative approach.. and fairly accurate
 	// CL > .60 gets approxed with CL = .60 curve
 	double Wing::calcMccZeroSweep(double AoA_rad) const {
-		double CL = fabs(CL3D.calcLiftCoefficient(AoA_rad));	// NOT SURE IF THIS WORKS, NEEDED BC SOMETIMES HAVE NEGATIVE CL
+		double CL = fabs(CL3D.calcLiftCoefficient(AoA_rad));	// CL needs to be positive for graph (negative shouldnt effect this, since we care abt magnitude)
 		double thicknessRatio = airfoil->getThicknessRatio();  
  
 		double ferror = .01;                                    // Error for comparisons of doubles
@@ -457,9 +457,7 @@ namespace airplane {
 
 
 	double Wing::calcSweptMExponent(double AoA_rad) const {
-		double CL = fabs(CL3D.calcLiftCoefficient(AoA_rad));       // AGAIN NOT SURE IF FABS WORKS FOR THIS CL PLOT... but worst case just say we assume symmetric airfoil
-
-		//cout << "CL3d = " << CL << endl; // delete
+		double CL = fabs(CL3D.calcLiftCoefficient(AoA_rad));  // CL needs to be positive for graph (negative shouldnt effect this, since we care abt magnitude)
 
 		if (CL > .6) {
 			// Chart doesnt go past CL = .6.. so we will assume anything more is .5
@@ -467,7 +465,7 @@ namespace airplane {
 			return .5;
 		}
 
-		assert(CL > 0 && CL <= .60);							
+		assert(CL > 0 && CL <= .60);	
 		//m = 0.823 + -0.57x + 0.101x^2
 		return 0.823 + (-.57 * CL) + (0.101 * CL * CL);
 	}
