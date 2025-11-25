@@ -59,8 +59,9 @@ namespace airplane {
 
 
 		// Takeoff Functions
+			// Probably create a struct and return a struct instead of passing by reference
 		TakeoffProperties calcTakeoffPropertites(double startHeight, double endHeight, double startVelocity, double startWeight);  // Use this one.. totalTime should be in seconds
-		//double calcTakeoffTime(double height, double endHeight);                                             // Just returns time... less useful
+		double calcTakeoffTime(double height, double endHeight);                                             // Just returns time... less useful
 
 
 		// Climb Functions
@@ -79,12 +80,22 @@ namespace airplane {
 		SteadyLevelAccelerationTimeProperties calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height); // updates totalWeight
 
 
+
+
+
+
 		// Feasability of Wing
 		bool isWingPossible() const;                       // Returns true if the mainWing can withstand the load & takeoff
+
+
+
+
+
+		// Make below Private
 		double calcLimitLift() const;			           // Capped by n_limit.. in theory could be capped by n_ult (if allow plastic deformation)
 		double calcRootLimitMoment() const;                // Returns lbf*ft
 		double calcRootLimitStress() const;                // Returns ksi
-		//double calcMinSpanNeeded(double maxRootStressKSI) const; // Returns ft, takes in ksi
+		double calcMinSpanNeeded(double maxRootStressKSI) const; // Returns ft, takes in ksi
 
 
 		// Accessors:
@@ -102,8 +113,9 @@ namespace airplane {
 
 
 		// Print Functions
-		//void printMainWingCharacteristics() const;          // That long block of cout statements for AR, area, e, taper, etc
+		void printMainWingCharacteristics() const;          // That long block of cout statements for AR, area, e, taper, etc
 
+		double randomTest = 0; // delete
 
 	private:
 		// Must take in:
@@ -167,7 +179,7 @@ namespace airplane {
 		static constexpr double PSI_TO_KSI = .001;                  // psi * PSI_TO_KSI = ksi
 
 		// calcTime9km Constas
-		static constexpr double VELOCITY_ERROR = 100;               // Used in calcSteadyLevelAccelerationTime, calcBestClimbTime, & calcBestClimbTimeApprox
+		static constexpr double VELOCITY_ERROR = .5;               // Used in calcSteadyLevelAccelerationTime, calcBestClimbTime, & calcBestClimbTimeApprox
 
 	
 

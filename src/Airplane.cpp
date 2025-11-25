@@ -140,6 +140,7 @@ namespace airplane {
 		double knottTerm = 0;
 
 		// Assume VT contributes negligble lift.
+		//alphaTerm = mainWing->getCL_Alpha() + HT->getCL_Alpha(); // delete
 		alphaTerm = mainWing->getCL_Alpha() + HT->getCL_Alpha() + fuselage->getCL_Alpha();
 		knottTerm = mainWing->getCL_Knott() + HT->getCL_Knott() + fuselage->getCL_Knott();
 
@@ -166,6 +167,23 @@ namespace airplane {
 		double totalDrag = 0;
 
 		totalDrag += mainWing->calcDragCoeff(AoA, mainWing->calcReynolds(velocity, kinematicViscosity), Mach, mainWing->calcWetRatio(referenceArea));
+
+		AtmosphereProperties Cond(randomTest);
+
+		double CL = mainWing->calcLiftCoeff(AoA);
+		cout << "maing wing CL " << CL << endl;
+		//double CL = calcLiftCoeff(AoA);
+		double lift = .5 * Cond.getDensity() * velocity * velocity * CL * mainWing->getArea();
+
+		cout << ".98 Weight " << .98 * totalWeight << endl;
+		cout << "Lift " << lift << endl;
+		cout << "Lift - .98Weight " << lift - (.98*totalWeight) << endl;
+
+
+		double inducedDrag = (CL * CL) / (pi * mainWing->getEllipticalEffic() * mainWing->getAspectRatio());
+		cout << "AoA " << AoA * 180 / 3.14 << endl;
+		cout << "Wing induced drag CD " << inducedDrag << endl << endl; // delete later
+
 		totalDrag += HT->calcDragCoeff(AoA, HT->calcReynolds(velocity, kinematicViscosity), Mach, HT->calcWetRatio(referenceArea));
 		totalDrag += fuselage->calcDragCoeff(AoA, fuselage->calcReynolds(velocity, kinematicViscosity), Mach, fuselage->calcWetRatio(referenceArea));
 		// Might need to add drag for VT, but just the parasite drag (inducded drag acts horizontally?)
@@ -463,6 +481,7 @@ namespace airplane {
 		powerRequiredData = calcPowerRequiredData(gamma, height);
 		powerAvailableData = calcPowerAvailableData(height);
 		calcAndSetMaxExcessPower();
+
 		return;
 	}
 
@@ -622,14 +641,17 @@ namespace airplane {
 		double TRY_AGAIN_EXCESS_VEL_INTERVAL = 2000;     // how many ft before trying to reach maxExcessVel again (so we save some efficiency)
 		// double VELOCITY_ERROR = .5; // global constant now
 		double TIME_STEP = .1;							// Can Change if too inefficient
-
+		double gamma = 0;
 
 		while (height <= endHeight) {
 			calcAndSetPowerCurveData(height);
 			calcAndSetMaxExcessPower();
 
 			if (fabs(velocity - velocityMaxExcessPower) > VELOCITY_ERROR && canReachMaxVelocity) {
-				// calcSteadyLevelAccel also updates Weight
+				//calcSteadyLevelAccel also updates Weight
+				gamma = 0;
+				//calcAndSetPowerCurveData(gamma, height);
+				//calcAndSetMaxExcessPower();
 				accelProperties = calcSteadyLevelAccelerationTime(velocity, velocityMaxExcessPower, height);
 				totalTime += accelProperties.timeTaken;
 				velocity = accelProperties.finalVelocity;
@@ -644,6 +666,10 @@ namespace airplane {
 
 			} else {
 				currentExcessPower = calcExcessPower(velocity); // can't juse use maxExcess power.. it typically is... but there are cases when it's not
+				gamma = asin(currentExcessPower / (totalWeight * velocity));
+				cout << "gamma is deg " << gamma*180/pi << endl;
+				//calcAndSetPowerCurveData(gamma, height);
+				//calcAndSetMaxExcessPower();
 
 				height += (currentExcessPower / totalWeight) * TIME_STEP; // small angle approx method
 				totalTime += TIME_STEP;
@@ -669,6 +695,11 @@ namespace airplane {
 				totalWeight -= numEngines * engine->calcFuelLoss2(TIME_STEP, height, velocity);
 
 
+				// delete later - just to see C_D_total
+				AtmosphereProperties Cond(height);
+				double Mach = velocity / sqrt(1.4 * GAS_CONSTANT * Cond.getTemperature());
+				randomTest = height;
+				cout << "Total Drag Coeff at " << height << " vel: " << velocity << " is " << calcDragCoeff(calcSteadyClimbAoA(14*pi/180, velocity, Cond.getDensity()), velocity, Mach, Cond.getKinematicVisc()) << endl;
 
 
 				/*
@@ -677,7 +708,6 @@ namespace airplane {
 					cout << "gamma (deg): " << gamma * 180 / 3.1415 << endl;
 				*/
 			}
-
 		}
 
 
@@ -906,13 +936,33 @@ namespace airplane {
 			// Weight Loss Consideration
 			//totalWeight -= numEngines * engine->calcFuelLoss2(TIME_STEP, height, velocity); // this is breaking like 40ft span, but helping 46ft
 
+			/*
+			cout << "totalWeight in Horiz Acceleration " << totalWeight << endl; //delete
+			cout << "vel diff " << velDifference << endl; // delete
+			
+			cout << "height " << height << endl; // delete
+			cout << "vel diff " << velDifference << endl; // delete
+			*/
 
-			assert(fabs(AoA) < (20 * 3.1415) / 180); // Just a precaution to make sure AoA never goes above 20 deg (optimisitic)
+			assert(fabs(AoA) < (20 * 3.1415) / 180);                                    // Just a precaution to make sure AoA never goes above 20 deg (optimisitic)
 		}
 
 
 		returnStruct.finalVelocity = velocity;
 		returnStruct.timeTaken = totalTime;
+
+		// Approxing weight loss because if weight loss is implemented with TIME_STEP, it causes weird behavior for certain spans (longer loop times)
+		// This is due to overshooting and then coming back for longer... which wouldnt happen in an actual climb...
+			// Since an actual climb would just change pitch angle to gain velocity... which we avoided bc the dynamics are a lot harder to optimize
+		//totalWeight -= numEngines * engine->calcFuelLoss2(totalTime, height, (velocity + startVelocity / 2));
+		/*
+		randomTest += totalTime; // delete
+		cout << "height " << height << endl; // delete
+		cout << " totalWeight Loss " << numEngines * engine->calcFuelLoss2(totalTime, height, (velocity + startVelocity / 2)) << endl; // delete
+		cout << "time taken " << totalTime << endl; // delete
+		cout << endl << endl << endl; // delete
+		*/
+
 		return returnStruct; 
 	}
 
@@ -927,10 +977,9 @@ namespace airplane {
 
 	// Takeoff Functions
 
-	/*
-	// Old - doesnt account for totalWeightLoss
 	// *** Need to account for weight loss ***
 	// See physics derivation in notes
+	// Old - doesnt account for totalWeightLoss
 	double Airplane::calcTakeoffTime(double height, double endHeight) {
 		double totalTime = 0;
 		double velocity = 0;  // Start from rest 
@@ -978,7 +1027,7 @@ namespace airplane {
 		}
 		return totalTime;
 	}
-	*/
+
 
 
 
