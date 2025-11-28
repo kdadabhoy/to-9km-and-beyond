@@ -7,9 +7,7 @@ using std::vector;
 /*
 	Notes:
 		- Weight of main wing is calculated in Airplane Class because it requires knowledge of MTOW
-		- Probably should add the big 3 to make it a dynamic class
 		- setSpan() recomputes all the properties
-		- calcMccZeroSweep() function still needs digitization values (incomplete rn)
 */
 
 

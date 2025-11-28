@@ -182,10 +182,13 @@ The purpose of this class is so that a user is able to easily get desired charac
 
 1. ```double calcDragCoeff(double AoA, double velocity, double Mach, double kinematicViscosity) const;```
     - This function returns the Airplane's total Drag Coefficient at the passed in conditions
+
 2. ```double calcDrag(double AoA, double velocity, double Mach, double kinematicViscosity, double density) const```
     - This function returns the Airplane's total Drag (lbf) at the passed in conditions
+    
 3. ```double calcLiftCoeff(double AoA) const;```
     - This function returns the Airplane's total Lift Coefficient for that AoA
+
 4. ```double calcLift(double AoA, double velocity, double density) const;```
     - This function returns the Airplane's total Lift (lbf) at the passed in conditions
 5. ```void getPowerCurveCSV(double gamma, double height, string fileName) const;```
@@ -362,7 +365,6 @@ Note: This class is derived from the TurboFan Class. We will ignore this impleme
     - The Wing and Fuselage Objects must have certain member functions including, but not limited to:
         - Wing: getEllipticalEffic(), getAspectRatio(), calcLiftCoeff(AoA), calcMcc(AoA), getSweepAngleRad()
         - Fuselage: getFormFactor()
-
 2. Compressibility Coefficient is based on Shevell's methods 
     - This graph was digitized and fitted with an exponential function.
 
@@ -372,10 +374,15 @@ Note: This class is derived from the TurboFan Class. We will ignore this impleme
     - Can only handle Wing objects
     - Compressibility Coefficient is based on Shevell's methods: Reading a graph 
         - The x-axis of the graph is Freestream Mach / Crest Critical Mach
-            - Crest Critical Mach is calculated by the Wing Object
+            - ```Crest Critical Mach is calculated by the Wing Object```
+                - Read the functions listed below, in the Wing Class Section to understand this more:
+                    - ```double calcMcc(AoA) const, which relies on:```
+                        - ```double calcSweptMExponent(AoA_rad) const```
+                        - ```double calcMccZeroSweep(AoA_rad) const```
         - The y-axis of the graph is C_Dc / cos^3(sweepAngle_quarterChord)
     - ```If the Freestream Mach / Crest Critical Mach < 0.75, we assume compressibility drag is 0```
         - Since the graph says's 0.75 is ~= 0
+
 
 2. ```double calcParasiteCoeff(double Renyolds, double wetAreaRatio) const```
     - Can handle both Wing and Fuselage objects
@@ -395,6 +402,7 @@ Note: This class is derived from the TurboFan Class. We will ignore this impleme
     - ***This is the most used function***
     - Can handle both Wing and Fuselage objects
     - ```Depending on if the object is a Fuselage or a Wing, it calls on the needed functions in order to calculate the totalDragCoeff for that object.```
+    - The assumptions used in the Wing Classes's Induced Drag 
 
 
 
@@ -517,13 +525,20 @@ Every Airplane has Nacelles. ```Currently this class is just a placeholder.``` A
     - This function
 
 1. ```double calcMccZeroSweep(double AoA_rad) const```
-    - This function
-
-1. ```double calcMccZeroSweep(double AoA_rad) const```
-    - This function
+    - This function calculates, from the digitized Shevell Graph, the Mcc if the Wing had has a sweep angle = 0. 
+    - __Assumptions:__
+        - Mcc Zero sweep is only defined for CL > 0 and CL <= .60, so:
+            - ```If AoA is negative, CL is calculated using the negative AoA, then the abs value is taken and used for the reading (this *should* work).```
+                - CL is not symmetric around zero, hence why it it calculated with the negative AoA, then the abs value is taken.
+            - ```If CL > .60, the function just uses the CL = .60 case. This is simply an assumption that has to be made because the of the limited data set.``` It is not the worst assumption ever, but it certainly contributes to error.
 
 1. ```double calcSweptMExponent(double AoA_rad) const```
-    - This function
+    - This function calculates, from the digitized Shevell Graph, the m exponent needed for the calcMcc function.
+    - __Assumptions:__
+        - Mcc Zero sweep is only defined for CL > 0 and CL <= .60, so:
+            - ```If AoA is negative, CL is calculated using the negative AoA, then the abs value is taken and used for the reading (this *should* work).```
+                - CL is not symmetric around zero, hence why it it calculated with the negative AoA, then the abs value is taken.
+            - ```If CL > .60, the function returns m = .5``` It is not the worst assumption ever, but it certainly contributes to error. Although, it is my belief this is a conservative estimate.
 
 1. ```double calcRootInertiaEstimate() const```
     - This function

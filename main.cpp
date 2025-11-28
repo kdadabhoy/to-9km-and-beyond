@@ -92,11 +92,11 @@ int main() {
 	printUsefulCharacteristics(mainWing, airplane);
 	cout << endl << endl;
 
-	//cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
+	cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
 	cout << airplane.getMTOW() - airplane.getWeight() << " Weight Lost after 9km" << endl;
 	cout << endl << endl << endl;
 
-	airplane.getPowerCurveCSV(0, "example.csv");
+	//airplane.getPowerCurveCSV(0, "example.csv");
 
 
 
@@ -105,8 +105,9 @@ int main() {
 
 
 	wingSpanOptimizerResults results;
-	//results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, 10, 100, 50);
-	//spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
+	double numberOfSimulationSteps = 25;
+	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, 10, 100, numberOfSimulationSteps);
+	spanOptimizerResultsToCSV(results, "SpanOptimizerData_NoABSonDrag.csv");
 
 	for (int i = 0; i < results.wingSpanVector.size(); i++) {
 		cout << fixed << setprecision(5);

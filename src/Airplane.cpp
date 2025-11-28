@@ -695,7 +695,6 @@ namespace airplane {
 
 
 
-	// *** Need to account for weight loss ***
 	// Only evalutes Power Curves when height changes by 500
 	double Airplane::calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight, double heightSteps) {
 		// Implementing an accelerate/declerate in a straight line then climb at maxExcessPower

@@ -46,7 +46,10 @@ namespace airplane {
 
 
 	double DragCoeff::calcTotalDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const {
-		AoA = fabs(AoA); // needed bc drag should always be positive
+		// Induced Drag AoA can be negative.. and should be (Bc CL will be off it it isnt... it still outputs pos value bc CL^2)
+		// InducedCoeff AoA can be negative... the Wing member functions can handle negative numbers
+			// These helpfer functions take fabs(AoA) bc graph is only defined for CL>0...
+			// In theory this is fine as long as CL is evalulated at negative AoA, then the magnitude is taken
 		if (Wing) {
 			return calcParasiteCoeff(Reynolds, wetAreaRatio) + calcCompressibilityCoeff(Mach, AoA) + calcInducedCoeff(AoA);
 		} else if (Fuselage) {
