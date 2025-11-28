@@ -92,11 +92,11 @@ int main() {
 	printUsefulCharacteristics(mainWing, airplane);
 	cout << endl << endl;
 
-	cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
+	//cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
 	cout << airplane.getMTOW() - airplane.getWeight() << " Weight Lost after 9km" << endl;
 	cout << endl << endl << endl;
 
-	//airplane.getPowerCurveCSV(10000, "example.csv");
+	airplane.getPowerCurveCSV(0, "example.csv");
 
 
 
