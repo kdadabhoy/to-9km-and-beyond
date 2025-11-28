@@ -81,7 +81,142 @@ int main() {
 
 
 
-	// Debugging
+/*
+		***** Span Optimizer (Adjusts velocity while climbing) ****
+
+	- This function uses calcBestTimeTo9km() 
+		- Which adjusts V to be at V_maxExcessPower (within an error of course)...
+			- What the error is set to can drastically change the climb times...
+			- Currently the error is set to a value that gives around the same results as the Approx Climb Method
+		- Read Github documentation or go over to Airplane.cpp to understand it's implementation
+	- The optimizer essentially runs this simulation for a new aircraft with different traits (defined by the range you give the optimizer)
+	- The optimizer also sorts that data, and bla bla bla, but the optimizer code might make more sense, if you understand this snippet of code
+
+*/
+
+	// This is the range the optimizer runs on
+	wingSpanOptimizerResults results;
+	double minSpanSimulated = 15;     // Min span in ft
+	double maxSpanSimulated = 150;    // Max span in ft
+	int numberOfSimulationSteps = 50; // How many evenly spaced steps in the range the optimizer will simulate
+									  // 50 Steps ~ 1 min, obv more will take more time... and depends on computer
+
+	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, minSpanSimulated, maxSpanSimulated, numberOfSimulationSteps);
+
+
+	// Produced the .csv for the sorted data.
+	// Also displays the results in the command window
+	spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
+	for (int i = 0; i < results.wingSpanVector.size(); i++) {
+		cout << fixed << setprecision(5);
+		cout << "Time: " << results.climbTimeVector[i] << " mins";
+		cout << " Wing Span: " << results.wingSpanVector[i] << " ft" << endl;
+		cout << endl;
+
+	}
+
+
+
+
+
+
+
+
+/*
+		***** Span Optimizer (Does not adjust Velocity while climbing) ****
+		
+	- This function uses calcBestTimeTo9km() 
+		- Which adjusts V to be at V_maxExcessPower (within an error of course)...
+			- What the error is set to can drastically change the climb times...
+			- Currently the error is set to a value that gives around the same results as the Approx Climb Method
+		- Read Github documentation or go over to Airplane.cpp to understand it's implementation
+
+	- The optimizer essentially runs this simulation for a new aircraft with different traits (defined by the range you give the optimizer)
+	- The optimizer also sorts that data, and bla bla bla, but the optimizer code might make more sense, if you understand this snippet of code
+
+*/
+
+
+/*
+
+	// This is the range the optimizer runs on
+	wingSpanOptimizerResults results;
+	double minSpanSimulated = 15;     // Min span in ft
+	double maxSpanSimulated = 150;    // Max span in ft
+	int numberOfSimulationSteps = 50; // How many evenly spaced steps in the range the optimizer will simulate
+									  // 50 Steps ~ 1 min, obv more will take more time... and depends on computer
+
+	results = spanOptimizerApprox(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, minSpanSimulated, maxSpanSimulated, numberOfSimulationSteps);
+
+	// Produced the .csv for the sorted data.
+	// Also displays the results in the command window
+	spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
+	for (int i = 0; i < results.wingSpanVector.size(); i++) {
+		cout << fixed << setprecision(5);
+		cout << "Time: " << results.climbTimeVector[i] << " mins";
+		cout << " Wing Span: " << results.wingSpanVector[i] << " ft" << endl;
+		cout << endl;
+
+	}
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+	 ************** Other Functions that might be intriguing (Useful for seeing how the program works) ***********
+	 
+	 - Recommended to Look at: 
+		- Power Curve Plot Function
+		- 1 Aircraft (the one initialized at the top of the program) Simulation
+
+	- Comment out the optimizer (can just // next to the "results = spanOptimizer..." line)
+	- Uncomment the code part of the function you want to look at
+		- Just remove the /* and the corresponding * /
+
+	
+	
+*/
+
+
+
+
+
+
+
+
+
+
+/*
+		***** 1 Aircraft (the one initialized at the top of the program) Simulation ****
+	
+	- Useful for debugging purposes or to quickly see 1 aircraft
+		- The aircraft that is simulated is the one intialized at the top of main
+	- The optimizer essentially runs this simulation for a new aircraft with different traits (defined by the range you give the optimizer)
+	- The optimizer also sorts that data, and bla bla bla, but the optimizer code might make more sense, if you understand this snippet of code
+
+*/
+
+
+/*
 	double startHeight = 0;
 	double takeOffEndHeight = 500;
 	double totalWeight = airplane.getWeight();
@@ -92,50 +227,82 @@ int main() {
 		airplane.setMainWingWeight(airplane.getMainWingWeight() + weightNeeded);
 	}
 
-	
+
 	printUsefulCharacteristics(mainWing, airplane);
 	cout << endl << endl;
 
 	cout << airplane.calcBestTimeTo9km(startHeight, takeOffEndHeight) / 60 << " mins" << endl;
 	cout << airplane.getMTOW() - airplane.getWeight() << " Weight Lost after 9km" << endl;
 	cout << endl << endl << endl;
-
-	//airplane.getPowerCurveCSV(0, "example.csv");
-
+*/
 
 
 
 
 
 
-	wingSpanOptimizerResults results;
-	int numberOfSimulationSteps = 50;
-	double minSpanSimulated = 15;
-	double maxSpanSimulated = 150;
-	
-	// This function adjusts V to be at V_maxExcessPower (within an error of course)...
-	// What the error is set to can drastically change the climb times...
-	// Currently the error is set to a value that gives around the same results as the Approx Climb Method
-	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, minSpanSimulated, maxSpanSimulated, numberOfSimulationSteps);
-
-	//Uncomment to use Approx Climb Method (No adjusting V for max power) - Comment out above results expression as well (obviously).
-	//results = spanOptimizerApprox(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, minSpanSimulated, maxSpanSimulated, numberOfSimulationSteps);
 
 
 
-	spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
 
-	for (int i = 0; i < results.wingSpanVector.size(); i++) {
-		cout << fixed << setprecision(5);
-		cout << "Time: " << results.climbTimeVector[i] << " mins";
-		cout << " Wing Span: " << results.wingSpanVector[i] << " ft" << endl;
-		cout << endl;
 
-	}
-	
+
+
+
+
+
+
+
+/*
+						***** Power Curve Plot Function ****
+
+	- It will produce .csv data for the Airplane intialized above at the given height
+	- The .csv will be saved in the to-9km-and-beyond folder
+	- Just open the .csv and select the A, B and C columns and create a scatter plot, in order to
+		the Power Curve (Drag Bucket) for the given airplane at the provided height
+	- Make sure you close the .csv or rename the fileNamePowerCurve before re-running
+	- Power Curves like this one are used to find the maxExcessPower, currentExcessPower, etc
+		- See Github documentation for a more detailed explanation... this occurs in "Airplane.cpp"
+*/
+
+/*
+	double heightPowerCurveFunction = 0;
+	string fileNamePowerCurve = "PowerCurve.csv";
+	airplane.getPowerCurveCSV(heightPowerCurveFunction, fileNamePowerCurve);
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

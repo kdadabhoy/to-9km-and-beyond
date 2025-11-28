@@ -623,7 +623,7 @@ namespace airplane {
 		double lastMaxExcessVelcTryHeight = 0;
 		double TRY_AGAIN_EXCESS_VEL_INTERVAL = 2000;     // how many ft before trying to reach maxExcessVel again (so we save some efficiency)
 		// double VELOCITY_ERROR = .5; // global constant now
-		double TIME_STEP = .1;							// Can Change if too inefficient
+		double TIME_STEP = 0.10;							// Can Change if too inefficient
 
 
 		while (height <= endHeight) {
@@ -678,7 +678,6 @@ namespace airplane {
 			}
 
 		}
-
 
 		return totalTime;
 	}
@@ -968,7 +967,7 @@ namespace airplane {
 		double density = Cond.getDensity();
 		double Mach, thrust, AoA, drag, maxAcceleration, engineFactor;
 
-		double TIME_STEP = 0.005;        // Can Change if too inefficient
+		double TIME_STEP = 0.0001;        // Can Change if too inefficient
 		double velDifference = finalVelocity - startVelocity;
 
 
@@ -977,9 +976,9 @@ namespace airplane {
 			AoA = calcSteadyLevelAoA(velocity, density);
 			drag = calcDrag(AoA, velocity, Mach, kineVisc, density);
 
-			if (velDifference > 0) {
+			if (velDifference > 0 && (velDifference + VELOCITY_ERROR > VELOCITY_ERROR + 20)) {
 				// Accelerate case
-				engineFactor = 1;
+				engineFactor = 1.0;
 			} else {
 				// Decelerate
 				engineFactor = 0.0;	 // Set this to 0% for best possible time... 
