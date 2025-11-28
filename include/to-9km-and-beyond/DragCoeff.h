@@ -15,7 +15,7 @@ namespace airplane {
 		DragCoeff(const airplane::Nacelle& inNacelle);
 
 
-	// Main Function
+	// Most Used Function
 		double calcTotalDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const;
 
 

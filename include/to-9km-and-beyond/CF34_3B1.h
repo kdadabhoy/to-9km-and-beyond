@@ -4,22 +4,28 @@
 using std::vector;
 #include "to-9km-and-beyond/TurboFan.h"
 
+// Technically implemented as a derived class right now...
+// But it in order to act as a true derived class, it will need to be refactored :)
+	// Right now it's pretending to be a derived class bc some of it's private data members
+	// should be in the TurboFan class.. and getters should be used to get and set them etc etc
+		// But that is a lot of refactoring for no gain, since this is the only engine used rn.
+
 
 namespace airplane {
 	class CF34_3B1 : public TurboFan {
 	public:
-		CF34_3B1();												// Call this one, already has normal characteristics
+		CF34_3B1();												// Use this to generate a typically CF34_3B1 engine
 		CF34_3B1(double inWeight, double inStaticThrust);       // If you ever wanted to have this enginge.. but different weight and staticThrust
 		CF34_3B1(const CF34_3B1& other);						// Copy Constructor
 
 		// Thrust Functions (Power Curve)
-		vector<double> getThrustCurveFunction(double height) const;  
-		double getThrust(double height, double velocity) const;     // Returns current Thrust in lbf
+		vector<double> getThrustCurveFunction(double height) const;  // See kadenMath for how this function is stored
+		double getThrust(double height, double velocity) const;      // Returns current Thrust in lbf
 
 
 		// Fuel Loss Functions
-		vector<double> getFuelLossFunction(double height) const;   
-		double calcFuelLoss(double timeInterval_Hours, double height, double velocity) const;   // returns how many lbf (=lbm on Earth) you lost
+		vector<double> getFuelLossFunction(double height) const;                                   // See kadenMath for how this function is stored
+		double calcFuelLoss(double timeInterval_Hours, double height, double velocity) const;      // returns how many lbf (=lbm on Earth) you lost
 		double calcFuelLoss2(double timeInterval_Seconds, double height, double velocity) const;   // returns how many lbf (=lbm on Earth) you lost
 
 
@@ -28,12 +34,13 @@ namespace airplane {
 		static constexpr double GAS_CONSTANT = 1716;
 		static constexpr double SECONDS_TO_HOURS = (1.0 / 3600.0);
 
-		// Have ability to get:
+		// Have ability to get from Base Class:
 			//	weight
 	
 
+
 		// Probably put these in Base Class... but that's a later problem:
-	
+
 		// Power Functions from Performance Map Digitization
 			// Notes:
 			// (Thrust/SSL Thrust) = PowerFunc(Mach) for a set height
@@ -51,6 +58,7 @@ namespace airplane {
 		const vector<double> h40kPowerFunc = { 0.0482 , -0.0851 , 0.238 };     //
 		const vector<double> h45kPowerFunc = { 0.0482 , -0.0851 , 0.238 };     //
 		const vector<double> h50kPowerFunc = { 0.0482 , -0.0851 , 0.238 };     //
+
 
 
 

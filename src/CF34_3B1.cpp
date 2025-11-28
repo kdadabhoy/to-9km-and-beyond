@@ -1,15 +1,15 @@
 #include <iostream>
 #include <vector>
-using std::vector;
+#include <cmath>
 #include "to-9km-and-beyond/CF34_3B1.h"
 #include "to-9km-and-beyond/TurboFan.h"
 #include "to-9km-and-beyond/AtmosphereProperties.h"
-using namespace atmosphere_properties;
 #include "to-9km-and-beyond/kadenMath.h"
+
+using std::vector;
 using kaden_math::evaluateFunction;
-#include <cmath>
 using std::sqrt;
-// Prob should add assignment operator at some point
+using namespace atmosphere_properties;
 
 
 
@@ -25,10 +25,18 @@ namespace airplane {
 
 
 
+
+
+
+
 	CF34_3B1::CF34_3B1(double inWeight, double inStaticThrust)
 		: TurboFan::TurboFan(inWeight, inStaticThrust) 
 	{
 	}
+
+
+
+
 
 
 
@@ -40,6 +48,10 @@ namespace airplane {
 	{
 		// And then do any specific CF34_3B1 copys
 	}
+
+
+
+
 
 
 
@@ -86,14 +98,12 @@ namespace airplane {
 
 
 
-
 	double CF34_3B1::getThrust(double height, double velocity) const {
 		AtmosphereProperties Cond(height);
 		vector<double> thrustFunction = getThrustCurveFunction(height);
 		double Mach = velocity / sqrt(1.4 * GAS_CONSTANT * Cond.getTemperature());
 		return (evaluateFunction(thrustFunction, Mach) * getSLSThrust());          // lbf
 	}
-
 
 
 

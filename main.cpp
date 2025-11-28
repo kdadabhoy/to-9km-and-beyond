@@ -1,3 +1,113 @@
+
+
+/*	
+	********************************************************************
+
+				    time-to-climb-to-9km-and-beyond Project 
+							By: Kaden Dadabhoy
+
+	********************************************************************
+
+	If you have any questions about the code or anything else, just email me!
+
+							Emails (either works):
+							- kdadabhoy28@gmail.com
+							- kdadabho@uci.edu
+
+	********************************************************************
+
+	HEAVILY recommended to read the README file on the Github!
+		- https://github.com/kdadabhoy/to-9km-and-beyond
+		- Read it on the website compared to the .txt file... 
+		because of markdown / HTML stuff
+			- Just scroll down below the files... and that text is the README :)
+
+
+	- The Header file's don't have traditional header documentation 
+		(sorry, it would take forever), so the READMEis the only place 
+		where they are explained
+
+		- Which is also nice, because it is all in one place and 
+			formatted nicely, compared to green comments
+
+		- It is also explained in a more "English approach"... whereas
+		  header documentation is usually written with the assumption the user
+		  is already very familar with the language :)
+
+		- There are comments in implementation files for some of the functions...
+			- These comments tend to give a general idea of the implementation...
+			  instead of explaining it line by line
+
+			- A lof of these comments are physics derivations that are used in the functions
+
+			- The general consesus is that comments explaining code implementation
+			  in a lot of detail, tend to make the code more confusing and less readable
+			  than just having the code by itself.
+			
+			- Again, look at Github, for very brief and Enlgish explanation... then look at the code
+			  so that you understand what it is attempting to do
+				- The function names do describe what the function does very accurately in most cases.
+
+	********************************************************************
+
+	TLDR of Everything Below this Comment:
+
+		- Read the Github README, then come back to this... to:
+
+		1) See that the code actually compiles and produces what I claim it does
+		2) See the implementation of the optimizer (at the bottom of this file)
+		3) See the implementation of any other function
+			- In the implementation file of that particular Class
+
+			- *** You probably will want to look at Airplane.cpp first ***
+				- *** Then look at DragCoeff.cpp ***
+					- Basically every class is setup so that it can easily
+					  use the DragCoeff functions
+
+				- Also, basically every other class's purpose is to make
+				the Airplane.cpp more readable, modular, etc
+					- And the Airplane.cpp's purpose is to easily
+					write the optimizer
+
+	********************************************************************
+
+	- The main() program, this program, is currently set up to run an optimizer
+	for the wing span only. It is running the optimizer that uses the calcBestTimeTo9km() 
+	function (difference between this function and the other approach explained somewhat
+	below... but read README for more details)
+
+
+
+	- Below the optimizer function there are other functions that you can uncomment,
+	which may help you understand the program better. These functions are also explained on Github,
+	and not to sound like a broken record, but it is unlikely to understand this project completely
+	without reading the Github. These functions are mainly included, so that you can see that
+	the code compiles. 
+
+
+	- Below these other functions, is the optimizer's implementation.
+
+
+
+	- All of this code relies HEAVILY on every other class created, as explained in the GitHub.
+		- "The classes, which will be described in much more detail in the 
+		"Classes and Assumptions" section, whole purpose is to make it easier, 
+		among other things (readbility, modularity, etc), to code an optimizer..."
+			- Directly quoted from main() function, Overview / Approach portion of README
+
+
+
+	- All the assumptions made are in the Github README
+
+
+*/
+
+
+
+
+
+
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -21,8 +131,10 @@ using namespace kaden_math;
 
 
 
+
+// Structs:
 struct wingSpanOptimizerResults {
-	// The best wing is in index 0
+	// The best wing is stored at index 0
 	// wing at wingVector[0] has a timeToClimb of timeToClimbVector[0]
 	vector<double> wingSpanVector;      // ft
 	vector<double> climbTimeVector;     // minutes
@@ -31,7 +143,10 @@ struct wingSpanOptimizerResults {
 
 
 
+// Function Protypes (What functions are in this file... needed for compiler purposes)
 void printUsefulCharacteristics(Wing& inWing, Airplane& inAirplane);
+void sortWingsByClimbTime(vector<double>& wingSpans, vector<double>& climbTimes);
+void spanOptimizerResultsToCSV(wingSpanOptimizerResults& results, string fileName);
 
 wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage,
 	double inFuelWeight, double inPayLoadWeight, double minSpanFt, double maxSpanFt, int numSteps);
@@ -39,8 +154,6 @@ wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF3
 wingSpanOptimizerResults spanOptimizerApprox(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage,
 	double inFuelWeight, double inPayLoadWeight, double minSpanFt, double maxSpanFt, int numSteps);
 
-void sortWingsByClimbTime(vector<double>& wingSpans, vector<double>& climbTimes);
-void spanOptimizerResultsToCSV(wingSpanOptimizerResults& results, string fileName);
 
 
 
@@ -53,30 +166,38 @@ int main() {
 	Airfoil NACA2412("2412", -.0349);
 
 	// Givens:
-	Wing VT(NACA2412, 99.68, 86.68, 86.68, 40, 0);										// Given, from Doc
-	Wing HT(NACA2412, 239.67, 23.55, 72.45, 32.04, 0);									// Given, from Doc
-	double givenAirplaneWeight = 23000 * 2.20462;										// lbms, this it the HT + VT + Fuselage + startingFuel + Payload
-	double startingFuelWeight = 1000 * 2.20462;											// lbm
-	double payLoadWeight = 1000 * 2.20462;												// lbm
-	givenAirplaneWeight = givenAirplaneWeight - startingFuelWeight - payLoadWeight - (2 * 1670);     // 1670 lbms is CF34_3B1
-	double fuselageWeight = .95 * givenAirplaneWeight;									// lbms... we will also store the VT and HT weight in this
-	double nacelleWeight = .025 * givenAirplaneWeight;									// just said each one is 2.5% of fuselage+VT+HT
-	double fuselageLength = 621.80;														// inches, from CAD
-	double fuselageWettedArea = 811.55 * 12;                                            // inches, from Doc
-	double nacelleWettedArea = 130.07 * 12;                                                // inches, from CAD
-	double nacelleLength = 87.17;                                                       // inches, from CAD
+	Wing VT(NACA2412, 99.68, 86.68, 86.68, 40, 0);				// Given, from Doc
+	Wing HT(NACA2412, 239.67, 23.55, 72.45, 32.04, 0);			// Given, from Doc
+	CF34_3B1 CF34_3B1;                                          // Given engine
+	double givenAirplaneWeight = 23000 * 2.20462;				// lbms, this it the HT + VT + Fuselage + startingFuel + Payload
+	double startingFuelWeight = 1000 * 2.20462;					// lbm
+	double payLoadWeight = 1000 * 2.20462;						// lbm
+
+	givenAirplaneWeight = givenAirplaneWeight					// lbm.. needed to allocate other weights
+		- startingFuelWeight - payLoadWeight 
+		- (2 * CF34_3B1.getWeight());     
+
+	double fuselageWeight = .95 * givenAirplaneWeight;		   // lbms... we will also store the VT and HT weight in this
+	double nacelleWeight = .025 * givenAirplaneWeight;		   // lbms.. we will just said each one is 2.5% of fuselage+VT+HT
+	double fuselageLength = 621.80;							   // inches, from CAD
+	double fuselageWettedArea = 811.55 * 12;                   // inches, from Doc
+	double nacelleWettedArea = 130.07 * 12;                    // inches, from CAD
+	double nacelleLength = 87.17;                              // inches, from CAD
 	Nacelle nacelle(nacelleWeight, nacelleLength, nacelleWettedArea);                 
 	Fuselage fuselage(fuselageWeight, fuselageLength, fuselageWettedArea); 
-	CF34_3B1 CF34_3B1;
 
-	// Main Wing Stuff, this is what will be optimized
-	double mainSpan = 60.9 * 12;
-	double mainRootChord = 186.7;
-	double mainTipChord = 74.7;
-	double mainSweepAngle = 20;
-	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle);      // mainWing weight will be calculated by airplane
+
+	// Main Wing Stuff (Just a random Wing that we initialize)
+	double mainSpan = 60.0 * 12;    // inches
+	double mainRootChord = 186.7;	// inches
+	double mainTipChord = 74.7;     // inches
+	double mainSweepAngle = 20;     // degrees
+	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle); 
 
 	Airplane airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
+
+
+
 
 
 
@@ -122,6 +243,10 @@ int main() {
 
 
 
+
+
+
+
 /*
 		***** Span Optimizer (Does not adjust Velocity while climbing) ****
 		
@@ -135,6 +260,8 @@ int main() {
 	- The optimizer also sorts that data, and bla bla bla, but the optimizer code might make more sense, if you understand this snippet of code
 
 */
+
+
 
 
 /*
@@ -193,8 +320,9 @@ int main() {
 		- Just remove the /* and the corresponding * /
 
 	
-	
 */
+
+
 
 
 
@@ -396,6 +524,17 @@ wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF3
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 // Uses calcRoughApproxTimeTo9km (the approach that get's to original maxExcessPower velocity, and stays at it)
 wingSpanOptimizerResults spanOptimizerApprox(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage,
 	double inFuelWeight, double inPayLoadWeight, double minSpanFt, double maxSpanFt, int numSteps) {
@@ -473,6 +612,22 @@ wingSpanOptimizerResults spanOptimizerApprox(Wing& inWing, Wing& inHT, Wing& inV
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // New sort function - Still could get more efficient using std::sort
 void sortWingsByClimbTime(vector<double>& wingSpans, vector<double>& climbTimes) {
 	assert(wingSpans.size() == climbTimes.size());
@@ -528,6 +683,20 @@ void sortWingsByClimbTime(vector<double>& wingSpans, vector<double>& climbTimes)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Could probably delete attemptNumber from this CSV... but it can be nice to have
 void spanOptimizerResultsToCSV(wingSpanOptimizerResults& results, string fileName) {
 	vector<double> attemptNumber;
@@ -538,6 +707,8 @@ void spanOptimizerResultsToCSV(wingSpanOptimizerResults& results, string fileNam
 
 	return;
 }
+
+
 
 
 
@@ -604,46 +775,8 @@ void printUsefulCharacteristics(Wing& inWing, Airplane& inAirplane) {
 
 
 
-// Optimizer Notes:
-	/*
-		Approach:
-		0) Fix Airfoil
-		1) Fix ct and cr to reasonable values and optimize span
-		2) Fix span at the top 3 best values and optimize ct and cr (use a nester loop for this)
-		3) Fix all the previous variables and optimize sweep angle
-		4) Re-run from start with new min and max variables
-			- like take top 3 spans from span optimizer.. then optimize other vars... then run run optimizer for span..
 
-
-		Notes:
-			- Will have to re-run all of the results once I add:
-				- Full plot digitizations (more accuracy)
-				- Weight loss accounted for with engine and time
-
-		After:
-			- Would be nice to have data plotted
-				- gamma vs time
-				- height vs time
-				- excess power vs time
-				- max possible excess power - excess power vs time
-				- AoA vs time
-				- Other stuff :)
-	*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Old implementaitons:
+// Old implementaitons (ignore):
 
 
 

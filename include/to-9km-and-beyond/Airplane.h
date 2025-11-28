@@ -11,9 +11,11 @@ using std::vector;
 
 
 // Assumes that plane is symmetric and has 2 engines (wings are symmetrical)
-// Assumes VT makes negligible lift and drag
+// Assumes VT makes negligible lift
 // DO NOT HAVE CREATED OBJECTS SHARE THE SAME PASSED IN PARAMETER, SINCE THIS CLASS USES
 	// POINTERS FOR EFFICIENCY... IT WILL LEAD TO UNEXPECTED BEHAVIOR!
+
+
 
 namespace airplane {
 	class Airplane {
@@ -51,7 +53,7 @@ namespace airplane {
 		double calcLift(double AoA, double velocity, double density) const;												// AoA in Rad
 
 
-		// Power Curve
+		// Power Curve CSV Getter Functions
 		void getPowerCurveCSV(double gamma, double height, string fileName) const;           // fileName should have ".csv", no small angle approx
 		void getPowerCurveCSV(double height, string fileName) const;						 // fileName should have ".csv", small angle approx 
 
@@ -69,16 +71,17 @@ namespace airplane {
 		double calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight, double heightSteps);   // does powerCurve every heightStep, updates totalWeight
 
 
-		// Sanity Check Approx (
-		double calcRoughApproxTimeTo9km(double startHeight, double takeOffEndHeight);						   // Returns seconds, updates totalWeight 
-		double calcRoughApproxClimbTime(double startHeight, double startVelocity, double endHeight);           // Returns seconds, updates totalWeight 
+		// Sanity Check Approx Climb Times
+		double calcRoughApproxTimeTo9km(double startHeight, double takeOffEndHeight);			        // Returns seconds, updates totalWeight 
+		double calcRoughApproxClimbTime(double startHeight, double startVelocity, double endHeight);    // Returns seconds, updates totalWeight 
+
 
 		// Steady Level Flight Functions (L = W)
 		SteadyLevelAccelerationTimeProperties calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height); // updates totalWeight
 
 
 		// Feasability of Wing
-		bool isWingPossible() const;                       // Returns true if the mainWing can withstand the load & takeoff
+		bool isWingPossible() const;                       // Returns true if the mainWing can withstand the load
 
 
 		// Accessors:
@@ -132,7 +135,6 @@ namespace airplane {
 		static constexpr double RAYMOND_CST = .0051;			          // Raymond constat in Cargo/Transport Weight Eq'n
 		static constexpr double MIN_LIMIT_LOAD_FACTOR = 2.5;
 		static constexpr double MAX_LIMIT_LOAD_FACTOR = 3.8;
-
 		static constexpr double LOAD_SAFETY_FACTOR = 1.5;				  // Typical safety factor 
 		static constexpr double SMUDGE_FACTOR = 0.85;                     // Our wing is an advanced composite... obviously! (Table 15.4 from Raymond book)
 		static constexpr double PERCENT_CONTROL_SURFACE_AREA = 0.10;      // % Control Surface Area of main Wing (Approx 10%)
@@ -150,7 +152,7 @@ namespace airplane {
 		static constexpr double GAS_CONSTANT = 1716;
 		static constexpr double pi = 3.141592653589;
 		static constexpr double GRAVITY = 32.2;
-		static constexpr double EXTRANEOUS_DRAG_MULTIPLIER = 1.15;  // Essentially a smudge factor for drag 
+		static constexpr double EXTRANEOUS_DRAG_MULTIPLIER = 1.15;   // Essentially a smudge factor for drag 
 																	 // = 1 for no multipler, should be around 1.02-1.15 (2-15%)
 
 
@@ -159,11 +161,12 @@ namespace airplane {
 		static constexpr double PSF_TO_PSI = 0.006944;				// psf * PSF_TO_PSI = psi
 		static constexpr double PSI_TO_KSI = .001;                  // psi * PSI_TO_KSI = ksi
 
+
 		// calcTime9km Constas
 		static constexpr double VELOCITY_ERROR = 30.0;              // Used in calcSteadyLevelAccelerationTime, calcBestClimbTime, & calcBestClimbTimeApprox
 																	// 30, seems accurate according to sanity Check approach
 
-	
+
 
 
 		// calcAndSet Functions:
@@ -185,24 +188,28 @@ namespace airplane {
 		vector<double> calcPowerRequiredData(double gamma, double height) const;   // Gamma in degrees, generates 1000 evenly spaced data points between Mach 0 and 1
 
 
+
 		// Climb Functions
 		double calcExcessPower(double velocity) const;				                           // Assumes Power Curve member vars are set
 		double calcSteadyClimbAoA(double gamma, double velocity, double density) const;        // Gamma in degrees, Returns AoA in rad
 		double calcSteadyClimbAoAApprox(double velocity, double density) const;				   // Small angle approx, so cos(gamma) = 1
 
 
+
 		// Steady Level Acceleration Functions:
 		double calcSteadyLevelAoA(double velocity, double density) const;
+
 
 
 		// Takeoff Functions:
 		TakeoffProperties calcEndRunwayAirplaneProperties(double height, double startVelocity, double startWeight) const; // startVelocity should = 0 usually
 
 
+
 		// Feasability of Wing Helpfer Functions
-		double calcLimitLift() const;			           // Capped by n_limit.. in theory could be capped by n_ult (if allow plastic deformation)
-		double calcRootLimitMoment() const;                // Returns lbf*ft
-		double calcRootLimitStress() const;                // Returns ksi
+		double calcLimitLift() const;			                   // Capped by n_limit.. in theory could be capped by n_ult (if allow plastic deformation)
+		double calcRootLimitMoment() const;                        // Returns lbf*ft
+		double calcRootLimitStress() const;                        // Returns ksi
 		//double calcMinSpanNeeded(double maxRootStressKSI) const; // Returns ft, takes in ksi
 
 	};
@@ -226,6 +233,14 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
+// My notes:
 
 
 /* Plotting Stuff (maybe add later)
@@ -256,28 +271,6 @@ namespace airplane {
 		void writeHeaderToFile(string& fileDirectory, string& fileName); // appending airplane characterisitcs to top of file
 		void exportDataToCSV(string& fileDirectory, string& fileName);   // calls printHeaderFile... etc etc... used to get data to a file the python script can use
 		void plotData(string& fileDirectory, string& fileName);          // Call a python script to plot all this stuff and put it in x place
-
-
-*/
-
-
-
-
-
-
-
-
-
-
-/*
-	Notes:
-
-		// Think about adding for efficiency:
-		// vector<double> calcExcessPower(double velocity, double height) const;	  // Doesn't assume Power Curve member vars are set
-		// void calcAndSetPowerRequiredData(double gamma, double height);			// Used if you only need to change Power Required (bc changed gamma)
-
-
-
 
 
 */

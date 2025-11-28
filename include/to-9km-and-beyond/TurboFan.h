@@ -2,16 +2,16 @@
 #define TURBOFAN_H
 // Base Class for CF34_3B1 (and possibly other turbofan engines)
 // Worry about virtual keyword later, since I will always us member functions with derived object
-// Prob should add assignment operator at some point
 
+// For all intensive MAE 158 Project Purposes - this file is ignorable
 
 namespace airplane {
 	class TurboFan {
 
 	public:
 		TurboFan();
-		TurboFan(double inWeight, double inSSLThrust);
-		TurboFan(const TurboFan& other); // Copy Constructor
+		TurboFan(double inWeight, double inSSLThrust);    // lbm and lbf
+		TurboFan(const TurboFan& other);				  // Copy Constructor
 
 
 		// Accessors

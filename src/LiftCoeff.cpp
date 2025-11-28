@@ -12,10 +12,21 @@ namespace airplane {
 
 
 
+
+
+
+
+
 	LiftCoeff::LiftCoeff(double inCL_alpha, double inCL_knott) {
 		CL_alpha = inCL_alpha;
 		CL_knott = inCL_knott;
 	}
+
+
+
+
+
+
 
 
 
@@ -24,6 +35,12 @@ namespace airplane {
 		CL_alpha = other.CL_alpha;
 		CL_knott = other.CL_knott;
 	}
+
+
+
+
+
+
 
 
 
@@ -42,14 +59,18 @@ namespace airplane {
 
 
 
-	// Accessors:
-	double LiftCoeff::getCL_Alpha() const {
-		return CL_alpha;
+
+
+
+
+	// Useful Functions:
+	double LiftCoeff::calcLiftCoefficient(double alpha) const {
+		return (CL_alpha * alpha) + CL_knott;
 	}
 
-	double LiftCoeff::getCL_Knott() const {
-		return CL_knott;
-	}
+
+
+
 
 
 
@@ -61,6 +82,13 @@ namespace airplane {
 	}
 
 
+
+
+
+
+
+
+
 	void LiftCoeff::setCL_Knott(double inTerm) {
 		CL_knott = inTerm;
 	}
@@ -69,12 +97,20 @@ namespace airplane {
 
 
 
-	// Useful Functions:
-	double LiftCoeff::calcLiftCoefficient(double alpha) const {
-		return (CL_alpha * alpha) + CL_knott;
+
+
+
+
+	// Accessors:
+	double LiftCoeff::getCL_Alpha() const {
+		return CL_alpha;
 	}
 
 
+
+	double LiftCoeff::getCL_Knott() const {
+		return CL_knott;
+	}
 
 
 }

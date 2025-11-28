@@ -16,7 +16,8 @@ namespace airplane {
 		Fuselage = nullptr;
 		Nacelle = nullptr;
 	}
-	
+
+
 
 
 
@@ -37,11 +38,13 @@ namespace airplane {
 
 
 
+
 	DragCoeff::DragCoeff(const airplane::Fuselage& inFuselage) {
 		Fuselage = &inFuselage;
 		Wing = nullptr;
 		Nacelle = nullptr;
 	}
+
 
 
 
@@ -92,6 +95,7 @@ namespace airplane {
 
 
 
+
 	double DragCoeff::calcParasiteCoeff(double Reynolds, double wetAreaRatio) const {
 		assert(Wing != nullptr || Fuselage != nullptr || Nacelle != nullptr);
 
@@ -103,8 +107,6 @@ namespace airplane {
 			return 0;
 		}
 	}
-
-
 
 
 
@@ -143,7 +145,9 @@ namespace airplane {
 			// Assuming compressibility negligible bc Shevell graph doesn't cover it
 			return 0;
 		} else {
-			assert(machRatio >= .75 && machRatio <= 1.5);
+			assert(machRatio >= .75 && machRatio <= 1.5);        // This is extrapolating to 1.5... which is an assumption
+																 // This assumption is needed in order to produce an accurate powerCurve
+																 // If you don't extrapolate you get odd curves.. well rather we abort the program
 			double Cdc = 0;
 			double sweepCosine = cos(Wing->getSweepAngleRad());
 
@@ -175,67 +179,4 @@ namespace airplane {
 	}
 
 
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-/*
-	Notes:
-
-		// Total Drag Functions
-
-		// Need
-		// AoA,							or CL
-		// kinematicViscosity			or Reynolds
-		// temp                         or Mach
-		// velocity
-
-		// Prob also need Mach Critical Crest (have a wing function for this)
-
-
-
-
-
-
-
-
-
-
-		// Eliminating this from Compressibility Function gives a more continous Power Required Curve
-		// The Cdc = .025 was messing it up...
-
-	
-		} else if (r <= 1.08) {
-			assert(r >= .75 && r <= 1.08); // This function only works if r >= .75 or <= 1.08
-			double Cdc = 0;
-			double sweepCosine = cos(Wing->getSweepAngleRad());
-
-			// y = (7.05*10^-11)*e^(17x)
-			Cdc = (7.05e-11) * exp(17 * r);
-			Cdc = Cdc / (sweepCosine*sweepCosine*sweepCosine);
-			return Cdc;
-
-		} else {
-			assert(r > 1.08 && r < 1.5); // If r is above 1.5 there is probably an issue
-			double Cdc = 0;
-			double sweepCosine = cos(Wing->getSweepAngleRad());
-
-			// y = .025 - An assumption that heavily incentivizes the optimizer not to go to this
-			Cdc = .025;		// Adjust if needed
-			Cdc = Cdc / (sweepCosine * sweepCosine * sweepCosine);
-			return Cdc;
-		}
-
-
-
-*/

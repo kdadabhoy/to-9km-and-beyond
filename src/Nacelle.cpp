@@ -37,7 +37,6 @@ namespace airplane {
 
 
 
-
 	// Copy constrcutor
 	Nacelle::Nacelle(const Nacelle& other) {
 		weight = other.weight;
@@ -45,7 +44,6 @@ namespace airplane {
 		wettedArea = other.wettedArea;
 		formFactor = other.formFactor;
 	}
-
 
 
 
@@ -76,14 +74,11 @@ namespace airplane {
 
 
 
-
-
 	// Useful Functions:
+
 	double Nacelle::calcReynolds(double velocity, double kinematicViscosity) const {
 		return ((velocity * length) / kinematicViscosity);
 	}
-
-
 
 
 
@@ -97,7 +92,6 @@ namespace airplane {
 		// WetArea divided by referenceArea
 		return  wettedArea / referenceArea;
 	}
-
 
 
 
@@ -121,11 +115,11 @@ namespace airplane {
 
 
 
-
 	// Mutators:
 	void Nacelle::setWeight(double inWeight) {
 		weight = inWeight;
 	}
+
 
 
 
@@ -139,16 +133,17 @@ namespace airplane {
 		return weight;
 	}
 
+
+
 	double Nacelle::getFormFactor() const {
 		return formFactor;
 	}
 
+
+
 	double Nacelle::getWettedArea() const {
 		return wettedArea;
 	}
-
-
-
 
 
 }

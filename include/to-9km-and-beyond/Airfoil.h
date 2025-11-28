@@ -5,16 +5,20 @@
 // Intended to work with 4 series NACA airfoils
 	// Assumes slope of 2D Cl = 2*pi
 
-// Prob should add assignment operator at some point
+/*
+	NACA 4 digit number:
+	first digit is max camber in % of chord
+	second digit is max chamber in 1/10th chord
+	last two digits is max t/c in % chord
 
-// Can think about refactoring without using LiftCoeff (efficiency purposes)
+	Ex: 2412
+	Max camber = .02 * chord
+	Location of max camber = 4/10
+	Max t/c in % chord = .12 (12%)
 
-/* Takeaways:
-		I only really care about 
-			Cl_alpha, which = 2pi = 6.28rad (good enough approx)
-			alphaZeroLift = ??? need to find equation and implement it at some point
-	
- */
+*/
+
+
 
 namespace airplane {
 	class Airfoil {
@@ -27,8 +31,6 @@ namespace airplane {
 		double getCl_rad(double inAlphaRad) const;
 
 
-
-
 		// Accesors
 		double getCl_AlphaTerm() const;				// Radians
 		double getCl_KnottTerm() const;             // No one really cares about this
@@ -37,6 +39,7 @@ namespace airplane {
 		double getMaxCamberRatio() const;           // Returns h/c as a fraction
 		std::string getName() const;
 		void printName() const;
+
 
 
 
@@ -53,32 +56,32 @@ namespace airplane {
 
 
 		double calcalphaZeroLift() const;					// returns alphaZeroLift in radians
-
-
-
-
-
-
 		// double calcCl0() const;							// Returns Cl0, kinda irrelvant
 	};
 }
 
-	/*
-		NACA
-		4 digit number... 
-		first digit is max camber in % of chord
-		second digit is max chamber in 1/10th chord
-		last two digits is max t/c in % chord
-
-
-		Ex: 2412
-		m = Max camber = .02 * chord
-		p = Location of max camber = 4/10
-		thickness = Max t/c in % chord = .12 (12%)
-		
-
-		Can Assum Cl_alpha = 2*pi for m < .05
-	*/
-
-
 #endif
+
+
+
+
+
+
+
+
+
+
+/*
+	Other irrelevant Notes:
+
+	// Prob should add assignment operator at some point
+
+	// Can think about refactoring without using LiftCoeff (efficiency purposes)
+
+	// Takeaways:
+		- I only really care about:
+			- Cl_alpha, which = 2pi = 6.28rad (good enough approx)
+			- alphaZeroLift = ??? need to find equation and implement it at some point
+				- Never was able to find an equation for this
+
+*/

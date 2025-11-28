@@ -28,6 +28,11 @@ namespace kaden_math {
 
 
 
+
+
+
+
+
 	vector<double> functionIntersection(const vector<double>& func1, const vector<double>& func2, double xmin, double xmax) {
 		int steps = 1000;
 		vector<double> intersections;
@@ -48,7 +53,6 @@ namespace kaden_math {
 		}
 		return intersections;
 	}
-
 
 
 
@@ -118,7 +122,6 @@ namespace kaden_math {
 
 
 
-
 	vector<double> maxDistBetweenFunctions(const vector<double>& func1, const vector<double>& func2, double xmin, double xmax, int inSteps) {
 		int steps = inSteps;
 		double maxDistance = 0;
@@ -140,6 +143,7 @@ namespace kaden_math {
 		}
 		return { maxLocation, maxDistance };
 	}
+
 
 
 
@@ -176,6 +180,10 @@ namespace kaden_math {
 
 
 
+
+
+
+
 	vector<double> curveIntersection(const vector<double>& x, const vector<double>& y1, const vector<double>& y2, double skip) {
 		vector<double> intersections;
 
@@ -201,6 +209,10 @@ namespace kaden_math {
 		}
 		return intersections;
 	}
+
+
+
+
 
 
 
@@ -273,7 +285,6 @@ namespace kaden_math {
 
 
 
-
 	void saveVectorsToCSV(const vector<double>& x, const vector<double>& y, const string& filename) {
 
 		if (x.size() != y.size()) {
@@ -297,8 +308,6 @@ namespace kaden_math {
 		cout << "Data is saved to: " << filename << endl;
 		return;
 	}
-
-
 
 
 
@@ -332,6 +341,10 @@ namespace kaden_math {
 		cout << "Data is saved to: " << filename << endl;
 		return;
 	}
+
+
+
+
 
 
 

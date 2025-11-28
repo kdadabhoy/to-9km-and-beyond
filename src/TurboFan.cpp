@@ -14,11 +14,20 @@ namespace airplane {
 
 
 
+
+
+
+
+
 	TurboFan::TurboFan(double inWeight, double inSLSThrust) {
 		weight = inWeight;
 		SLSThrust = inSLSThrust;
 		specificFuelConsumption = .5;  // should prob take input
 	}
+
+
+
+
 
 
 
@@ -34,20 +43,6 @@ namespace airplane {
 
 
 
-	// Accessors:
-	double TurboFan::getWeight() const {
-		return weight;
-	}
-
-	double TurboFan::getSLSThrust() const {
-		return SLSThrust;
-	}
-
-
-	double TurboFan::getSpecificFuelConsumption() const {
-		return specificFuelConsumption;
-	}
-
 
 
 
@@ -59,14 +54,53 @@ namespace airplane {
 	}
 
 
+
+
+
+
+
+
+
 	void TurboFan::setSLSThrust(double inThrust) {
 		SLSThrust = inThrust;
 	}
 
 
 
+
+
+
+
+
+
 	void TurboFan::setSpecificFuelConsumption(double inFrac) {
 		specificFuelConsumption = inFrac;
 	}
+
+
+
+
+
+
+
+
+
+	// Accessors:
+	double TurboFan::getWeight() const {
+		return weight;
+	}
+
+
+
+	double TurboFan::getSLSThrust() const {
+		return SLSThrust;
+	}
+
+
+
+	double TurboFan::getSpecificFuelConsumption() const {
+		return specificFuelConsumption;
+	}
+
 
 }

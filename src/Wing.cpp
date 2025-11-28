@@ -69,7 +69,6 @@ namespace airplane {
 
 
 
-
 // Typically used for HT and VT because you need to set their weights
 	Wing::Wing(Airfoil& inAirfoil, double inSpanInch, double inTipChordInch, double inRootChordInch, double inSweepAngleDeg, double inWeight) {
 		tipChord = inTipChordInch / 12;
@@ -82,6 +81,7 @@ namespace airplane {
 
 		calcAndSetAllProperties();
 	}
+
 
 
 
@@ -120,6 +120,7 @@ namespace airplane {
 
 
 
+
 // CalcAndSet functions:
 
 	// The order these functions are called is very important!
@@ -131,6 +132,10 @@ namespace airplane {
 		calcAndSetCL3D();                   // Needs sweepAngle, aspectRatio, and airfoil to be defined
 		return;
 	}
+
+
+
+
 
 
 
@@ -151,6 +156,10 @@ namespace airplane {
 
 
 
+
+
+
+
 	void Wing::calcAndSetMAC() {
 		MAC = (2.0 / 3.0) * rootChord * ((1 + taperRatio + (taperRatio * taperRatio)) / (1 + taperRatio));
 		return;
@@ -163,10 +172,18 @@ namespace airplane {
 
 
 
+
+
+
+
 	void Wing::calcAndSetAspectRatio() {
 		aspectRatio = (span * span) / area;
 		return;
 	}
+
+
+
+
 
 
 
@@ -218,9 +235,6 @@ namespace airplane {
 
 
 
-
-
-
 // CL 3D Calc
 	void Wing::calcAndSetCL3D() {
 		double Cl2D_alphaTerm = airfoil->getCl_AlphaTerm();						// This is gunna be 2pi always
@@ -251,11 +265,17 @@ namespace airplane {
 
 
 
+
+
 // Calc Public Functions:
 
 	double Wing::calcArea(double inSpan, double inRootChord, double inTaperRatio) const {
 		return (0.5 * inRootChord * inSpan * (inTaperRatio + 1));
 	}
+
+
+
+
 
 
 
@@ -275,9 +295,17 @@ namespace airplane {
 
 
 
+
+
+
+
 	double Wing::calcAspectRatio(double inSpan, double inArea) const {
 		return (inSpan * inSpan) / inArea;
 	}
+
+
+
+
 
 
 
@@ -313,9 +341,6 @@ namespace airplane {
 
 
 
-
-
-
 	// Useful Calcs:
 
 	double Wing::calcReynolds(double velocity, double kinematicViscosity) const {
@@ -329,9 +354,17 @@ namespace airplane {
 
 
 
+
+
+
+
 	double Wing::calcWettedArea() const {
 		return 2 * area * 1.02;
 	}
+
+
+
+
 
 
 
@@ -352,11 +385,16 @@ namespace airplane {
 
 
 
+
+
+
+
 	double Wing::calcDragCoeff(double AoA_rad, double Reynolds, double Mach, double wetAreaRatio) const {
 		assert(Mach <= .99);
 		DragCoeff CD_Total(*this);
 		return CD_Total.calcTotalDragCoeff(AoA_rad, Reynolds, Mach, wetAreaRatio);
 	}
+
 
 
 
@@ -382,10 +420,13 @@ namespace airplane {
 
 
 
+
 	double Wing::calcMcc(double AoA_rad) const {
 		// Mcc = Mcc0 / (cos(sweep))^m
 		return calcMccZeroSweep(AoA_rad) / pow(cos(sweepAngle), calcSweptMExponent(AoA_rad));
 	}
+
+
 
 
 
@@ -466,6 +507,10 @@ namespace airplane {
 
 
 
+
+
+
+
 	double Wing::calcSweptMExponent(double AoA_rad) const {
 		double CL = fabs(CL3D.calcLiftCoefficient(AoA_rad));    // The graph *should* only need the magnitude of CL
 																// The graph is only defined for CL > 0
@@ -487,6 +532,12 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
 	// Moment Approx Functions:
 
 	double Wing::calcRootMoment(double Lift) const {
@@ -497,6 +548,13 @@ namespace airplane {
 
 		return (Lift * span * (1 + (2 * taperRatio))) / (12 * (1 + taperRatio));   // lbf*ft
 	}
+
+
+
+
+
+
+
 
 
 
@@ -527,6 +585,11 @@ namespace airplane {
 
 
 
+
+
+
+
+
 	// MIT Way (Way higher Inertia)
 	double Wing::calcRootInertiaEstimate() const {
 		// Assumes trapezodial Wing with linear taper
@@ -548,6 +611,12 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
 	// MIT Way
 	double Wing::calc_C_ForRootStress() const {
 		// sigma = Mc / I, c = h/2 
@@ -555,6 +624,14 @@ namespace airplane {
 
 		return 0.90 * thicknessRatio * rootChord;        // ft
 	}
+
+
+
+
+
+
+
+
 
 
 
@@ -578,6 +655,13 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
 /*
 	// Old
 	double Wing::calc_C_ForRootStress() const {
@@ -586,6 +670,11 @@ namespace airplane {
 		return airfoil->getThicknessRatio() * rootChord / 2;        // ft
 	}
 */
+
+
+
+
+
 
 
 
@@ -613,15 +702,14 @@ namespace airplane {
 
 
 
-
-
-
-
 // Mutators:
 	void Wing::setWeight(double inWeight) {
 		weight = inWeight;
 		return;
 	}
+
+
+
 
 
 
@@ -650,16 +738,10 @@ namespace airplane {
 
 
 
-
 // Accessors:
 	double Wing::getArea() const {
 		return area;
 	}
-
-
-
-
-
 
 
 
@@ -669,16 +751,9 @@ namespace airplane {
 
 
 
-
-
-
-
-
 	double Wing::getRootChord() const {
 		return rootChord;
 	}
-
-
 
 
 
@@ -688,18 +763,9 @@ namespace airplane {
 
 
 
-
-
-
-
-
 	double Wing::getAspectRatio() const {
 		return aspectRatio;
 	}
-
-
-
-
 
 
 
@@ -709,19 +775,9 @@ namespace airplane {
 
 
 
-
-
-
-
-
 	double Wing::getWeight() const {
 		return weight;
 	}
-
-
-
-
-
 
 
 
@@ -731,19 +787,9 @@ namespace airplane {
 
 
 
-
-
-
-
-
 	double Wing::getSweepAngle() const {
 		return sweepAngle * 180 / pi;
 	}
-
-
-
-
-
 
 
 
@@ -753,19 +799,9 @@ namespace airplane {
 
 
 
-
-
-
-
-
 	double Wing::getLeadingEdgeSweep() const {
 		return atan(tan(sweepAngle) + ((.25 * (1 - taperRatio)) / (aspectRatio * (1 + taperRatio))));
 	}
-
-
-
-
-
 
 
 
@@ -775,31 +811,15 @@ namespace airplane {
 
 
 
-
-
-
-
-
 	double Wing::getCL_Knott() const {
 		return CL3D.getCL_Knott();
 	}
 
 
 
-
-
-
-
-
 	Airfoil* Wing::getAirfoil() const {
 		return airfoil;
 	}
-
-
-
-
-
-
 
 
 }

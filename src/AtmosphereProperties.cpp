@@ -3,7 +3,6 @@
 #include <cmath>
 #include <cassert>
 using namespace std;
-// Prob should add assignment operator at some point
 
 
 
@@ -12,6 +11,7 @@ namespace atmosphere_properties {
 		height = 0;
 		calcAndSetAllPropertities();
 	}
+
 
 
 
@@ -32,6 +32,7 @@ namespace atmosphere_properties {
 
 
 
+
 // Calcs and sets all properties based on height member variable
 	void AtmosphereProperties::calcAndSetAllPropertities() {
 		calcAndSetTemperature();			// Requires height
@@ -41,6 +42,7 @@ namespace atmosphere_properties {
 		calcAndSetKinematicVisc();          // Requires viscosity and density
 		calcAndSetSpeedofSound();           // Requires temperature
 	}
+
 
 
 
@@ -73,6 +75,7 @@ namespace atmosphere_properties {
 
 
 
+
 	void AtmosphereProperties::calcAndSetStaticPressure() {
 		assert(height >= 0);
 
@@ -95,10 +98,12 @@ namespace atmosphere_properties {
 
 
 
+
 	void AtmosphereProperties::calcAndSetDensity() {
 		density = staticPressure / (GAS_CONSTANT * temperature);
 		return;
 	}
+
 
 
 
@@ -120,10 +125,12 @@ namespace atmosphere_properties {
 
 
 
+
 	void AtmosphereProperties::calcAndSetKinematicVisc() {
 		kinematicViscosity = viscosity / density;
 		return;
 	}
+
 
 
 
@@ -167,6 +174,7 @@ namespace atmosphere_properties {
 
 
 
+
 	double AtmosphereProperties::calcStaticPressure(double inHeight) const{
 		assert(inHeight >= 0);
 		double temp = calcTemperature(inHeight);
@@ -187,12 +195,14 @@ namespace atmosphere_properties {
 
 
 
+
 	double AtmosphereProperties::calcDensity(double inHeight) const {
 		double pressure = calcStaticPressure(inHeight);
 		double temperature = calcTemperature(inHeight);
 		return pressure / (GAS_CONSTANT * temperature);
 
 	}
+
 
 
 
@@ -216,6 +226,7 @@ namespace atmosphere_properties {
 
 
 
+
 	double AtmosphereProperties::calcKinematicVisc(double inHeight) const {
 		double density = calcDensity(inHeight);
 		double visc = calcViscosity(inHeight);
@@ -229,11 +240,11 @@ namespace atmosphere_properties {
 
 
 
+
 	double AtmosphereProperties::calcSpeedofSound(double inHeight) const {
 		double temp = calcTemperature(inHeight);
 		return sqrt(GAMMA * GAS_CONSTANT * temp);
 	}
-
 
 
 
@@ -258,16 +269,11 @@ namespace atmosphere_properties {
 
 
 
-
 // Accessors:
 
 	double AtmosphereProperties::getDensity() const {
 		return density;
 	}
-
-
-
-
 
 
 
@@ -279,17 +285,9 @@ namespace atmosphere_properties {
 
 
 
-
-
-
-
 	double AtmosphereProperties::getKinematicVisc() const {
 		return kinematicViscosity;
 	}
-
-
-
-
 
 
 
@@ -301,17 +299,9 @@ namespace atmosphere_properties {
 
 
 
-
-
-
-
 	double AtmosphereProperties::getTemperature() const {
 		return temperature;
 	}
-
-
-
-
 
 
 
@@ -323,19 +313,9 @@ namespace atmosphere_properties {
 
 
 
-
-
-
-
 	double AtmosphereProperties::getHeight() const {
 		return height;
 	}
-
-
-
-
-
-
 
 
 }

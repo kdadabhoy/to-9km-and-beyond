@@ -1,7 +1,11 @@
 #ifndef ATMOSPHEREPROPERTIES_H
 #define ATMOSPHEREPROPERTIES_H
 
-// Works in imperial units
+// Class operates in Imperial Units (and Returns Imperial Units)
+// TLDR: Implementation of NASA Equations & a few others to get atmopshere properties
+
+
+
 
 namespace atmosphere_properties {
 	class AtmosphereProperties {
@@ -9,8 +13,10 @@ namespace atmosphere_properties {
 		AtmosphereProperties();
 		AtmosphereProperties(double inHeight);
 
+
 	//Mutator:
 		void setHeight(double inHeight);            // Sets new height and recalculates all propertites
+
 
 	//Accessors:
 		double getDensity() const;                  // slug/ft^3
@@ -30,6 +36,7 @@ namespace atmosphere_properties {
 		double calcViscosity(double inHeight) const;          // slug/(ft*s)  Using Sutherland Law
 		double calcKinematicVisc(double inHeight) const;      // ft^2/s,      Using v = mu / rho
 		double calcSpeedofSound(double inHeight) const;       // ft/s
+
 
 
 	private:

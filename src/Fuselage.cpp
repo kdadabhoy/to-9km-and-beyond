@@ -32,13 +32,13 @@ namespace airplane {
 
 
 
+
 	// Copy constrcutor
 	Fuselage::Fuselage(const Fuselage& other) {
 		weight = other.weight;
 		length = other.length;
 		wettedArea = other.wettedArea;
 	}
-
 
 
 
@@ -69,10 +69,8 @@ namespace airplane {
 
 
 
+	// Useful Member functions:
 
-
-
-	//Useful Member functions
 	double Fuselage::calcWetRatio(double referenceArea) const {
 		// WetArea divided by referenceArea
 		return  wettedArea / referenceArea;
@@ -86,11 +84,9 @@ namespace airplane {
 
 
 
-
 	double Fuselage::calcLiftCoeff(double AoA) const {
 		return CL_alpha * AoA + CL_knott;
 	}
-
 
 
 
@@ -114,12 +110,9 @@ namespace airplane {
 
 
 
-
-
 	double Fuselage::calcReynolds(double velocity, double kinematicViscosity) const {
 		return ((velocity * length) / kinematicViscosity);
 	}
-
 
 
 
@@ -142,23 +135,30 @@ namespace airplane {
 
 
 
-
 	// Accessors
 	double Fuselage::getWeight() const {
 		return weight;
 	}
 
+
+
 	double Fuselage::getFormFactor() const {
 		return formFactor;
 	}
+
+
 
 	double Fuselage::getWettedArea() const {
 		return wettedArea;
 	}
 
+
+
 	double Fuselage::getCL_Alpha() const {
 		return CL_alpha;
 	}
+
+
 
 	double Fuselage::getCL_Knott() const {
 		return CL_knott;

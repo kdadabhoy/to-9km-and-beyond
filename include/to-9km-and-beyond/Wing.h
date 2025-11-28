@@ -8,6 +8,7 @@ using std::vector;
 	Notes:
 		- Weight of main wing is calculated in Airplane Class because it requires knowledge of MTOW
 		- setSpan() recomputes all the properties
+		- Assumes Trapezodial Wing :)
 */
 
 
@@ -29,11 +30,13 @@ namespace airplane {
 		double calcLiftCoeff(double AoA_rad) const;													 
 		double calcMcc(double AoA_rad) const; 
 
+
 	// Moment Approxs
 		double calcRootMoment(double Lift) const;              // Returns lbf*ft
 		double calcRootInertiaEstimate() const;                // Returns ft^4
 		double calcLocalChord(double distanceFromRoot) const;  // Returns ft
 		double calc_C_ForRootStress() const;                   // Returns ft
+
 
 	// Maybe Useful Functions, Assume Trapezodial Wing
 		double calcArea(double inSpan, double inRootChord, double inTaperRatio) const;                
@@ -45,7 +48,6 @@ namespace airplane {
 	// Mutators
 		void setWeight(double inWeight);
 		void setSpan(double inSpan);
-
 
 
 	// Accessors
@@ -63,6 +65,7 @@ namespace airplane {
 		double getCL_Alpha() const;			    // This returns the 3D CL_Alpha for CL = CL_Alpha * alpha + CL_Knott
 		double getCL_Knott() const;			    // This returns the 3D CL_Knott for CL = CL_Alpha * alpha + CL_Knott
 		Airfoil* getAirfoil() const;
+
 
 
 	private:
@@ -87,6 +90,7 @@ namespace airplane {
 	// Constants
 		static constexpr double pi = 3.141592653589;
 		static constexpr double GAS_CONSTANT = 1716;
+
 
 	// MccZeroSweep Constants (CL20 -> CL = .20)
 		const vector<double> CL0 =  { 4.46 , -2.20 , 0.972 };		// 0.972 + -2.2x + 4.46x^2          

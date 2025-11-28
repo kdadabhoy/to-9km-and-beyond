@@ -18,6 +18,10 @@ namespace airplane {
 
 
 
+
+
+
+
 	Airfoil::Airfoil(const std::string& inNACA){
 		assert(inNACA.size() == 4);
 		NACA = inNACA;
@@ -29,6 +33,11 @@ namespace airplane {
 		Cl.setCL_Knott(0);
 		alphaZeroLift = calcalphaZeroLift();
 	}
+
+
+
+
+
 
 
 
@@ -45,6 +54,14 @@ namespace airplane {
 		maxThickness = std::stoi(NACA.substr(2, 2)) / 100.0;
 
 	}
+
+
+
+
+
+
+
+
 
 	Airfoil::Airfoil(const std::string& inNACA, double inAlphaZeroLift, double inCl0) {
 		assert(inNACA.size() == 4);
@@ -63,11 +80,19 @@ namespace airplane {
 
 
 
+
+
+
+
 	// Need to figure out math
 	double Airfoil::calcalphaZeroLift() const {
-
+		// Don't think there is a function that allows this
+		// Currently we just take in this variable
 		return 0;
 	}
+
+
+
 
 
 
@@ -82,9 +107,20 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
 	double Airfoil::getCl_rad(double inAlphaRad) const {
 		return Cl.calcLiftCoefficient(inAlphaRad);
 	}
+
+
+
+
+
 
 
 
@@ -93,26 +129,37 @@ namespace airplane {
 	double Airfoil::getCl_AlphaTerm() const {
 		return Cl.getCL_Alpha();
 	}
-	
+
+
+
 	double Airfoil::getCl_alphaZeroLift() const {
 		return alphaZeroLift;
 	}
+
 
 	double Airfoil::getCl_KnottTerm() const {
 		return Cl.getCL_Knott();
 	}
 
+
+
 	double Airfoil::getThicknessRatio() const {
 		return maxThickness;
 	}
+
+
 
 	double Airfoil::getMaxCamberRatio() const {
 		return maxCamber;
 	}
 
+
+
 	void Airfoil::printName() const {
 		std::cout << "NACA: " << NACA << std::endl;
 	}
+
+
 
 	std::string Airfoil::getName() const {
 		return NACA;
@@ -120,25 +167,5 @@ namespace airplane {
 
 
 
-
-
-	/*
-	// This seems to be a made up approx... Look up thin airfoil theory and prob write an integration thing to calculate this
-	// Verify below function
-	// Kind of irrelevant bc I dont really care about C0
-	double Airfoil::calcCl0() const {
-		double C0;
-
-		if (posMaxCamber == 0) {
-			C0 = 0;
-		} else {
-			C0 = (-2.0 * maxCamber / posMaxCamber) * (1 - (posMaxCamber / 2));          // radians, thin-airfoil theory approx
-		}
-
-		return C0;
-	}
-	// ^ Verify above funciton
-
-	*/
 
 }

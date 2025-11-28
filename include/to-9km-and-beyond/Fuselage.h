@@ -10,6 +10,7 @@ namespace airplane {
 		Fuselage(const Fuselage& other);				// Copy Constructor
 		Fuselage& operator=(const Fuselage& other);		// Assignment Operator
 
+
 		// Helpful Functions
 		double calcReynolds(double velocity, double kinematicViscosity) const;
 		double calcWetRatio(double referenceArea) const;
@@ -17,12 +18,13 @@ namespace airplane {
 		double calcDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const;     // Takes in AoA in radian
 
 
-		//Accessors:
+		// Accessors:
 		double getWeight() const;
 		double getFormFactor() const;
 		double getWettedArea() const;
 		double getCL_Alpha() const;
 		double getCL_Knott() const;
+
 
 		// Mutators:
 		void setWeight(double inWeight);

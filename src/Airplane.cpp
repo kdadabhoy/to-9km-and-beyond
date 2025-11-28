@@ -20,7 +20,6 @@ using namespace std;
 using namespace atmosphere_properties;
 // Assumes we are passing in the full span of the Wing and HT (in other words they are symmetrical)
 	// In other, other words, the Wing objects represent the full main wing and full HT 
-// Prob should add assignment operator at some point
 
 
 namespace airplane {
@@ -41,6 +40,9 @@ namespace airplane {
 		CL.setCL_Alpha(0);
 		CL.setCL_Knott(0);
 	}
+
+
+
 
 
 
@@ -77,6 +79,9 @@ namespace airplane {
 
 		MTOW = totalWeight;
 	}
+
+
+
 
 
 
@@ -184,6 +189,8 @@ namespace airplane {
 
 
 
+
+
 	double Airplane::calcDrag(double AoA, double velocity, double Mach, double kinematicViscosity, double density) const {
 		double totalDrag = 0;
 
@@ -215,6 +222,10 @@ namespace airplane {
 	double Airplane::calcLiftCoeff(double AoA) const {
 		return CL.calcLiftCoefficient(AoA);
 	}
+
+
+
+
 
 
 
@@ -260,6 +271,7 @@ namespace airplane {
 
 
 
+
 	// Calc Alpha needed for Steady Level Climb at a Gamma
 		// L = W*cos(gamma)
 	double Airplane::calcSteadyClimbAoA(double gamma, double velocity, double density) const {
@@ -289,7 +301,6 @@ namespace airplane {
 
 
 
-
 	// Small Angle assumption (L = W*cos(0) = W)
 	double Airplane::calcSteadyClimbAoAApprox(double velocity, double density) const {
 		assert(velocity > 0.00 && density > 0.00 && CL.getCL_Alpha() > 0.00);
@@ -303,7 +314,6 @@ namespace airplane {
 
 		return AoA_needed;
 	}
-
 
 
 
@@ -371,6 +381,7 @@ namespace airplane {
 
 
 
+
 	vector<double> Airplane::calcPowerAvailableData(double height) const {
 		vector<double> xdata = calcPowerCurveVelocityData(height);
 		vector<double> ydata;
@@ -387,6 +398,7 @@ namespace airplane {
 		}
 		return ydata;
 	}
+
 
 
 
@@ -425,8 +437,7 @@ namespace airplane {
 
 
 
-	// double check that the interpolation is working accurately sometime
-		// It's close.. but not sure it's 100% accurate
+
 	double Airplane::calcExcessPower(double velocity) const {
 		double x_min = powerCurveVelocityData[0];
 		double x_max = powerCurveVelocityData[powerCurveVelocityData.size() - 1];
@@ -454,8 +465,8 @@ namespace airplane {
 
 
 
-	// 100% Accurate (gamma accounted for):
 
+	// 100% Accurate (gamma accounted for):
 	void Airplane::calcAndSetPowerCurveData(double gamma, double height) {
 		if (powerCurveVelocityData.empty()) {
 			powerCurveVelocityData = calcPowerCurveVelocityData(height);
@@ -468,6 +479,7 @@ namespace airplane {
 
 		return;
 	}
+
 
 
 
@@ -510,6 +522,7 @@ namespace airplane {
 
 
 
+
 	// Slightly inefficent bc the calling functions create their own AtmosProp Object
 	void Airplane::getPowerCurveCSV(double gamma, double height, string fileName) const {
 		vector<double> xdata = calcPowerCurveVelocityData(height);
@@ -530,8 +543,9 @@ namespace airplane {
 
 
 
-	// Small Angle Approx (cos(gamma) ~= 1)
 
+
+	// Small Angle Approx (cos(gamma) ~= 1)
 	void Airplane::calcAndSetPowerCurveData(double height) {
 		if (powerCurveVelocityData.empty()) {
 			powerCurveVelocityData = calcPowerCurveVelocityData(height);
@@ -543,6 +557,8 @@ namespace airplane {
 
 		return;
 	}
+
+
 
 
 
@@ -582,6 +598,9 @@ namespace airplane {
 
 
 
+
+
+
 	// Slightly inefficent bc the calling functions create their own AtmosProp Object
 	void Airplane::getPowerCurveCSV(double height, string fileName) const {
 		vector<double> xdata = calcPowerCurveVelocityData(height);
@@ -602,7 +621,10 @@ namespace airplane {
 
 
 
+
+
 	// Climb Functions
+
 		// Uses small angle approx for gamma
 	double Airplane::calcBestClimbTime(double startHeight, double startVelocity, double endHeight) {
 		// Implementing an accelerate/declerate in a straight line then climb at maxExcessPower
@@ -694,6 +716,9 @@ namespace airplane {
 
 
 
+
+
+
 	// Only evalutes Power Curves when height changes by 500
 	double Airplane::calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight, double heightSteps) {
 		// Implementing an accelerate/declerate in a straight line then climb at maxExcessPower
@@ -764,6 +789,11 @@ namespace airplane {
 		}
 		return totalTime;
 	}
+
+
+
+
+
 
 
 
@@ -865,6 +895,15 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
+
+
 	// Calcs the time to 9km (approx) from h=0 to h = 9km + startHeight (accounts for possibility of not starting at sea level)
 	double Airplane::calcBestTimeTo9kmApprox(double startHeight, double takeOffEndHeight, double heightSteps) {
 		double END_HEIGHT = 29527.6 + startHeight; // 9km in ft
@@ -883,6 +922,12 @@ namespace airplane {
 
 		return totalTime; // Returns time in seconds
 	}
+
+
+
+
+
+
 
 
 
@@ -920,6 +965,13 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
 	// Steady Level Flight (L=W) Functions
 
 	double Airplane::calcSteadyLevelAoA(double velocity, double density) const {
@@ -934,6 +986,10 @@ namespace airplane {
 
 		return AoA_needed;
 	}
+
+
+
+
 
 
 
@@ -1020,10 +1076,32 @@ namespace airplane {
 
 
 
-	// Takeoff Functions
 
-	// See physics derivation in notes
-	// Old - doesnt account for totalWeightLoss
+
+
+
+
+
+	// Takeoff Functions:
+
+
+
+
+
+	// Old - doesnt account for totalWeightLoss & isn't very useful.. since it just returns time
+	// Assumes we have enough control authority to takeoff, if we can reach V2
+	/*
+	* Assumes we takeoff at 1.2V_Stall
+
+		V2 = 1.2V_stall = 1.2 * sqrt((2*W) / (rho*CL_max*S))
+		Rolling Resistance = mu*(W-(q*S*C_L))
+			- mu ~= .02
+
+		 a  = F/m
+			 Force = Thrust - Drag - Rolling Resistance
+			 F = T - qSC_D - mu*(W-(q*S*C_L))
+			 m = W/g
+	*/
 	double Airplane::calcTakeoffTime(double height, double endHeight) {
 		double totalTime = 0;
 		double velocity = 0;  // Start from rest 
@@ -1071,6 +1149,11 @@ namespace airplane {
 		}
 		return totalTime;
 	}
+
+
+
+
+
 
 
 
@@ -1135,7 +1218,23 @@ namespace airplane {
 
 
 
+
+
+
 	// Assumes we have enough control authority to takeoff, if we can reach V2
+	/*
+	* Assumes we takeoff at 1.2V_Stall
+
+		V2 = 1.2V_stall = 1.2 * sqrt((2*W) / (rho*CL_max*S))
+		Rolling Resistance = mu*(W-(q*S*C_L))
+			- mu ~= .02
+
+		 a  = F/m
+			 Force = Thrust - Drag - Rolling Resistance
+			 F = T - qSC_D - mu*(W-(q*S*C_L))
+			 m = W/g
+	*/
+
 	Airplane::TakeoffProperties Airplane::calcEndRunwayAirplaneProperties(double height, double startVelocity, double startWeight) const {
 
 		double AoA_Stall = 15 * pi / 180;      // Just using a realistic, arbirtary AoA rn
@@ -1181,6 +1280,10 @@ namespace airplane {
 		returnStrut.finalWeight = weight;
 		return returnStrut;
 	}
+
+
+
+
 
 
 
@@ -1259,13 +1362,30 @@ namespace airplane {
 
 
 
-	// Wing Feasability Functions:
 
+
+
+
+
+
+
+
+	// Wing Feasability Functions:
 
 	double Airplane::calcLimitLift() const {
 		// L_lim = n_lim * MTOW 
 		return (N_ULT / LOAD_SAFETY_FACTOR) * MTOW;
 	}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1283,12 +1403,29 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
+
+
 	// MIT way
 	double Airplane::calcRootLimitStress() const {
 		// sigma_limit = M_root,_limit * c / I
 		double sigma = (calcRootLimitMoment() * mainWing->calc_C_ForRootStress()) / mainWing->calcRootInertiaEstimate(); // psf
 		return sigma * PSF_TO_PSI * PSI_TO_KSI;  // returns ksi
 	}
+
+
+
+
+
+
+
+
 
 
 
@@ -1312,7 +1449,11 @@ namespace airplane {
 
 
 
-	
+
+
+
+
+
 
 
 
@@ -1336,6 +1477,18 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 /*
 	// Maybe dumb
 	double Airplane::calcMinSpanNeeded(double maxRootStressKSI) const {
@@ -1345,6 +1498,14 @@ namespace airplane {
 		return sigma * PSF_TO_PSI * PSI_TO_KSI;  // returns ksi
 	}
 */
+
+
+
+
+
+
+
+
 
 
 
@@ -1396,7 +1557,6 @@ namespace airplane {
 
 
 
-
 	// Mutators:
 	
 	// This function completely resets the airplane with the new wing (weight goes back to MTOW)
@@ -1425,6 +1585,13 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
 	void Airplane::setMainWingWeight(double inWeight) {
 		assert(mainWing != nullptr);		// Precaution
 		mainWing->setWeight(inWeight);
@@ -1444,15 +1611,15 @@ namespace airplane {
 
 
 
+
+
+
+
+
 	// Accessors:
 	double Airplane::getWeight() const {
 		return totalWeight;
 	}
-
-
-
-
-
 
 
 
@@ -1462,21 +1629,9 @@ namespace airplane {
 
 
 
-
-
-
-
-
-
 	double Airplane::getMTOW() const {
 		return MTOW;
 	}
-
-
-
-
-
-
 
 
 
@@ -1486,19 +1641,9 @@ namespace airplane {
 
 
 
-
-
-
-
-
 	double Airplane::getVelocityMaxExcessPower() const {
 		return velocityMaxExcessPower;
 	}
-
-
-
-
-
 
 
 
@@ -1508,22 +1653,7 @@ namespace airplane {
 
 
 
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1531,6 +1661,32 @@ namespace airplane {
 
 /*
 	Notes:
+
+
+	// calcTakeoffTime() & Calc
+		This function assumes we start climbing at V2 = 1.2V_stall = 1.2 * sqrt((2*W) / (rho*CL_max*S))
+		And we climb until we reach 500 ft.. which is on the low end of FAA regs
+			I have doubts that this is the best way to takeoff for a time-to-climb...
+			but for realism and the purpose of integrating lec content into this program
+			we will take this approach
+
+		V2 = 1.2V_stall = 1.2 * sqrt((2*W) / (rho*CL_max*S))
+		Rolling Resistance = mu*(W-(q*S*C_L))
+			 mu ~= .02
+		 a  = F/m
+			Force = Thrust - Drag - Rolling Resistance
+			F = T - qSC_D - mu*(W-(q*S*C_L))
+			m = W/g
+
+	//
+
+
+
+
+
+
+
+
 
 	// Climb Functions
 
@@ -1564,25 +1720,20 @@ namespace airplane {
 
 
 
-	// calcTakeoffTime():
-		This function assumes we start climbing at V2 = 1.2V_stall = 1.2 * sqrt((2*W) / (rho*CL_max*S))
-		And we climb until we reach 500 ft.. which is on the low end of FAA regs
-			I have doubts that this is the best way to takeoff for a time-to-climb...
-			but for realism and the purpose of integrating lec content into this program
-			we will take this approach
-
-		V2 = 1.2V_stall = 1.2 * sqrt((2*W) / (rho*CL_max*S))
-		Rolling Resistance = mu*(W-(q*S*C_L))
-			 mu ~= .02
-		 a  = F/m
-			Force = Thrust - Drag - Rolling Resistance
-			F = T - qSC_D - mu*(W-(q*S*C_L))
-			m = W/g
-
-
-	//
-
 */
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
