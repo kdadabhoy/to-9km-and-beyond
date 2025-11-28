@@ -69,6 +69,10 @@ namespace airplane {
 		double calcBestClimbTimeApprox(double startHeight, double startVelocity, double endHeight, double heightSteps);   // does powerCurve every heightStep, updates totalWeight
 
 
+		// Sanity Check Approx (
+		double calcRoughApproxTimeTo9km(double startHeight, double takeOffEndHeight);						   // Returns seconds, updates totalWeight 
+		double calcRoughApproxClimbTime(double startHeight, double startVelocity, double endHeight);           // Returns seconds, updates totalWeight 
+
 		// Steady Level Flight Functions (L = W)
 		SteadyLevelAccelerationTimeProperties calcSteadyLevelAccelerationTime(double startVelocity, double finalVelocity, double height); // updates totalWeight
 
@@ -93,6 +97,8 @@ namespace airplane {
 
 		// Print Functions
 		//void printMainWingCharacteristics() const;          // That long block of cout statements for AR, area, e, taper, etc
+
+
 
 	private:
 		// Must take in:
@@ -144,6 +150,8 @@ namespace airplane {
 		static constexpr double GAS_CONSTANT = 1716;
 		static constexpr double pi = 3.141592653589;
 		static constexpr double GRAVITY = 32.2;
+		static constexpr double EXTRANEOUS_DRAG_MULTIPLIER = 1.15;  // Essentially a smudge factor for drag 
+																	 // = 1 for no multipler, should be around 1.02-1.15 (2-15%)
 
 
 		// Feasibility of Wing Constants
@@ -152,8 +160,8 @@ namespace airplane {
 		static constexpr double PSI_TO_KSI = .001;                  // psi * PSI_TO_KSI = ksi
 
 		// calcTime9km Constas
-		static constexpr double VELOCITY_ERROR = 30.0;               // Used in calcSteadyLevelAccelerationTime, calcBestClimbTime, & calcBestClimbTimeApprox
-																	 // 30.0 Works okay
+		static constexpr double VELOCITY_ERROR = 30.0;              // Used in calcSteadyLevelAccelerationTime, calcBestClimbTime, & calcBestClimbTimeApprox
+																	// 30, seems accurate according to sanity Check approach
 
 	
 

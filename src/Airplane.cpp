@@ -170,7 +170,7 @@ namespace airplane {
 		totalDragCoeff += fuselage->calcDragCoeff(AoA, fuselage->calcReynolds(velocity, kinematicViscosity), Mach, fuselage->calcWetRatio(referenceArea));
 		totalDragCoeff += numEngines * (nacelle->calcDragCoeff(AoA, nacelle->calcReynolds(velocity, kinematicViscosity), Mach, nacelle->calcWetRatio(referenceArea)));
 
-		return totalDragCoeff;
+		return EXTRANEOUS_DRAG_MULTIPLIER * totalDragCoeff;
 	}
 
 
@@ -195,7 +195,7 @@ namespace airplane {
 
 		totalDrag = 0.5 * density * velocity * velocity * referenceArea * totalDrag;
 
-		return totalDrag;
+		return EXTRANEOUS_DRAG_MULTIPLIER * totalDrag;
 	}
 
 
@@ -603,7 +603,6 @@ namespace airplane {
 
 
 	// Climb Functions
-
 		// Uses small angle approx for gamma
 	double Airplane::calcBestClimbTime(double startHeight, double startVelocity, double endHeight) {
 		// Implementing an accelerate/declerate in a straight line then climb at maxExcessPower
@@ -773,6 +772,75 @@ namespace airplane {
 
 
 
+
+
+
+
+	// Sanity check approach - get to first V for maxExcessPower, then climb with no adjusting Velocity
+	double Airplane::calcRoughApproxClimbTime(double startHeight, double startVelocity, double endHeight) {
+
+		double totalTime = 0;
+		double height = startHeight;
+		double velocity = startVelocity;
+		SteadyLevelAccelerationTimeProperties accelProperties;
+		double currentExcessPower;
+		double TIME_STEP = .1;							// Can Change if too inefficient
+
+
+		calcAndSetPowerCurveData(height);
+		calcAndSetMaxExcessPower();
+		if (fabs(velocity - velocityMaxExcessPower) > VELOCITY_ERROR) {
+			// calcSteadyLevelAccel also updates Weight
+			accelProperties = calcSteadyLevelAccelerationTime(velocity, velocityMaxExcessPower, height);
+			totalTime += accelProperties.timeTaken;
+			velocity = accelProperties.finalVelocity;
+		}
+
+
+		while (height <= endHeight) {
+			calcAndSetPowerCurveData(height);
+			calcAndSetMaxExcessPower();
+
+			currentExcessPower = calcExcessPower(velocity); // can't juse use maxExcess power.. it typically is... but there are cases when it's not
+
+
+			height += (currentExcessPower / totalWeight) * TIME_STEP; // small angle approx method
+			totalTime += TIME_STEP;
+
+
+			if (fabs(currentExcessPower) < 0.001) {
+				// Plane can't reach 8km case
+				totalTime = 1e10;
+				cout << "Plane with Wing Span (ft): " << mainWing->getSpan() <<
+					" and taper: " << mainWing->getTaperRatio() << " could not reach 9km. "
+					<< "total time for this plane set to a very large number!" << endl;
+				break;
+
+			}
+
+			// Weight Loss Consideration
+			totalWeight -= numEngines * engine->calcFuelLoss2(TIME_STEP, height, velocity);
+		}
+
+
+		return totalTime;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	// Calcs the time to 9km (accurately) from h=0 to h = 9km + startHeight (accounts for possibility of not starting at sea level)
 	double Airplane::calcBestTimeTo9km(double startHeight, double takeOffEndHeight) {
 		double END_HEIGHT = 29527.6 + startHeight; // 9km in ft
@@ -823,6 +891,36 @@ namespace airplane {
 
 
 
+
+
+
+	// Sanity check approach - get to first V for maxExcessPower, then climb with no adjusting Velocity
+	double Airplane::calcRoughApproxTimeTo9km(double startHeight, double takeOffEndHeight) {
+		double END_HEIGHT = 29527.6 + startHeight; // 9km in ft
+		double velocity = 0;                       // Starting from rest
+
+		TakeoffProperties takeoffProperties = calcTakeoffPropertites(startHeight, takeOffEndHeight, velocity, totalWeight);
+
+		double totalTime = takeoffProperties.timeTaken;
+		velocity = takeoffProperties.finalVelocity;
+		takeOffEndHeight = takeoffProperties.height;
+
+		// Weight Loss Consideration
+		totalWeight = takeoffProperties.finalWeight;
+
+		totalTime += calcRoughApproxClimbTime(takeOffEndHeight, velocity, END_HEIGHT);
+
+		return totalTime; // Returns time in seconds
+	}
+
+
+
+
+
+
+
+
+
 	// Steady Level Flight (L=W) Functions
 
 	double Airplane::calcSteadyLevelAoA(double velocity, double density) const {
@@ -848,7 +946,6 @@ namespace airplane {
 
 
 
-	// *** Need to account for weight loss ***
 
 	// Constant height Max Horizontal Acceleration
 		// In a straight line F = ma, a = F/m
@@ -926,7 +1023,6 @@ namespace airplane {
 
 	// Takeoff Functions
 
-	// *** Need to account for weight loss ***
 	// See physics derivation in notes
 	// Old - doesnt account for totalWeightLoss
 	double Airplane::calcTakeoffTime(double height, double endHeight) {
@@ -1037,9 +1133,9 @@ namespace airplane {
 
 
 
-	// *** Need to account for weight loss ***
 
-	// Incomplete
+
+
 	// Assumes we have enough control authority to takeoff, if we can reach V2
 	Airplane::TakeoffProperties Airplane::calcEndRunwayAirplaneProperties(double height, double startVelocity, double startWeight) const {
 
@@ -1274,17 +1370,13 @@ namespace airplane {
 		double taper = mainWing->getTaperRatio();
 		double spanNeeded = (6 * (1+taper) * sigma_needed_ft * inertia) / (maxLift * c_cst);
 
-		cout << "Span needed: " << spanNeeded << endl; // del
-
 		double currentSpan = mainWing->getSpan();
 
 		if (maxRootStress <= SIGMA_YIELD_COMPOSITE && spanNeeded >= currentSpan) {
 			canWithStandLoad = true;
-
 			if (canTakeoff) {
 				return true;
 			}
-
 		}
 
 		return false;
