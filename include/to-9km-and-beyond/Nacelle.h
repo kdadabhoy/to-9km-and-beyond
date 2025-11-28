@@ -34,7 +34,7 @@ namespace airplane {
 
 		// Could take these in as parameters... 
 		// but they're fairly consistent across Nacelles (approxs anyway)
-		double formFactor = 1.75;       // formFactor is ~1.0-2.0
+		double formFactor = 1.5;       // formFactor is ~1.0-2.0
 	};
 
 
