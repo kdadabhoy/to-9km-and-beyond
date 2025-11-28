@@ -51,7 +51,7 @@ int main() {
 	Airfoil NACA2412("2412", -.0349);
 
 	// Givens:
-	Wing VT(NACA2412, 99.68, 86.68, 86.68, 40, 0);										// Set in Stone.. Altho not really needed bc ignoring contributions
+	Wing VT(NACA2412, 99.68, 86.68, 86.68, 40, 0);										// Given
 	Wing HT(NACA2412, 239.67, 23.55, 72.45, 32.04, 0);									// Set in Stone
 	double givenAirplaneWeight = 23000 * 2.20462;										// lbms, this it the HT + VT + Fuselage + startingFuel + Payload
 	double startingFuelWeight = 1000 * 2.20462;											// lbm
@@ -59,9 +59,11 @@ int main() {
 	givenAirplaneWeight = givenAirplaneWeight - startingFuelWeight - payLoadWeight - (2 * 1670);     // 1670 lbms is CF34_3B1
 	double fuselageWeight = .95 * givenAirplaneWeight;									// lbms... we will also store the VT and HT weight in this
 	double nacelleWeight = .025 * givenAirplaneWeight;									// just said each one is 2.5% of fuselage+VT+HT
-	double fuselageLength = 621.80;														// inches
-	double fuselageWettedArea = 811.55 * 12;                                            // inches
-	Nacelle nacelle(nacelleWeight);
+	double fuselageLength = 621.80;														// inches, from CAD
+	double fuselageWettedArea = 811.55 * 12;                                            // inches, from CAD
+	double nacelleWettedArea = 18730.75;                                                // inches, from CAD
+	double nacelleLength = 87.17;                                                       // inches, from CAD
+	Nacelle nacelle(nacelleWeight, nacelleLength, nacelleWettedArea);                 
 	Fuselage fuselage(fuselageWeight, fuselageLength, fuselageWettedArea); 
 	CF34_3B1 CF34_3B1;
 
@@ -105,9 +107,9 @@ int main() {
 
 
 	wingSpanOptimizerResults results;
-	double numberOfSimulationSteps = 25;
+	int numberOfSimulationSteps = 25;
 	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, 10, 100, numberOfSimulationSteps);
-	spanOptimizerResultsToCSV(results, "SpanOptimizerData_NoABSonDrag.csv");
+	spanOptimizerResultsToCSV(results, "SpanOptimizerData_wNacelle.csv");
 
 	for (int i = 0; i < results.wingSpanVector.size(); i++) {
 		cout << fixed << setprecision(5);

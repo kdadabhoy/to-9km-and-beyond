@@ -2,6 +2,7 @@
 #define DRAGCOEFF_H
 #include "to-9km-and-beyond/Wing.h"
 #include "to-9km-and-beyond/Fuselage.h"
+#include "to-9km-and-beyond/Nacelle.h"
 // Might want to rework this class a bit for future projects
 
 namespace airplane {
@@ -11,6 +12,7 @@ namespace airplane {
 		DragCoeff();
 		DragCoeff(const airplane::Wing& inWing);
 		DragCoeff(const airplane::Fuselage& inFuselage);
+		DragCoeff(const airplane::Nacelle& inNacelle);
 
 
 	// Main Function
@@ -18,15 +20,16 @@ namespace airplane {
 
 
 	// Useful Functions:
-		double calcParasiteCoeff(double Renyolds, double wetAreaRatio) const;	// For Wing and Fuselage
+		double calcParasiteCoeff(double Renyolds, double wetAreaRatio) const;	// For Wing, Fuselage, and Nacelle
 		double calcInducedCoeff(double AoA) const;								// For Wings only
-		double calcCompressibilityCoeff(double Mach, double AoA) const;			// For Wings only (for now)
-		double calcFormDragCoeff(double Cf) const;								// For fuselage only
+		double calcCompressibilityCoeff(double Mach, double AoA) const;			// For Wings only 
+		double calcFormDragCoeff(double Cf) const;								// For Fuselage and Nacelle
 
 
 	private:
 		const airplane::Wing* Wing;
 		const airplane::Fuselage* Fuselage;
+		const airplane::Nacelle* Nacelle;
 
 
 	// Constants:

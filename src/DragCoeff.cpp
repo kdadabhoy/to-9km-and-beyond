@@ -1,6 +1,8 @@
 #include <iostream>
 #include "to-9km-and-beyond/DragCoeff.h"
 #include "to-9km-and-beyond/Wing.h"
+#include "to-9km-and-beyond/Nacelle.h"
+#include "to-9km-and-beyond/Fuselage.h"
 #include <cmath>
 #include <cassert>
 using namespace std;
@@ -12,6 +14,7 @@ namespace airplane {
 	DragCoeff::DragCoeff() {
 		Wing = nullptr;
 		Fuselage = nullptr;
+		Nacelle = nullptr;
 	}
 	
 
@@ -24,6 +27,7 @@ namespace airplane {
 	DragCoeff::DragCoeff(const airplane::Wing& inWing) {
 		Wing = &inWing;
 		Fuselage = nullptr;
+		Nacelle = nullptr;
 	}
 
 
@@ -36,7 +40,22 @@ namespace airplane {
 	DragCoeff::DragCoeff(const airplane::Fuselage& inFuselage) {
 		Fuselage = &inFuselage;
 		Wing = nullptr;
+		Nacelle = nullptr;
 	}
+
+
+
+
+
+
+
+
+	DragCoeff::DragCoeff(const airplane::Nacelle& inNacelle) {
+		Nacelle = &inNacelle;
+		Wing = nullptr;
+		Fuselage = nullptr;
+	}
+
 
 
 
@@ -56,6 +75,10 @@ namespace airplane {
 			double parasiteTemp;
 			parasiteTemp = calcParasiteCoeff(Reynolds, wetAreaRatio);
 			return parasiteTemp + calcFormDragCoeff(parasiteTemp);
+		} else if (Nacelle) {
+			double parasiteTemp;
+			parasiteTemp = calcParasiteCoeff(Reynolds, wetAreaRatio);
+			return parasiteTemp + calcFormDragCoeff(parasiteTemp);
 		} else {
 			return 0;
 		}
@@ -68,8 +91,9 @@ namespace airplane {
 
 
 
+
 	double DragCoeff::calcParasiteCoeff(double Reynolds, double wetAreaRatio) const {
-		assert(Wing != nullptr || Fuselage != nullptr);
+		assert(Wing != nullptr || Fuselage != nullptr || Nacelle != nullptr);
 
 		if (Reynolds >= CRITICAL_REYNOLDS_NUMBER) {
 			return wetAreaRatio * .455 / pow(log10(Reynolds), 2.58);
@@ -87,11 +111,15 @@ namespace airplane {
 
 
 
+
+
+
 	double DragCoeff::calcInducedCoeff(double AoA) const {
 		assert(Wing != nullptr);
 		double CL = Wing->calcLiftCoeff(AoA);
 		return (CL*CL) / (pi * Wing->getEllipticalEffic() * Wing->getAspectRatio());
 	}
+
 
 
 
@@ -133,20 +161,26 @@ namespace airplane {
 
 
 
-	// Form Drag - Fuselage Only
+
+	// Form Drag - Fuselage and Nacelle Only
 	double DragCoeff::calcFormDragCoeff(double Cf) const {
-		assert(Fuselage != nullptr);
-		return Cf * Fuselage->getFormFactor();
+		assert(Fuselage != nullptr || Nacelle != nullptr);
+		if (Fuselage) {
+			return Cf * Fuselage->getFormFactor();
+		} else if (Nacelle) {
+			return Cf * Nacelle->getFormFactor();
+		} else {
+			return 0;
+		}
 	}
 
 
 
 
 
-
-
-
 }
+
+
 
 
 

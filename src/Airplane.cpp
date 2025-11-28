@@ -68,8 +68,7 @@ namespace airplane {
 		assert(mainWing != nullptr);
 		referenceArea = mainWing->getArea();
 		calcAndSetLiftCoeff();
-		calcAndSetTotalWeight();				// Main Wing Weight depends on total weight before everything else
-		// So need to calc that first
+		calcAndSetTotalWeight();    // Main Wing Weight depends on total weight before everything else, so need to calc that first
 
 		if (fabs(mainWing->getWeight()) < .01) {
 			calcAndSetMainWingWeight();				// Now calc main wing weight using Raymond Approx
@@ -98,7 +97,7 @@ namespace airplane {
 		}
 
 		if (HT) {
-			total += (HT->getWeight() * 2);
+			total += HT->getWeight();
 		}
 
 		if (VT) {
@@ -110,7 +109,7 @@ namespace airplane {
 		}
 
 		if (nacelle) {
-			total += (nacelle->getWeight() * 2);
+			total += (nacelle->getWeight() * numEngines);
 		}
 
 		if (fuselage) {
@@ -167,8 +166,9 @@ namespace airplane {
 
 		totalDragCoeff += mainWing->calcDragCoeff(AoA, mainWing->calcReynolds(velocity, kinematicViscosity), Mach, mainWing->calcWetRatio(referenceArea));
 		totalDragCoeff += HT->calcDragCoeff(AoA, HT->calcReynolds(velocity, kinematicViscosity), Mach, HT->calcWetRatio(referenceArea));
+		totalDragCoeff += VT->calcDragCoeff(AoA, VT->calcReynolds(velocity, kinematicViscosity), Mach, VT->calcWetRatio(referenceArea));
 		totalDragCoeff += fuselage->calcDragCoeff(AoA, fuselage->calcReynolds(velocity, kinematicViscosity), Mach, fuselage->calcWetRatio(referenceArea));
-		// Might need to add drag for VT, but just the parasite drag (inducded drag acts horizontally?)
+		totalDragCoeff += numEngines * (nacelle->calcDragCoeff(AoA, nacelle->calcReynolds(velocity, kinematicViscosity), Mach, nacelle->calcWetRatio(referenceArea)));
 
 		return totalDragCoeff;
 	}
@@ -189,8 +189,9 @@ namespace airplane {
 
 		totalDrag += mainWing->calcDragCoeff(AoA, mainWing->calcReynolds(velocity, kinematicViscosity), Mach, mainWing->calcWetRatio(referenceArea));
 		totalDrag += HT->calcDragCoeff(AoA, HT->calcReynolds(velocity, kinematicViscosity), Mach, HT->calcWetRatio(referenceArea));
+		totalDrag += VT->calcDragCoeff(AoA, VT->calcReynolds(velocity, kinematicViscosity), Mach, VT->calcWetRatio(referenceArea));
 		totalDrag += fuselage->calcDragCoeff(AoA, fuselage->calcReynolds(velocity, kinematicViscosity), Mach, fuselage->calcWetRatio(referenceArea));
-		// Might need to add drag for VT, but just the parasite drag (inducded drag acts horizontally?)
+		totalDrag += numEngines * (nacelle->calcDragCoeff(AoA, nacelle->calcReynolds(velocity, kinematicViscosity), Mach, nacelle->calcWetRatio(referenceArea)));
 
 		totalDrag = 0.5 * density * velocity * velocity * referenceArea * totalDrag;
 

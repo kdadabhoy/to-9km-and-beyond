@@ -16,11 +16,17 @@ namespace airplane {
 
 
 
+
+
+
 	Fuselage::Fuselage(double inWeight, double inLength, double inWettedArea) {
 		weight = inWeight;
 		length = inLength / 12;
 		wettedArea = inWettedArea / 12;
 	}
+
+
+
 
 
 
@@ -32,6 +38,11 @@ namespace airplane {
 		length = other.length;
 		wettedArea = other.wettedArea;
 	}
+
+
+
+
+
 
 
 
@@ -54,6 +65,13 @@ namespace airplane {
 
 
 
+
+
+
+
+
+
+
 	//Useful Member functions
 	double Fuselage::calcWetRatio(double referenceArea) const {
 		// WetArea divided by referenceArea
@@ -66,9 +84,18 @@ namespace airplane {
 
 
 
+
+
+
 	double Fuselage::calcLiftCoeff(double AoA) const {
 		return CL_alpha * AoA + CL_knott;
 	}
+
+
+
+
+
+
 
 
 
@@ -84,9 +111,19 @@ namespace airplane {
 
 
 
+
+
+
+
+
 	double Fuselage::calcReynolds(double velocity, double kinematicViscosity) const {
 		return ((velocity * length) / kinematicViscosity);
 	}
+
+
+
+
+
 
 
 
@@ -96,6 +133,11 @@ namespace airplane {
 	void Fuselage::setWeight(double inWeight) {
 		weight = inWeight;
 	}
+
+
+
+
+
 
 
 
