@@ -863,7 +863,7 @@ namespace airplane {
 		double velocity = startVelocity;
 		SteadyLevelAccelerationTimeProperties returnStruct;
 		returnStruct.canReachFinalVel = true;
-		double MAX_ACCLERATION_CUTOFF = .5; // When to say we can't reach finalVel... smaller is more accurate... but adds a lot of non climb time
+		double MAX_ACCLERATION_CUTOFF = 0.50; // When to say we can't reach finalVel... smaller is more accurate... but adds a lot of non climb time
 
 		AtmosphereProperties Cond(height);
 		double temp = Cond.getTemperature();
@@ -871,7 +871,7 @@ namespace airplane {
 		double density = Cond.getDensity();
 		double Mach, thrust, AoA, drag, maxAcceleration, engineFactor;
 
-		double TIME_STEP = 0.05;        // Can Change if too inefficient
+		double TIME_STEP = 0.005;        // Can Change if too inefficient
 		double velDifference = finalVelocity - startVelocity;
 
 
@@ -885,8 +885,10 @@ namespace airplane {
 				engineFactor = 1;
 			} else {
 				// Decelerate
-				engineFactor = .20;	 // Thrust to 20% max thrust (brake using drag)... could use some PID thing instead.. but this is good enough
-				// Set this to 0% for best possible time... but real life is ~20% of thrust being minimum.. but we are climbing so we technically just adjust pitch...
+				engineFactor = 0.0;	 // Set this to 0% for best possible time... 
+									 // but real life is ~20% of thrust being minimum.. 
+									 // but we are climbing so we technically just adjust pitch... 
+				                     // This is a contributing factor to error bc of this approx approach
 			}
 
 			thrust = numEngines * engine->getThrust(height, velocity) * engineFactor;

@@ -152,7 +152,8 @@ namespace airplane {
 		static constexpr double PSI_TO_KSI = .001;                  // psi * PSI_TO_KSI = ksi
 
 		// calcTime9km Constas
-		static constexpr double VELOCITY_ERROR = 20.0;               // Used in calcSteadyLevelAccelerationTime, calcBestClimbTime, & calcBestClimbTimeApprox
+		static constexpr double VELOCITY_ERROR = 30.0;               // Used in calcSteadyLevelAccelerationTime, calcBestClimbTime, & calcBestClimbTimeApprox
+																	 // 30.0 Works okay
 
 	
 
