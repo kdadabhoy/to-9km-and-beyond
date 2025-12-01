@@ -130,7 +130,7 @@ The classes, which will be described in much more detail in the "Classes and Ass
 ## Airplane:
 
 ### Overview:
-The purpose of this class is so that a user is able to easily get desired characteristics of an airplane and have an functional airplane object to use (like for simulations). An airplane object is initialized with three Wing objects (Main Wing, Horizontal Tail, and Vertical Tail), an CF34_3B1 object (the engines), a Nacelle object, a Fuselage object, a fuel weight, and a payload weight. 
+The purpose of this class is to enable a user to easily get desired characteristics of an airplane and have an functional airplane object to use (like for simulations). An airplane object is initialized with three Wing objects (Main Wing, Horizontal Tail, and Vertical Tail), an CF34_3B1 object (the engines), a Nacelle object, a Fuselage object, a fuel weight, and a payload weight. 
 
 
 ### Disclosures:
@@ -149,7 +149,7 @@ The purpose of this class is so that a user is able to easily get desired charac
         - PERCENT_CONTROL_SURFACE_AREA = 0.10
     - Additionally, assumes FAR 25 cert:
         - Which means that n = 2.1 + (24000 / MTOW), 2.5 <= n <= 3.8
-    - Additionally an advanced composite wing is assumed (aka less weight, higher yield)
+    - Additionally an advanced composite wing is assumed (aka less weight and a higher yield strength)
         - SMUDGE_FACTOR = .80, which is given by Raymond for composite wings
         - SIGMA_YIELD_COMPOSITE = 101.526 ksi (700 MPa)
             - Rough estimate
@@ -316,7 +316,7 @@ The purpose of the Atmosphere Properties Class is to enable the calculations of 
 
 ### Overview:
 ```The main purpose of the CF_34_3B1 Class is to be able to calculate the current thrust, the current thrust curve function, and the current fuel loss, in a simple and readable manner. The performance map (thrust and fuel loss) was digitized for this engine. This class does rely on kadenMath functions in order to evaluate the polynomial equations.```
- - ___For this class (and other classes that use continuous polynomial functions), I developed a way of storing them in a vector. The coefficient of the largest term is stored in the lowest index, then the coefficient of the largest degree - 1, ... , then constant. My evaluateFunction in kadenMath, can evaluate any degree polynomial function efficiently and accurately. Read the kadenMath header comments for more details___
+ - ___For this class (and other classes that use continuous polynomial functions), I developed a way of storing them in a vector. The coefficient of the largest term is stored in the lowest index, then the coefficient of the largest degree - 1, ... , then constant. My evaluateFunction() in kadenMath, can evaluate any degree polynomial function efficiently and accurately. Read the kadenMath header comments for more details___
     - ___The thrust curve and fuel loss functions are stored as const vector<double> private data members, using the above format___
  
 <br>
@@ -417,9 +417,9 @@ Note: This class is derived from the TurboFan Class. We will ignore this impleme
 The purpose of the Fuselage Class is to provide the functionality needed to calculate a total Airplane weight, lift coefficient, and drag coefficient. Therefore, the functionality of this class is fairly limited, but still sufficient for most purposes. 
 
 ### Disclosures / Assumptions:
-1. ```Assuming the form factor of every fuselage object is 1.2```
-2. ```Assuming the CL_alpha of every fuselage object is 0.20```
-3. ```Assuming the CL_knott of every fuselage object is 0.00```
+1. ```Assuming the form factor of every Fuselage object is 1.2```
+2. ```Assuming the CL_alpha of every Fuselage object is 0.20```
+3. ```Assuming the CL_knott of every Fuselage object is 0.00```
 
 ### Notable Functions:
 
@@ -473,17 +473,33 @@ The purpose of the Fuselage Class is to provide the functionality needed to calc
 ## Nacelle:
 
 ### Overview:
-Every Airplane has Nacelles. ```Currently this class is just a placeholder.``` All it can do is store the weight of a Nacelle. ```It was implemented so that the Airplane Class could be implemented modularly, so that if drag and lift from the Nacelle's wanted to be implemented, it could be fairly easily.```
+
+The purpose of the Nacelle Class is to provide the functionality needed to calculate a total Airplane weight, lift coefficient, and drag coefficient. Therefore, the functionality of this class is fairly limited, but still sufficient for most purposes. 
+
+
 
 ### Disclosures / Assumptions:
-1. Currently we are assuming the Nacelle has a negligible (no) contribution to lift and drag
+1. ```Assuming the form factor of every Nacelle object is 1.50```
+2. ```Assuming the CL_alpha of every Nacelle object is 0.00```
+3. ```Assuming the CL_knott of every Nacelle object is 0.00```
+
 
 ### Notable Functions:
 
 1. ```void setWeight(double inWeight)```
     - This mutator modifies the Nacelle's weight private data member.
-    - ```The Nacelle's weight is still calculated in the Airplane object's total weight.```
 
+1. ```double calcReynolds(double velocity, double kinematicViscosity) const```
+    - This function calculates the Reynolds number of the Nacelle using the length of the Nacelle
+        - This function is needed for Parasite Drag
+
+1. ```double calcWetRatio(double referenceArea) const```
+    - This function returns Nacelle's wettedArea / referenceArea
+        - This function is needed for Parasite Drag
+
+1. ```double calcDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const;```
+    - ***This is the most used function***
+    - This function uses the DragCoeff Class to calculate the Nacelle's total drag coeff at the given conditions 
 
 
 
@@ -496,13 +512,22 @@ Every Airplane has Nacelles. ```Currently this class is just a placeholder.``` A
 ## Wing:
 
 ### Overview:
+The purpose of this class is to easily declare a (trapezoidal) wing object. From this class, the user will easily be able to get necessary Wing attributes like area, Mach Critical Crest Number, the lift coefficient, the drag coefficient, and much more.
+
+The minimum amount of variables needed to define a Wing object is: an Airfoil object, the span, the tip chord, the root chord, and the sweep angle. 
+
+Note: The Wing class is meant to be used in tandem with the Airplane class. You can either pass in a weight (or use a mutator to set the weight) of the Wing, or when the Wing is used to initialize an Aircraft object, the weight of the Wing will be automatically calculated using an empirical calculation (more details in the Airplane Class's Section)
+
 
 
 ### Disclosures / Assumptions:
-1. Assumes linearly tapered trapezoidal wing
-2. CL Mcc >.6 assume .6 function
-3. Shevell method for Mcc
-4.
+1. Assumes a linearly tapered trapezoidal wing
+1. Oswald efficiency of the Wing is assumed to be equal to 0.80
+    - The empirical equations (that I have tried) for Oswald efficiency usually give below 0.80 (often below 0.70), which doesn't seem accurate, hence the assumption.
+1. Calculating Mach Critical Crest Number (Mcc) is done using Shevell graphs.
+    - There are limitations on the bounds of the graphs
+        - For example, Mcc for an unswept wing is calculated, but those equations are limited to a lift coefficient of 0.60. 
+            - The program approximates any lift coefficient > 0.60 with the 0.60 equations.
 
 ### Notable Functions:
 
@@ -522,22 +547,23 @@ Every Airplane has Nacelles. ```Currently this class is just a placeholder.``` A
     - This function
 
 1. ```double calcMcc(double AoA_rad) const```
-    - This function
+    - This function calls on calcMccZeroSweep(), and calcSweptMExponent(), and plugs the results into the formula that Shevell provides for Mach Critical Crest Number (Mcc). 
+    - It returns the Mcc for the given Angle of Attack (AoA).
 
 1. ```double calcMccZeroSweep(double AoA_rad) const```
     - This function calculates, from the digitized Shevell Graph, the Mcc if the Wing had has a sweep angle = 0. 
     - __Assumptions:__
         - Mcc Zero sweep is only defined for CL > 0 and CL <= .60, so:
             - ```If AoA is negative, CL is calculated using the negative AoA, then the abs value is taken and used for the reading (this *should* work).```
-                - CL is not symmetric around zero, hence why it it calculated with the negative AoA, then the abs value is taken.
+                - CL is not symmetric around zero, hence why it calculated with the negative AoA, then the abs value is taken.
             - ```If CL > .60, the function just uses the CL = .60 case. This is simply an assumption that has to be made because the of the limited data set.``` It is not the worst assumption ever, but it certainly contributes to error.
 
 1. ```double calcSweptMExponent(double AoA_rad) const```
-    - This function calculates, from the digitized Shevell Graph, the m exponent needed for the calcMcc function.
+    - This function calculates, from the digitized Shevell Graph, the m exponent needed for the calcMcc() function.
     - __Assumptions:__
         - Mcc Zero sweep is only defined for CL > 0 and CL <= .60, so:
             - ```If AoA is negative, CL is calculated using the negative AoA, then the abs value is taken and used for the reading (this *should* work).```
-                - CL is not symmetric around zero, hence why it it calculated with the negative AoA, then the abs value is taken.
+                - CL is not symmetric around zero, hence why it calculated with the negative AoA, then the abs value is taken.
             - ```If CL > .60, the function returns m = .5``` It is not the worst assumption ever, but it certainly contributes to error. Although, it is my belief this is a conservative estimate.
 
 1. ```double calcRootInertiaEstimate() const```
@@ -547,26 +573,38 @@ Every Airplane has Nacelles. ```Currently this class is just a placeholder.``` A
     - This function
 
 1. ```double calcLocalChord(double distanceFromRoot) const```
-    - This function
+    - This function calculates the local chord (ft) at the provided distance from the root.
+        - There is no error or bound checks implemented (be careful to not pass in a distance longer than the span)
 
 1. ```double calcArea(double inSpan, double inRootChord, double inTaperRatio) const```
-    - This function
+    - This function calculates and the returns the area for a trapezoidal wing, with the passed in parameters.
+        - There is a private helper function that uses the same calculations, but doesn't take in any parameters, used behind the scences (calcAndSetArea()).
 
 1. ```double calcMAC(double inRootChord, double inTaperRatio) const;```
-    - This function
+    - This function calculates and the returns the Mean Aerodynamic Chord (MAC) for a trapezoidal wing, with the passed in parameters.
+        - There is a private helper function that uses the same calculations, but doesn't take in any parameters, used behind the scenes (calcAndSetMAC()).
 
 1. ```double calcAspectRatio(double inSpan, double inArea) const```
-    - This function
+    - This function calculates and the returns the Aspect Ratio for a trapezoidal wing, with the passed in parameters.
+        - There is a private helper function that uses the same calculations, but doesn't take in any parameters, used behind the scenes (calcAndSetAspectRatio()).
 
 1. ```double calcEllipEfficiency(double inSweepAngleRad, double inAspectRatio, double inTaperRatio) const```
-    - This function
+    - This function uses an empirical formula to calculate the Oswald efficiency.
+        - As aforementioned, currently for a swept wing, the Oswald efficiency is just assumed to be 0.80 (because of questionable empirical equations), so this function just returns 0.80 for a swept wing.
+        - For an unswept wing, the empirical equation seemed accurate, so the Oswald efficiency is calculated using it.
+        - There is a private helper function that uses the same calculations, but doesn't take in any parameters, used behind the scenes (calcAndSetEllipEfficiency()).
 
 1. ```void calcAndSetCL3D()```
-    - This function
+    - This private helper function, uses the airfoil characteristic and known 2D to 3D aerodynamic equations to convert the airfoil's 2D lift coefficient to a 3D lift coefficient.
+        - There are a few different formulas that different textbooks/papers use. Currently this one is implemented:
+            - CL_alpha = (pi * aspectRatio) / (1 + sqrt(1 + (insideSqrtTerm * insideSqrtTerm)))
+            - CL_knott = Cl2D_alphaZeroLift * -1 * CL_alpha
+            - (Obviously: CL = CL_alpha * alpha + CL_knott)
+        - This lift coefficient is stored in the Wing's private LiftCoeff data member.
 
 
 1. ```void calcAndSetAllProperties()```
-    - This function
+    - This function is called 
 
 
 

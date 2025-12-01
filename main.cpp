@@ -344,7 +344,7 @@ int main() {
 	wingSpanOptimizerResults spanResults;
 	double MIN_SPAN_SIMULATED = 15.0;     // Min span in ft
 	double MAX_SPAN_SIMULATED = 100.0;    // Max span in ft
-	int NUMBER_OF_SIMULATIONS = 25;       // How many evenly spaced steps in the range the optimizer will simulate
+	int NUMBER_OF_SIMULATIONS = 200;       // How many evenly spaced steps in the range the optimizer will simulate
 									      // 50 Steps ~ 1 min, obv more will take more time... and depends on computer
 
 
@@ -433,7 +433,7 @@ int main() {
 	wingSweepOptimizerResults sweepResults;
 	double MIN_SWEEP_ANGLE_SIMULATED = 0.0;     // deg
 	double MAX_SWEEP_ANGLE_SIMULATED = 60.0;    // deg
-	int NUMBER_OF_SIMULATIONS2 = 25;           // How many evenly spaced steps in the range the optimizer will simulate
+	int NUMBER_OF_SIMULATIONS2 = 100;           // How many evenly spaced steps in the range the optimizer will simulate
 									           // 50 Simulations ~ 1 min, obv more will take more time... and depends on computer
 
 
