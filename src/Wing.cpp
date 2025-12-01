@@ -734,6 +734,20 @@ namespace airplane {
 
 
 
+	void Wing::setSweepAngle(double inSweepAngle_DEG) {
+		sweepAngle = inSweepAngle_DEG * pi / 180;
+
+		calcAndSetAllProperties();
+		return;
+	}
+
+
+
+
+
+
+
+
 
 
 

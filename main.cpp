@@ -142,17 +142,42 @@ struct wingSpanOptimizerResults {
 
 
 
+struct wingSweepOptimizerResults {
+	// The best wing is stored at index 0
+	// wing at wingVector[0] has a timeToClimb of timeToClimbVector[0]
+	vector<double> wingSweepVector;     // degrees
+	vector<double> climbTimeVector;     // minutes
+};
+
+
+
 
 // Function Protypes (What functions are in this file... needed for compiler purposes)
 void printUsefulCharacteristics(Wing& inWing, Airplane& inAirplane);
 void sortWingsByClimbTime(vector<double>& wingSpans, vector<double>& climbTimes);
 void spanOptimizerResultsToCSV(wingSpanOptimizerResults& results, string fileName);
+void sweepOptimizerResultsToCSV(wingSweepOptimizerResults& results, string fileName);
+
+
+
 
 wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage,
 	double inFuelWeight, double inPayLoadWeight, double minSpanFt, double maxSpanFt, int numSteps);
 
 wingSpanOptimizerResults spanOptimizerApprox(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage,
 	double inFuelWeight, double inPayLoadWeight, double minSpanFt, double maxSpanFt, int numSteps);
+
+
+wingSweepOptimizerResults sweepOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage,
+	double inFuelWeight, double inPayLoadWeight, double minSweepDeg, double maxSweepDeg, int numSteps);
+
+
+
+// Global Constants:
+static constexpr double PI = 3.141592653589;
+static constexpr double INCHES_TO_FEET = 12.0;
+static constexpr double SECONDS_TO_MINS = 60.0;
+static constexpr double MIN_TOTAL_WEIGHT = 25000 * 2.205;     // Need airplane to be at least 25000 kgs
 
 
 
@@ -191,7 +216,7 @@ int main() {
 	double mainSpan = 60.0 * 12;    // inches
 	double mainRootChord = 186.7;	// inches
 	double mainTipChord = 74.7;     // inches
-	double mainSweepAngle = 20;     // degrees
+	double mainSweepAngle = 20.0;     // degrees
 	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle); 
 
 	Airplane airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
@@ -202,8 +227,15 @@ int main() {
 
 
 
+
+
+
+
 /*
-		***** Span Optimizer (Adjusts velocity while climbing) ****
+	**********************************************
+					Span Optimizer 
+	   (This one Adjusts velocity while climbing)
+	 **********************************************
 
 	- This function uses calcBestTimeTo9km() 
 		- Which adjusts V to be at V_maxExcessPower (within an error of course)...
@@ -216,25 +248,127 @@ int main() {
 */
 
 	// This is the range the optimizer runs on
-	wingSpanOptimizerResults results;
-	double minSpanSimulated = 15;     // Min span in ft
-	double maxSpanSimulated = 150;    // Max span in ft
-	int numberOfSimulationSteps = 50; // How many evenly spaced steps in the range the optimizer will simulate
+	wingSpanOptimizerResults spanResults;
+	double MIN_SPAN_SIMULATED = 15.0;     // Min span in ft
+	double MAX_SPAN_SIMULATED = 100.0;    // Max span in ft
+	int NUMBER_OF_SIMULATIONS = 1; // How many evenly spaced steps in the range the optimizer will simulate
 									  // 50 Steps ~ 1 min, obv more will take more time... and depends on computer
 
-	results = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, minSpanSimulated, maxSpanSimulated, numberOfSimulationSteps);
+
+	
+	spanResults = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, 
+		MIN_SPAN_SIMULATED, MAX_SPAN_SIMULATED, NUMBER_OF_SIMULATIONS);
 
 
 	// Produced the .csv for the sorted data.
 	// Also displays the results in the command window
-	spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
-	for (int i = 0; i < results.wingSpanVector.size(); i++) {
+	spanOptimizerResultsToCSV(spanResults, "Span_OptimizerData.csv");
+
+	cout << "For the wing with charateristics (ignore the span): " << endl;
+	printUsefulCharacteristics(mainWing, airplane);
+	cout << endl << endl;
+	cout << "The Span Optimization Results are: " << endl;
+
+	for (int i = 0; i < spanResults.wingSpanVector.size(); i++) {
 		cout << fixed << setprecision(5);
-		cout << "Time: " << results.climbTimeVector[i] << " mins";
-		cout << " Wing Span: " << results.wingSpanVector[i] << " ft" << endl;
+		cout << "Time: " << spanResults.climbTimeVector[i] << " mins";
+		cout << " Wing Span: " << spanResults.wingSpanVector[i] << " ft" << endl;
 		cout << endl;
 
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/*
+		**********************************************
+					Sweep Angle Optimizer 
+			(This one Adjusts velocity while climbing)
+		**********************************************
+
+
+
+		- Very similar to spanOptimizer, just with Sweep Angle instead.
+
+
+		- This function uses calcBestTimeTo9km()
+			- Which adjusts V to be at V_maxExcessPower (within an error of course)...
+				- What the error is set to can drastically change the climb times...
+				- Currently the error is set to a value that gives around the same results as the Approx Climb Method
+			- Read Github documentation or go over to Airplane.cpp to understand it's implementation
+		- The optimizer essentially runs this simulation for a new aircraft with different traits (defined by the range you give the optimizer)
+		- The optimizer also sorts that data, and bla bla bla, but the optimizer code might make more sense, if you understand this snippet of code
+
+	*/
+
+
+
+
+	// Use this line if you ran the span optimizer, and want to optimize around that span
+	Wing mainWingSweepOptimizer(NACA2412, spanResults.wingSpanVector[0] * INCHES_TO_FEET, mainTipChord, mainRootChord, mainSweepAngle);
+
+
+/*
+	// Otherwise use this line:
+	double SPAN_FOR_SWEEP_OPTIMIZER = 52.80 * INCHES_TO_FEET;      // ft, you pick
+	Wing mainWingSweepOptimizer(NACA2412, SPAN_FOR_SWEEP_OPTIMIZER, mainTipChord, mainRootChord, mainSweepAngle);
+*/
+
+
+
+	// This is the range the optimizer runs on
+	wingSweepOptimizerResults sweepResults;
+	double MIN_SWEEP_ANGLE_SIMULATED = 0.0;     // deg
+	double MAX_SWEEP_ANGLE_SIMULATED = 45.0;    // deg
+	int NUMBER_OF_SIMULATIONS2 = 25;           // How many evenly spaced steps in the range the optimizer will simulate
+									           // 50 Simulations ~ 1 min, obv more will take more time... and depends on computer
+
+
+	sweepResults = sweepOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight,
+		MIN_SWEEP_ANGLE_SIMULATED, MAX_SWEEP_ANGLE_SIMULATED, NUMBER_OF_SIMULATIONS2);
+
+
+
+	// Produced the .csv for the sorted data.
+	// Also displays the results in the command window
+	sweepOptimizerResultsToCSV(sweepResults, "SweepAngle_OptimizerData.csv");
+
+	cout << "For the wing with charateristics (ignore the sweep): " << endl;
+	printUsefulCharacteristics(mainWing, airplane);
+	cout << endl << endl;
+	cout << "The Sweep Angle Otimization Results are: " << endl;
+
+
+	for (int i = 0; i < sweepResults.wingSweepVector.size(); i++) {
+		cout << fixed << setprecision(5);
+		cout << "Time: " << sweepResults.climbTimeVector[i] << " mins";
+		cout << " Wing Sweep: " << sweepResults.wingSweepVector[i] << " deg" << endl;
+		cout << endl;
+
+	}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -309,7 +443,10 @@ int main() {
 
 
 /*
-	 ************** Other Functions that might be intriguing (Useful for seeing how the program works) ***********
+	 **********************************************
+	   Other Functions that might be intriguing 
+	   (Useful for seeing how the program works)
+	 **********************************************
 	 
 	 - Recommended to Look at: 
 		- Power Curve Plot Function
@@ -334,8 +471,11 @@ int main() {
 
 
 /*
-		***** 1 Aircraft (the one initialized at the top of the program) Simulation ****
-	
+	 **********************************************
+				1 Aircraft Simulation
+	(the one initialized at the top of the program)
+	 **********************************************
+
 	- Useful for debugging purposes or to quickly see 1 aircraft
 		- The aircraft that is simulated is the one intialized at the top of main
 	- The optimizer essentially runs this simulation for a new aircraft with different traits (defined by the range you give the optimizer)
@@ -382,7 +522,9 @@ int main() {
 
 
 /*
-						***** Power Curve Plot Function ****
+	**********************************************
+		   Power Curve Plot Function 
+	**********************************************
 
 	- It will produce .csv data for the Airplane intialized above at the given height
 	- The .csv will be saved in the to-9km-and-beyond folder
@@ -398,16 +540,6 @@ int main() {
 	string fileNamePowerCurve = "PowerCurve.csv";
 	airplane.getPowerCurveCSV(heightPowerCurveFunction, fileNamePowerCurve);
 */
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -436,7 +568,11 @@ int main() {
 
 
 
-
+/*
+		**********************************************
+		***** Start of Optimizers used for Report ****
+		**********************************************
+*/
 
 
 
@@ -450,11 +586,12 @@ int main() {
 wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, 
 										double inFuelWeight, double inPayLoadWeight, double minSpanFt, double maxSpanFt, int numSteps) {
 
-	// Adjustable Constants:
-	double SPAN_MIN = minSpanFt * 12;			// No more breaking... unless abort
-	double SPAN_MAX = maxSpanFt * 12;			// Run it high, then adjust (*12 to convert to inches)
-	int NUM_STEPS = numSteps;				// NUM_STEPS = 100 takes about 1 min and 15s to run
+	// Inputted Constants:
+	double SPAN_MIN = minSpanFt * INCHES_TO_FEET;			// No more breaking... unless abort
+	double SPAN_MAX = maxSpanFt * INCHES_TO_FEET;			// Run it high, then adjust (*12 to convert to inches)
+	int NUM_STEPS = numSteps;				    // NUM_STEPS = 100 takes about 1 min and 15s to run
 
+	// Other Constants:
 	double TAKE_OFF_END_HEIGHT = 500;   // Change to 0, 10, or 50ft when wanting to get best possible plane
 	double START_HEIGHT = 0;            // Don't change
 	double START_VELOCITY = 0;          // Don't Change
@@ -464,17 +601,16 @@ wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF3
 	wingSpanOptimizerResults returnStruct;
 	vector<double> wingSpansVector;
 	vector<double> climbTimeVector;
-	static const int INCHES_TO_FEET = 12;
-	static const int SECONDS_TO_MINS = 60;
-	double MIN_TOTAL_WEIGHT = 25000 * 2.205;     // Need airplane to be at least 25000 kgs
+
 
 	double step = (SPAN_MAX - SPAN_MIN) / NUM_STEPS;
+
 
 	for (int i = 0; i < NUM_STEPS; i++) {
 		double newSpan = SPAN_MIN + (i * step);
 		newWing.setSpan(newSpan);
 
-		cout << "Simulating Span (ft): " << newSpan/12 << endl; // delete
+		cout << "Simulating Span (ft): " << newSpan / INCHES_TO_FEET << endl; // can delete, but useful for making sure you aren't stuck in an infinite loop
 
 		Airplane newAirplane(newWing, inHT, inVT, inEngine, inNacelle, inFuselage, inFuelWeight, inPayLoadWeight);
 
@@ -529,43 +665,36 @@ wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF3
 
 
 
+// Runs Simulations for airplanes from minSweepAngle to maxSweepAngle and returns the sorted results.
+// Will abort if one of the wings isn't possible (not the most ideal handling, but just change inputted bounds to fix)
+wingSweepOptimizerResults sweepOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage,
+	double inFuelWeight, double inPayLoadWeight, double minSweepDeg, double maxSweepDeg, int numSteps) {
 
+	// Constants:
+	double TAKE_OFF_END_HEIGHT = 500.0;					// Change to 0, 10, or 50ft when wanting to get best possible plane
+	double START_HEIGHT = 0.0;							// Don't change
+	double START_VELOCITY = 0.0;							// Don't Change
 
-
-
-
-
-// Uses calcRoughApproxTimeTo9km (the approach that get's to original maxExcessPower velocity, and stays at it)
-wingSpanOptimizerResults spanOptimizerApprox(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage,
-	double inFuelWeight, double inPayLoadWeight, double minSpanFt, double maxSpanFt, int numSteps) {
-
-	// Adjustable Constants:
-	double SPAN_MIN = minSpanFt * 12;			// No more breaking... unless abort
-	double SPAN_MAX = maxSpanFt * 12;			// Run it high, then adjust (*12 to convert to inches)
-	int NUM_STEPS = numSteps;				// NUM_STEPS = 100 takes about 1 min and 15s to run
-
-	double TAKE_OFF_END_HEIGHT = 500;   // Change to 0, 10, or 50ft when wanting to get best possible plane
-	double START_HEIGHT = 0;            // Don't change
-	double START_VELOCITY = 0;          // Don't Change
 
 	// Other Intialization
 	Wing newWing(inWing);						 // Calls copy constructor (equivalent to newWing = inWing)
-	wingSpanOptimizerResults returnStruct;
-	vector<double> wingSpansVector;
+	wingSweepOptimizerResults returnStruct;
+	vector<double> wingSweepVector;
 	vector<double> climbTimeVector;
-	static const int INCHES_TO_FEET = 12;
-	static const int SECONDS_TO_MINS = 60;
-	double MIN_TOTAL_WEIGHT = 25000 * 2.205;     // Need airplane to be at least 25000 kgs
 
-	double step = (SPAN_MAX - SPAN_MIN) / NUM_STEPS;
 
-	for (int i = 0; i < NUM_STEPS; i++) {
-		double newSpan = SPAN_MIN + (i * step);
-		newWing.setSpan(newSpan);
+	double step = (maxSweepDeg - minSweepDeg) / numSteps;
 
-		cout << "Simulating Span (ft): " << newSpan / 12 << endl; // delete
+
+	for (int i = 0; i < numSteps; i++) {
+		double newSweep = minSweepDeg + (i * step);
+
+		newWing.setSweepAngle(newSweep);						// takes in degrees
+
+		cout << "Simulating Sweep (deg): " << newSweep << endl; // can delete, but useful for making sure you aren't stuck in an infinite loop
 
 		Airplane newAirplane(newWing, inHT, inVT, inEngine, inNacelle, inFuselage, inFuelWeight, inPayLoadWeight);
+
 
 		double totalWeight = newAirplane.getWeight();
 		if (totalWeight < MIN_TOTAL_WEIGHT) {
@@ -575,18 +704,22 @@ wingSpanOptimizerResults spanOptimizerApprox(Wing& inWing, Wing& inHT, Wing& inV
 
 		assert(newAirplane.getWeight() >= MIN_TOTAL_WEIGHT - .1);
 
-		double climbTime = newAirplane.calcRoughApproxTimeTo9km(START_HEIGHT, TAKE_OFF_END_HEIGHT);
 
-		/* 
+
+		double climbTime = newAirplane.calcBestTimeTo9km(START_HEIGHT, TAKE_OFF_END_HEIGHT);
+
+
+
+		/*
 			// Unforunately the emperical equations used are not accurate enough
 			// But this would check if our Plane can handle the stress required
 			if (!newAirplane.isWingPossible()) {
 			climbTime = 9e9; // Very large climb time
 			}
-
 		*/
 
-		wingSpansVector.push_back(newSpan / INCHES_TO_FEET);     // stored in ft
+
+		wingSweepVector.push_back(newSweep);     // stored in deg
 		//climbTimeVector.push_back(climbTime);  // stored in seconds
 		climbTimeVector.push_back(climbTime / SECONDS_TO_MINS);  // stored in mins
 	}
@@ -594,17 +727,24 @@ wingSpanOptimizerResults spanOptimizerApprox(Wing& inWing, Wing& inHT, Wing& inV
 
 
 
-	sortWingsByClimbTime(wingSpansVector, climbTimeVector);
 
-	returnStruct.wingSpanVector = wingSpansVector;
+	sortWingsByClimbTime(wingSweepVector, climbTimeVector);
+
+	returnStruct.wingSweepVector = wingSweepVector;
 	returnStruct.climbTimeVector = climbTimeVector;
 	return returnStruct;
+
 }
 
 
 
 
 
+/*
+		**********************************************
+		***** End of Optimizers used for Report ******
+		**********************************************
+*/
 
 
 
@@ -623,6 +763,17 @@ wingSpanOptimizerResults spanOptimizerApprox(Wing& inWing, Wing& inHT, Wing& inV
 
 
 
+
+
+
+
+
+
+/*
+		**********************************************
+		** Start of Other Used Functions in Program **
+		**********************************************
+*/
 
 
 
@@ -697,7 +848,7 @@ void sortWingsByClimbTime(vector<double>& wingSpans, vector<double>& climbTimes)
 
 
 
-// Could probably delete attemptNumber from this CSV... but it can be nice to have
+// Creates a CSV file with the span Optimizer Results
 void spanOptimizerResultsToCSV(wingSpanOptimizerResults& results, string fileName) {
 	vector<double> attemptNumber;
 	for (int i = 0; i < results.wingSpanVector.size(); i++) {
@@ -723,6 +874,31 @@ void spanOptimizerResultsToCSV(wingSpanOptimizerResults& results, string fileNam
 
 
 
+
+// Creates a CSV file with the Sweep Optimizer results
+void sweepOptimizerResultsToCSV(wingSweepOptimizerResults& results, string fileName) {
+	vector<double> attemptNumber;
+	for (int i = 0; i < results.wingSweepVector.size(); i++) {
+		attemptNumber.push_back(i + 1);
+	}
+	saveVectorsToCSV(attemptNumber, results.wingSweepVector, results.climbTimeVector, fileName);
+
+	return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Useful for debugging
 void printUsefulCharacteristics(Wing& inWing, Airplane& inAirplane) {
 	cout << fixed << setprecision(5);
 	cout << "Area (ft^2): " << inWing.getArea() << endl;
@@ -744,7 +920,118 @@ void printUsefulCharacteristics(Wing& inWing, Airplane& inAirplane) {
 
 
 
+/*
+		**********************************************
+		*** End of Other Used Functions in Program ***
+		**********************************************
+*/
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+		**********************************************
+		********* Start of Approx Optimizers *********
+		**********************************************
+*/
+
+
+
+
+
+// Uses calcRoughApproxTimeTo9km (the approach that get's to original maxExcessPower velocity, and stays at it)
+wingSpanOptimizerResults spanOptimizerApprox(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage,
+	double inFuelWeight, double inPayLoadWeight, double minSpanFt, double maxSpanFt, int numSteps) {
+
+	// Adjustable Constants:
+	double SPAN_MIN = minSpanFt * INCHES_TO_FEET;			// No more breaking... unless abort
+	double SPAN_MAX = maxSpanFt * INCHES_TO_FEET;			// Run it high, then adjust (*12 to convert to inches)
+	int NUM_STEPS = numSteps;				// NUM_STEPS = 100 takes about 1 min and 15s to run
+
+	double TAKE_OFF_END_HEIGHT = 500;   // Change to 0, 10, or 50ft when wanting to get best possible plane
+	double START_HEIGHT = 0;            // Don't change
+	double START_VELOCITY = 0;          // Don't Change
+
+	// Other Intialization
+	Wing newWing(inWing);						 // Calls copy constructor (equivalent to newWing = inWing)
+	wingSpanOptimizerResults returnStruct;
+	vector<double> wingSpansVector;
+	vector<double> climbTimeVector;
+
+
+	double step = (SPAN_MAX - SPAN_MIN) / NUM_STEPS;
+
+	for (int i = 0; i < NUM_STEPS; i++) {
+		double newSpan = SPAN_MIN + (i * step);
+		newWing.setSpan(newSpan);
+
+		cout << "Simulating Span (ft): " << newSpan / INCHES_TO_FEET << endl; // delete
+
+		Airplane newAirplane(newWing, inHT, inVT, inEngine, inNacelle, inFuselage, inFuelWeight, inPayLoadWeight);
+
+		double totalWeight = newAirplane.getWeight();
+		if (totalWeight < MIN_TOTAL_WEIGHT) {
+			double weightNeeded = MIN_TOTAL_WEIGHT - totalWeight;
+			newAirplane.setMainWingWeight(newAirplane.getMainWingWeight() + weightNeeded);
+		}
+
+		assert(newAirplane.getWeight() >= MIN_TOTAL_WEIGHT - .1);
+
+		double climbTime = newAirplane.calcRoughApproxTimeTo9km(START_HEIGHT, TAKE_OFF_END_HEIGHT);
+
+		/*
+			// Unforunately the emperical equations used are not accurate enough
+			// But this would check if our Plane can handle the stress required
+			if (!newAirplane.isWingPossible()) {
+			climbTime = 9e9; // Very large climb time
+			}
+
+		*/
+
+		wingSpansVector.push_back(newSpan / INCHES_TO_FEET);     // stored in ft
+		//climbTimeVector.push_back(climbTime);  // stored in seconds
+		climbTimeVector.push_back(climbTime / SECONDS_TO_MINS);  // stored in mins
+	}
+
+
+
+
+	sortWingsByClimbTime(wingSpansVector, climbTimeVector);
+
+	returnStruct.wingSpanVector = wingSpansVector;
+	returnStruct.climbTimeVector = climbTimeVector;
+	return returnStruct;
+}
+
+
+
+
+
+/*
+		**********************************************
+		********* End of Approx Optimizers *********
+		**********************************************
+*/
 
 
 
@@ -789,8 +1076,8 @@ void printUsefulCharacteristics(Wing& inWing, Airplane& inAirplane) {
 		double inFuelWeight, double inPayLoadWeight) {
 
 		// Adjustable Constants:
-		double SPAN_MIN = 8 * 12;			// No more breaking... unless abort
-		double SPAN_MAX = 100 * 12;			// Run it high, then adjust (*12 to convert to inches)
+		double SPAN_MIN = 8 * INCHES_TO_FEET;			// No more breaking... unless abort
+		double SPAN_MAX = 100 * INCHES_TO_FEET;			// Run it high, then adjust (*12 to convert to inches)
 		int NUM_STEPS = 25;				// NUM_STEPS = 100 takes about 1 min and 15s to run
 
 		double TAKE_OFF_END_HEIGHT = 500;   // Change to 0, 10, or 50ft when wanting to get best possible plane
@@ -802,9 +1089,6 @@ void printUsefulCharacteristics(Wing& inWing, Airplane& inAirplane) {
 		wingSpanOptimizerResults returnStruct;
 		vector<double> wingSpansVector;
 		vector<double> climbTimeVector;
-		static const int INCHES_TO_FEET = 12;
-		static const int SECONDS_TO_MINS = 60;
-		double MIN_TOTAL_WEIGHT = 25000 * 2.205;     // Need airplane to be at least 25000 kgs
 
 		double step = (SPAN_MAX - SPAN_MIN) / NUM_STEPS;
 
@@ -812,7 +1096,7 @@ void printUsefulCharacteristics(Wing& inWing, Airplane& inAirplane) {
 			double newSpan = SPAN_MIN + (i * step);
 			newWing.setSpan(newSpan);
 
-			cout << "Simulating Span (ft): " << newSpan / 12 << endl; // delete
+			cout << "Simulating Span (ft): " << newSpan / INCHES_TO_FEET << endl; // delete
 
 			Airplane newAirplane(newWing, inHT, inVT, inEngine, inNacelle, inFuselage, inFuelWeight, inPayLoadWeight);
 

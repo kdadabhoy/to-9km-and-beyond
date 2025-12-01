@@ -48,6 +48,7 @@ namespace airplane {
 	// Mutators
 		void setWeight(double inWeight);
 		void setSpan(double inSpan);
+		void setSweepAngle(double inSweepAngle_DEG);         // Quarter chord sweep angle
 
 
 	// Accessors
