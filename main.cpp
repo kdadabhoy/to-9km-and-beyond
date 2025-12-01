@@ -8,6 +8,7 @@
 
 	********************************************************************
 
+
 	If you have any questions about the code or anything else, just email me!
 
 							Emails (either works):
@@ -15,38 +16,77 @@
 							- kdadabho@uci.edu
 
 	********************************************************************
+	
+	Brief Summary: This program is used to optimize a wing for a 
+	subsonic aircraft (in the 25-35kg category) climbing to 9km. This 
+	program accomplishes this by simulating a range of aircrafts first 
+	by changing the span, then by changing the sweep angle, in order to 
+	find the best wing.
+
+
+
+
+	The main() program, this program, is currently set up to:
+	1) Run an optimizer for the wing span 
+	2) Run an optimizer for the wing sweep angle 
+		- ONLY FOR THE BEST WING SPAN, from the wing span optimizer
+
+	***Running this program, without any modifications, will run 25 simulations 
+	for 25 different wing spans, in the range that the wing span optimizer is set for. 
+	It will then take the best wing span from those simulations and then run 25 more 
+	simulations with that wing span and different sweep angles ***
+
+
+	********************************************************************
 
 	HEAVILY recommended to read the README file on the Github!
 		- https://github.com/kdadabhoy/to-9km-and-beyond
-		- Read it on the website compared to the .txt file... 
+		- Read it on the website compared to the .md file...
 		because of markdown / HTML stuff
 			- Just scroll down below the files... and that text is the README :)
 
 
-	- The Header file's don't have traditional header documentation 
-		(sorry, it would take forever), so the READMEis the only place 
-		where they are explained
+	********************************************************************
 
-		- Which is also nice, because it is all in one place and 
-			formatted nicely, compared to green comments
+	SOME Assumptions and Disclosures:
+		
+		- Trapezodial Wing
 
-		- It is also explained in a more "English approach"... whereas
-		  header documentation is usually written with the assumption the user
-		  is already very familar with the language :)
+		- Subsonic airplane (program will abort if airplane ever tries to fly above Mach .98)
 
-		- There are comments in implementation files for some of the functions...
-			- These comments tend to give a general idea of the implementation...
-			  instead of explaining it line by line
+		- Optimizers make no attempt to account for structural feasability
+			- There are member functions in the Airplane Class, that attempt to deal with this,
+			but those functions rely on unreliable emperical equations
 
-			- A lof of these comments are physics derivations that are used in the functions
+		- "Optimizers" are currently set up in a manner that produces a .csv file
+		of the sorted wing characteristic and it's associated time to climb to 9km
+			- In a way, this isn't a traditional optimizer, but it still acts in an optmization manner
+				- You can run the code once with a large range. You can then visually see
+				(by Scatter plotting the data), how to narrow your range down, then re-run the code.
+				- OR you can just increase the steps to something crazy and basically have an optimizer.
+					- I recommend the former approach.
+				- Due to how many assumptions this code makes, I find it more useful to 
+				see all the data, then narrow the range, and then make a decision on what wing to use,
+				rather than just solving for the best wing.
+					- For example: If a wing that is 40ft and 70ft perform within .01 seconds 
+					of one another, it might make more sense to pick the 70ft wing for structural reasons
+					than the technical optimial (but maybe not practical) 40 ft wing.
+						- For these reasons the "optimizer" isn't completely automated
+						to spit out the best value, but rather a useful set of data points
+						that can easily be graphed.
 
-			- The general consesus is that comments explaining code implementation
-			  in a lot of detail, tend to make the code more confusing and less readable
-			  than just having the code by itself.
-			
-			- Again, look at Github, for very brief and Enlgish explanation... then look at the code
-			  so that you understand what it is attempting to do
-				- The function names do describe what the function does very accurately in most cases.
+		- Max takeoff AoA for every plane is assumed to be 15 deg
+			- Program aborts if plane needs to ever go above this for takeoff
+
+		- Max AoA an airplane will ever have is 15 deg
+
+		- Wing weight is accounted for, but in the optimizer, if a wing weight
+		isn't sufficient to have the aircraft have a MTOW of 25,000kg, then
+		the difference it needs to get to this benchmark is added to the wing.
+			- Program is aborted if MTOW > 35000
+
+		- A lot of functions rely on digitized graphs. This and all the other assumptions are in the README
+
 
 	********************************************************************
 
@@ -55,9 +95,14 @@
 		- Read the Github README, then come back to this... to:
 
 		1) See that the code actually compiles and produces what I claim it does
-		2) See the implementation of the optimizer (at the bottom of this file)
+		2) See the implementation of the optimizers
 		3) See the implementation of any other function
 			- In the implementation file of that particular Class
+			- Or in the "Other Functions that might be Intriguing"
+				- That section, is "nicer" "debugging" code that can help you see
+				what the code is generating for each simulation
+					- Like the power curve
+
 
 			- *** You probably will want to look at Airplane.cpp first ***
 				- *** Then look at DragCoeff.cpp ***
@@ -71,22 +116,12 @@
 
 	********************************************************************
 
-	- The main() program, this program, is currently set up to run an optimizer
-	for the wing span only. It is running the optimizer that uses the calcBestTimeTo9km() 
-	function (difference between this function and the other approach explained somewhat
-	below... but read README for more details)
-
-
 
 	- Below the optimizer function there are other functions that you can uncomment,
-	which may help you understand the program better. These functions are also explained on Github,
-	and not to sound like a broken record, but it is unlikely to understand this project completely
-	without reading the Github. These functions are mainly included, so that you can see that
-	the code compiles. 
+	which may help you understand the program better. 
 
 
-	- Below these other functions, is the optimizer's implementation.
-
+	- Below these other functions, is the optimizers's implementation.
 
 
 	- All of this code relies HEAVILY on every other class created, as explained in the GitHub.
@@ -97,7 +132,33 @@
 
 
 
-	- All the assumptions made are in the Github README
+
+	- The Header file's don't have traditional (or any useful) header documentation 
+		(sorry, it would take forever), so the README is the only place 
+		where they are explained
+
+		- Which is also nice, because it is all in one place and 
+			formatted nicely, compared to green comments
+
+		- It is also explained in a more "English approach"... whereas
+		  header documentation is usually written with the assumption the user
+		  is already very familar with the language :)
+
+		- There are comments in implementation files for SOME of the functions...
+			- These comments tend to give a general idea of the implementation...
+			  instead of explaining it line by line
+
+			- Most comments are reasonings for specific lines (physics reasonings)
+
+			- A lof of these comments are physics derivations that are used in the functions
+
+			- The general consesus is that comments explaining code implementation
+			  in a lot of detail, tend to make the code more confusing and less readable
+			  than just having the code by itself.
+			
+			- Again, look at Github, for very brief and Enlgish explanation... then look at the code
+			  so that you understand what it is attempting to do
+				- The function names do describe what the function does very accurately in most cases.
 
 
 */
@@ -159,17 +220,15 @@ void spanOptimizerResultsToCSV(wingSpanOptimizerResults& results, string fileNam
 void sweepOptimizerResultsToCSV(wingSweepOptimizerResults& results, string fileName);
 
 
-
-
 wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage,
 	double inFuelWeight, double inPayLoadWeight, double minSpanFt, double maxSpanFt, int numSteps);
 
 wingSpanOptimizerResults spanOptimizerApprox(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage,
 	double inFuelWeight, double inPayLoadWeight, double minSpanFt, double maxSpanFt, int numSteps);
 
-
 wingSweepOptimizerResults sweepOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage,
 	double inFuelWeight, double inPayLoadWeight, double minSweepDeg, double maxSweepDeg, int numSteps);
+
 
 
 
@@ -178,6 +237,10 @@ static constexpr double PI = 3.141592653589;
 static constexpr double INCHES_TO_FEET = 12.0;
 static constexpr double SECONDS_TO_MINS = 60.0;
 static constexpr double MIN_TOTAL_WEIGHT = 25000 * 2.205;     // Need airplane to be at least 25000 kgs
+static constexpr double MAX_TOTAL_WEIGHT = 35000 * 2.205;     // Need airplane to be under 35000kgs
+
+
+
 
 
 
@@ -231,38 +294,69 @@ int main() {
 
 
 
+
+/*
+	 **********************************************
+			Optimizers Used for Report
+	(Uncommented, just run program and they will work)
+	 **********************************************
+*/
+
+
+
+
+
+
 /*
 	**********************************************
 					Span Optimizer 
 	   (This one Adjusts velocity while climbing)
 	 **********************************************
 
+
+	- If a wing isn't feasible (typically because it is too small), and abort will be called
+		- 99% of the time, just increase MIN_SPAN_SIMULATED
+			- Abort is usually called bc wing is too small to takeoff
+			- Typically any wing span above ~15ft works
+				- There are structural concerns for small (and large) wing spans
+				that this program does not currently attempt to deal with 
+					- Namely because the inertia emperical equations (that I tried implementing)
+					  aren't accurate
+
+
 	- This function uses calcBestTimeTo9km() 
 		- Which adjusts V to be at V_maxExcessPower (within an error of course)...
 			- What the error is set to can drastically change the climb times...
 			- Currently the error is set to a value that gives around the same results as the Approx Climb Method
 		- Read Github documentation or go over to Airplane.cpp to understand it's implementation
+
+
 	- The optimizer essentially runs this simulation for a new aircraft with different traits (defined by the range you give the optimizer)
 	- The optimizer also sorts that data, and bla bla bla, but the optimizer code might make more sense, if you understand this snippet of code
 
 */
 
-	// This is the range the optimizer runs on
+
+
+
+
+	// This is the range the optimizer runs on (Feel free to change)
 	wingSpanOptimizerResults spanResults;
 	double MIN_SPAN_SIMULATED = 15.0;     // Min span in ft
 	double MAX_SPAN_SIMULATED = 100.0;    // Max span in ft
-	int NUMBER_OF_SIMULATIONS = 1; // How many evenly spaced steps in the range the optimizer will simulate
-									  // 50 Steps ~ 1 min, obv more will take more time... and depends on computer
+	int NUMBER_OF_SIMULATIONS = 25;       // How many evenly spaced steps in the range the optimizer will simulate
+									      // 50 Steps ~ 1 min, obv more will take more time... and depends on computer
 
 
-	
 	spanResults = spanOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, 
 		MIN_SPAN_SIMULATED, MAX_SPAN_SIMULATED, NUMBER_OF_SIMULATIONS);
 
 
 	// Produced the .csv for the sorted data.
 	// Also displays the results in the command window
-	spanOptimizerResultsToCSV(spanResults, "Span_OptimizerData.csv");
+	spanOptimizerResultsToCSV(spanResults, "Span_OptimizerData.csv");     // Feel Free to change the fileName (2nd parameter)
+
+
 
 	cout << "For the wing with charateristics (ignore the span): " << endl;
 	printUsefulCharacteristics(mainWing, airplane);
@@ -301,7 +395,10 @@ int main() {
 
 
 
+
 		- Very similar to spanOptimizer, just with Sweep Angle instead.
+			- Typically no aborts will be called, but it is subject to same
+			limitations as the span Optimizer
 
 
 		- This function uses calcBestTimeTo9km()
@@ -309,10 +406,13 @@ int main() {
 				- What the error is set to can drastically change the climb times...
 				- Currently the error is set to a value that gives around the same results as the Approx Climb Method
 			- Read Github documentation or go over to Airplane.cpp to understand it's implementation
+
+
 		- The optimizer essentially runs this simulation for a new aircraft with different traits (defined by the range you give the optimizer)
 		- The optimizer also sorts that data, and bla bla bla, but the optimizer code might make more sense, if you understand this snippet of code
 
 	*/
+
 
 
 
@@ -332,7 +432,7 @@ int main() {
 	// This is the range the optimizer runs on
 	wingSweepOptimizerResults sweepResults;
 	double MIN_SWEEP_ANGLE_SIMULATED = 0.0;     // deg
-	double MAX_SWEEP_ANGLE_SIMULATED = 45.0;    // deg
+	double MAX_SWEEP_ANGLE_SIMULATED = 60.0;    // deg
 	int NUMBER_OF_SIMULATIONS2 = 25;           // How many evenly spaced steps in the range the optimizer will simulate
 									           // 50 Simulations ~ 1 min, obv more will take more time... and depends on computer
 
@@ -344,7 +444,7 @@ int main() {
 
 	// Produced the .csv for the sorted data.
 	// Also displays the results in the command window
-	sweepOptimizerResultsToCSV(sweepResults, "SweepAngle_OptimizerData.csv");
+	sweepOptimizerResultsToCSV(sweepResults, "SweepAngle_OptimizerData.csv");  // Feel Free to change the fileName (2nd parameter)
 
 	cout << "For the wing with charateristics (ignore the sweep): " << endl;
 	printUsefulCharacteristics(mainWing, airplane);
@@ -366,73 +466,12 @@ int main() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*
-		***** Span Optimizer (Does not adjust Velocity while climbing) ****
-		
-	- This function uses calcBestTimeTo9km() 
-		- Which adjusts V to be at V_maxExcessPower (within an error of course)...
-			- What the error is set to can drastically change the climb times...
-			- Currently the error is set to a value that gives around the same results as the Approx Climb Method
-		- Read Github documentation or go over to Airplane.cpp to understand it's implementation
-
-	- The optimizer essentially runs this simulation for a new aircraft with different traits (defined by the range you give the optimizer)
-	- The optimizer also sorts that data, and bla bla bla, but the optimizer code might make more sense, if you understand this snippet of code
-
+	 **********************************************
+					End of
+			Optimizers Used for Report
+	 **********************************************
 */
-
-
-
-
-/*
-
-	// This is the range the optimizer runs on
-	wingSpanOptimizerResults results;
-	double minSpanSimulated = 15;     // Min span in ft
-	double maxSpanSimulated = 150;    // Max span in ft
-	int numberOfSimulationSteps = 50; // How many evenly spaced steps in the range the optimizer will simulate
-									  // 50 Steps ~ 1 min, obv more will take more time... and depends on computer
-
-	results = spanOptimizerApprox(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, minSpanSimulated, maxSpanSimulated, numberOfSimulationSteps);
-
-	// Produced the .csv for the sorted data.
-	// Also displays the results in the command window
-	spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
-	for (int i = 0; i < results.wingSpanVector.size(); i++) {
-		cout << fixed << setprecision(5);
-		cout << "Time: " << results.climbTimeVector[i] << " mins";
-		cout << " Wing Span: " << results.wingSpanVector[i] << " ft" << endl;
-		cout << endl;
-
-	}
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -444,7 +483,7 @@ int main() {
 
 /*
 	 **********************************************
-	   Other Functions that might be intriguing 
+	   Other Functions that might be Intriguing 
 	   (Useful for seeing how the program works)
 	 **********************************************
 	 
@@ -458,11 +497,6 @@ int main() {
 
 	
 */
-
-
-
-
-
 
 
 
@@ -547,6 +581,80 @@ int main() {
 
 
 
+
+
+
+
+
+
+
+
+/*
+
+	**********************************************
+		   Sanity Check Span Optimizer
+	(Does not adjust Velocity while climbing)
+	**********************************************
+
+
+	- This is used as a sanity check to make sure the adjusted velocity function
+		isn't massively different than this simplistic approach
+
+	- Works essentially the same as the other Span Optimizer, but calls an optimizer that uses
+	calcRoughApproxTimeTo9km() instead of calcBestTimeTo9km()
+
+
+
+*/
+
+
+
+
+
+/*
+
+	// This is the range the optimizer runs on
+	wingSpanOptimizerResults results;
+	double minSpanSimulated = 15;     // Min span in ft
+	double maxSpanSimulated = 150;    // Max span in ft
+	int numberOfSimulationSteps = 50; // How many evenly spaced steps in the range the optimizer will simulate
+									  // 50 Steps ~ 1 min, obv more will take more time... and depends on computer
+
+	results = spanOptimizerApprox(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight, minSpanSimulated, maxSpanSimulated, numberOfSimulationSteps);
+
+	// Produced the .csv for the sorted data.
+	// Also displays the results in the command window
+	spanOptimizerResultsToCSV(results, "SpanOptimizerData.csv");
+	for (int i = 0; i < results.wingSpanVector.size(); i++) {
+		cout << fixed << setprecision(5);
+		cout << "Time: " << results.climbTimeVector[i] << " mins";
+		cout << " Wing Span: " << results.wingSpanVector[i] << " ft" << endl;
+		cout << endl;
+
+	}
+
+*/
+
+
+
+
+
+
+
+
+
+
+/*
+	 **********************************************
+					End of 
+	   Other Functions that might be Intriguing
+	 **********************************************
+*/
+
+
+
+
+
 	return 0;
 }
 
@@ -571,6 +679,7 @@ int main() {
 /*
 		**********************************************
 		***** Start of Optimizers used for Report ****
+		******** (Implementation of them) ************
 		**********************************************
 */
 
@@ -620,7 +729,7 @@ wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF3
 			newAirplane.setMainWingWeight(newAirplane.getMainWingWeight() + weightNeeded);
 		}
 
-		assert(newAirplane.getWeight() >= MIN_TOTAL_WEIGHT - .1);
+		assert(newAirplane.getWeight() >= MIN_TOTAL_WEIGHT - .1 && newAirplane.getWeight() <= MAX_TOTAL_WEIGHT);
 
 		double climbTime = newAirplane.calcBestTimeTo9km(START_HEIGHT, TAKE_OFF_END_HEIGHT);
 
@@ -740,11 +849,14 @@ wingSweepOptimizerResults sweepOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, C
 
 
 
+
+
 /*
 		**********************************************
 		***** End of Optimizers used for Report ******
 		**********************************************
 */
+
 
 
 
@@ -1064,7 +1176,6 @@ wingSpanOptimizerResults spanOptimizerApprox(Wing& inWing, Wing& inHT, Wing& inV
 
 
 // Old implementaitons (ignore):
-
 
 
 
