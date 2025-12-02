@@ -11,9 +11,16 @@
 ## Overview and Coding Methodology
 
 ### Main Objective 
-```The main objective is to optimize a wing to get an aircraft with given engine and given min and max weight to 9km```
-(fill in later)
+__The main objective of this project is to optimize the main wing of an aircraft to beat the FAI record for C-1k planes climbing to 9,000m with a 1,000kg payload (https://fai.org/record/4918), currently held by Gary M. Freeman.__ In other words, the goal of this program is to optimize a main wing around the airplane's climb time to 9,000m. 
 
+For any aircraft configuration (set by the user), this program will also produce best wing* and it's corresponding climb time to 9,000m. This climb time can then be prepared to Freeman's 5 min 54s record. Using this program, one can easily design (at least the wing) of an airplane, which can beat Freeman's record. which can then be compared to Freeman's 5 min 54s record, 
+
+__Note: The program is currently setup to output the simulation data into the console, and produce two .csv files. One csv file is a bunch of wing spans simulated, and one csv file is a bunch of sweep angles simulated for the best span. Currently, the program is setup to only simulate 25 wing spans, and 25 sweep angles\*. In order for it to act as an optimizer, increase the number of simulations to 200+ for span and 100+ for sweep angle, or drastically reduce the range.__ 
+
+
+__Data used in the "Results" section is based on 300 simulations for span, and 150 simulations for sweep angle.__
+
+\* The program is setup in the current manner, in order for a user to be able to easily see how it works, without needing to wait 10 mins for a bunch of simulations. A user should expect to only wait around 1-2mins for the program to run with it's current setup. __Additionally, since this program does not account for structural feasability (due to empirical equations not being reliable), it is my belief that it is more beneficial for the program to produce an easily plottable .csv file, for the user to intepret, rather than a traditional optimizer that just outputs one wing.__ 
 
 <br>
 <br>
@@ -21,9 +28,9 @@
 
 
 ### Coding Methodology Overview
-```A secondary goal of the project was to have the program be robust.``` Robust meaning that any component could be easily modified - in a safe manner - by any user familiar with C++. Classes (OOP) were used to accomplish this goal. 
+__A secondary goal of the project was to have the program be robust.__ Robust meaning that any component could be easily modified - in a safe manner - by any user familiar with C++. Classes (OOP) were used to accomplish this goal. 
 
-```Every Airplane has (at least) a mainWing, a Horizontal Tail, a Vertical Tail, Engine(s), Nacelle(s), a Fuselage, a fuel weight, and a payload weight.``` 
+__Every Airplane has (at least) a mainWing, a Horizontal Tail, a Vertical Tail, Engine(s), Nacelle(s), a Fuselage, a fuel weight, and a payload weight.__ 
 So, each of the corresponding main components (everything that isn't a single float or integer variable) have their own classes. (Note: these classes are not derived from Airplane, because they have a "has-a," not an "is-a" relationship).
 
 Note: It could be helpful to know, now, that in the current Airplane Class implementation every Airplane has two identical engines and two identical nacelles.
@@ -34,9 +41,9 @@ Note: It could be helpful to know, now, that in the current Airplane Class imple
 
 
 
-### How Object Oriented Programming (OOP) Enables Robustness w/ Examples  
+### How Object Oriented Programming (OOP) Enables Robustness w/ Examples 
 #### (Feel Free to  Skip if Already Familiar with OOP)
-```Object Oriented Programming (OOP) essentially allows a programmer to create a new "type".``` Common types are ints, doubles, char, etc. In order to create a new type, a programmer needs to create a class (header and implementation files). This class is the new type. ```When a variable is assigned with the new type, it is known as an object. Objects have access to all the public member functions``` (and/or variables... although that is poor practice), that the class defines. Additionally objects have private member variables, which are initialized in the constructor. There is a LOT more detail behind OOP, like polymorphism, encapsulation, best practices, dynamic classes, constructors, destructors, operator overloading, etc; however, the main takeaways are:
+__Object Oriented Programming (OOP) essentially allows a programmer to create a new "type".__ Common types are ints, doubles, char, etc. In order to create a new type, a programmer needs to create a class (header and implementation files). This class is the new type. __When a variable is assigned with the new type, it is known as an object. Objects have access to all the public member functions__ (and/or variables... although that is poor practice), that the class defines. Additionally objects have private member variables, which are initialized in the constructor. There is a LOT more detail behind OOP, like polymorphism, encapsulation, best practices, dynamic classes, constructors, destructors, operator overloading, etc; however, the main takeaways are:
 
         1. The programmer can create any new type
         2. The programmer can develop any functions for the type
@@ -53,7 +60,7 @@ For example, if we ever wanted to code an Airplane to go supersonically, we woul
 
 Another example, is currently the Wing class operates under the assumption that every wing is trapezoidal . The airplane class doesn't care about these assumptions, just that it has a Wing object that can call on certain (neccessary) public member functions that the Airplane Class's implementation may need. So, if we ever wanted to run this program with a non-trapezoidal wing, the only thing we would have to change is the implementation of Wing Class to be able to handle trapezoidal Wings. (Note: One approach (polymorphism) is making the Wing class a base class and deriving a trapezoidal wing class from the Wing Class, and then deriving the other type of wing from the Wing Class, which is a bit more advanced than just changing the member functions of the Wing Class, but is still in essence, just changing the implementation of the Wing Class). 
 
-```The cost of the robustness gained from using this methodology, is the time and effort it takes to implement the classes.``` Each class, at the bare minimum, needs a constructor, accessors, and mutators (if it is dynamic it needs copy constructors, assignment operators, etc).
+__The cost of the robustness gained from using this methodology, is the time and effort it takes to implement the classes.__ Each class, at the bare minimum, needs a constructor, accessors, and mutators (if it is dynamic it needs copy constructors, assignment operators, etc).
 
 This cost is worth it for me, as will be explained in "Why C++."
 
@@ -64,9 +71,9 @@ This cost is worth it for me, as will be explained in "Why C++."
 
 
 ### Why C++
-When I first started to brainstorm and outline how I wanted to do this project, I realized it ```would be a lot more readable if an OOP language was used.``` This is due to the fact that having classes is very desirable for this program (especially for it's readability). Take a moment to try and think of how to make a robust program without using classes for the major components of the Airplane... In my opinion, any program developed for this project, not using OOP, will be significantly less robust, less readable, and frankly a lot more annoying to code. Additionally, I realized ```the need (or at least desire) to have an efficient program.``` This desirability for efficiency is due to the fact that since there would be many classes, many objects would be created - especially in the optimization portion. 
+When I first started to brainstorm and outline how I wanted to do this project, I realized it __would be a lot more readable if an OOP language was used.__ This is due to the fact that having classes is very desirable for this program (especially for it's readability). Take a moment to try and think of how to make a robust program without using classes for the major components of the Airplane... In my opinion, any program developed for this project, not using OOP, will be significantly less robust, less readable, and frankly a lot more annoying to code. Additionally, I realized __the need (or at least desire) to have an efficient program.__ This desirability for efficiency is due to the fact that since there would be many classes, many objects would be created - especially in the optimization portion. 
 
-C++ is a low level, OOP, programming language, which enables more efficiency than say Python. ```Personally, I am also more familiar with C++ than any other programming language, since most of the courses I have taken for my Computer Science Minor, have been taught in C++.``` ```The cost of getting this extra efficiency is that almost everything had to be built from the ground up``` (like kadenMath functions, which a language like Python might already have a library for).
+C++ is a low level, OOP, programming language, which enables more efficiency than say Python. __Personally, I am also more familiar with C++ than any other programming language, since most of the courses I have taken for my Computer Science Minor, have been taught in C++.__ __The cost of getting this extra efficiency is that almost everything had to be built from the ground up__ (like kadenMath functions, which a language like Python might already have a library for).
 
 This project really benefits from being efficient. When I started outlining how I wanted to implement each function I would need (or at least the key functions), and then figured out the classes I would need to develop, 
 I started to realize the magnitude of how many objects would be created, passed, or used. Additionally, since the goal is to optimize an object (the mainWing) , it just made a lot of sense to use a language known for efficiency. 
@@ -134,17 +141,17 @@ The purpose of this class is to enable a user to easily get desired characterist
 
 
 ### Disclosures:
-1. ```The class is designed to be used with standard imperial units (ft, s, lbf, etc) and on Earth (lbf=lbm)```
-2. ```The class uses pointers behind the scenes. In fact all objects passed in are by reference, and are subject to modification.```
+1. __The class is designed to be used with standard imperial units (ft, s, lbf, etc) and on Earth (lbf=lbm)__
+2. __The class uses pointers behind the scenes. In fact all objects passed in are by reference, and are subject to modification.__
     - So, do NOT try assigning the same objects (like mainWing) to different airplane objects. It can lead to unexpected behavior and is a headache to debug.
 
 ### Major Assumptions 
 #### Note: Assumptions from other classes used within this class may not be specified but do apply.
 1. The Wing weight is approximated using a method from Raymond 
     - The Class only runs this approx for the mainWing (and only if the mainWing has a weight of 0 when passed in)
-2. ```The airplane has two engines``` (numEngines = 2) and ```two identical Nacelles.```
-3. The ```engines are identical``` (same thrust, same fuel loss)
-4. The ```Wing weight is approximated using a method from Raymond (Cargo/Transport Approx)```
+2. __The airplane has two engines__ (numEngines = 2) and __two identical Nacelles.__
+3. The __engines are identical__ (same thrust, same fuel loss)
+4. The __Wing weight is approximated using a method from Raymond (Cargo/Transport Approx)__
     - Assuming 10% of the mainWing is used for control surfaces
         - PERCENT_CONTROL_SURFACE_AREA = 0.10
     - Additionally, assumes FAR 25 cert:
@@ -158,24 +165,24 @@ The purpose of this class is to enable a user to easily get desired characterist
 5. Gravity = 32.2 ft/s (constant)
 6. pi = 3.141592653589
 7. Gas Constant = 1716 (ft * lb) / (slug * R)
-8. ```calcBestTimeTo9km uses a "Takeoff to Steady Level Accelerate (to velocity for maxExcessPower) to Climb to Steady Accelerate (to velocity for maxExcessPower) to Climb, etc." approach.```
+8. ```calcBestTimeTo9km()``` __uses a "Takeoff to Steady Level Accelerate (to velocity for maxExcessPower) to Climb to Steady Accelerate (to velocity for maxExcessPower) to Climb, etc." approach.__
     - Why?
-        - ```Solving for the best path/trajectory/inputs to climb to 9km the fastest is a very complicated dynamics problem that would be a whole project in and of itself.``` In order to solve for that best path/trajectory/inputs, (most likely) hundreds of simulations would need to be performed for each particular aircraft (when to pitch, how much to pitch by, when to fly straight before climbing, when to not bother about reaching the maxExcessPower velocity, because you are close enough, and that marginal gain isn't worth the time sacrifice, how much time it takes for the control surfaces to act, how much drag those control surfaces are making, etc etc etc). 
-        - The cherry on top is that this model would change significantly from airplane to airplane and would be very intensive to calculate. ```The primary goal this program was designed to accomplish was to size/optimize a mainWing for this mission... not necessarily get the most accurate simulation time.```
+        - __Solving for the best path/trajectory/inputs to climb to 9km the fastest is a very complicated dynamics problem that would be a whole project in and of itself.__ In order to solve for that best path/trajectory/inputs, (most likely) hundreds of simulations would need to be performed for each particular aircraft (when to pitch, how much to pitch by, when to fly straight before climbing, when to not bother about reaching the maxExcessPower velocity, because you are close enough, and that marginal gain isn't worth the time sacrifice, how much time it takes for the control surfaces to act, how much drag those control surfaces are making, etc etc etc). 
+        - The cherry on top is that this model would change significantly from airplane to airplane and would be very intensive to calculate. __The primary goal this program was designed to accomplish was to size/optimize a mainWing for this mission... not necessarily get the most accurate simulation time.__
 
     - Drawbacks of this approach
-        - First and foremost, this approach is definitely not the most accurate. ```Changing allowable error variables (particularly the velocity error (allowed difference) for entering/leaving the steadyLevelAccelerate function) drastically alters the simulated times for the aircraft```
-            - ```HOWEVER, while simulation times may drastically change, the different aircrafts keep the same relative performance.``` In other words, if say a 50ft span wing performs has the quickest time to climb with certain error variables, that 50ft span wing will also have the quickest time to climb with different error variables. ```The relative performance of the wing is independent of the error variables, which justifies this approach for optimization of a wing, despite the fluctuation in overall times.```
-            - Additionally, ```adjusting the error variables tends to DECREASE the time to climb```, not increase it (although there are anomalies). The quickest times to climbs I was able to achieve were in the 3 min range. ```Currently the program error variables settings give climb times in the 4-5 min range for optimal  wings.```
+        - First and foremost, this approach is definitely not the most accurate. __Changing allowable error variables (particularly the velocity error (allowed difference) for entering/leaving the steadyLevelAccelerate function) drastically alters the simulated times for the aircraft__
+            - __Currently, this approach produces similar times to taking off, steady level accelerating to the velocity for max excess power, and then climbing without changing velocity at all.__
+            - That being said, while simulation times may drastically change, the different aircrafts keep the same relative performance. In other words, if say a 50ft span wing performs has the quickest time to climb with certain error variables, that 50ft span wing will also have the quickest time to climb with different error variables. The relative performance of the wing is independent of the error variables, which justifies this approach for optimization of a wing, despite the fluctuation in overall times.
 
-9. ```calcBestTimeTo9km uses the small angle approx for gamma (flight path angle)```
+9. ```calcBestTimeTo9km()``` __uses the small angle approx for gamma (flight path angle)__
     - Typically gamma is at most 11 degrees... which isn't a true small angle... but is a good approx for the amount of complexity it saves.
-        - ```Note: Coupling between AoA, the Power Curve, and gamma, make solving for gamma difficult and computationally heavy.```
+        - __Note: Coupling between AoA, the Power Curve, and gamma, make solving for gamma difficult and computationally heavy.__
         - The program already has a lot of assumptions built into it, this small angle approx for gamma is fairly insignificant in comparison.
 9. Assumes the Vertical Tail makes no lift.
-10. ```Assumes liftoff occurs at 1.2*V_stall```
-11. ```Assumes 15 deg for takeoff AoA_stall,``` this is actually a conservative estimate.
-12. ```The Wing Class assumes a trapezodial wing. This class relies on the Wing Class.```
+10. __Assumes liftoff occurs at 1.2*V_stall__
+11. __Assumes 15 deg for takeoff AoA_stall,__ this is actually a conservative estimate.
+12. __The Wing Class assumes a trapezodial wing. This class relies on the Wing Class.__
 
 
 ### Notable Functions:
@@ -226,21 +233,21 @@ The purpose of this class is to enable a user to easily get desired characterist
 
 8. ```TakeoffProperties calcEndRunwayAirplaneProperties(double height, double startVelocity, double startWeight) const;```
     - ***One of the important function for the purposes of this project***
-    - ```Assumes 15 deg for takeoff AoA_stall, this is actually a conservative estimate.```
+    - __Assumes 15 deg for takeoff AoA_stall, this is actually a conservative estimate.__
     - Assumes rolling resistance = .02 (fair assumption)
-    - ```Essentially calcs the maxAcceleration = (((thrust - drag - rollingFriction) * GRAVITY) / weight), and then time steps until the plane gets to 1.2V_stall.```
-    - ```The function then returns a struct that contains useful properties (final velocity, final weight, and time taken)```
+    - __Essentially calcs the maxAcceleration = (((thrust - drag - rollingFriction) * GRAVITY) / weight), and then time steps until the plane gets to 1.2V_stall.__
+    - __The function then returns a struct that contains useful properties (final velocity, final weight, and time taken)__
 
 9. ```double calcBestClimbTime(double startHeight, double startVelocity, double endHeight);```
     - ***One of the important function for the purposes of this project***
     - Uses a "Takeoff to Steady Level Accelerate (to velocity for maxExcessPower) to Climb to Steady Accelerate (to velocity for maxExcessPower) to Climb, etc." approach. And assumes the small angle approx for gamma.
         - Justified above
-    - ```While the height is below the end height, the function will use that climb logic```
-        - ```Calculates the Power Curve for each height using the Power Curve private helper functions. ```
-        - ```If velocity < velocity maxExcess power```
-            - ```Call on calcSteadyLevelAccelerationTime() to get to the velocity for maxExcessPower```
+    - __While the height is below the end height, the function will use that climb logic__
+        - __Calculates the Power Curve for each height using the Power Curve private helper functions.__
+        - __If velocity < velocity maxExcess power__
+            - __Call on calcSteadyLevelAccelerationTime() to get to the velocity for maxExcessPower__
                 - There is a safeguard built into it, in case the airplane can't reach that velocity (which without this safeguard would cause an infinite loop)
-        - ```Else, calculate the change in height with the current properties for a time step. ```
+        - __Else, calculate the change in height with the current properties for a time step.__
         - There is a safeguard built into it, in case the airplane can't reach the maxHeight (which without this safeguard would cause an infinite loop)
             - The time to climb would be set to 1e10 if the airplane can't reach the endHeight
     - Time taken for steadyLevelAcceleration and climb are taken into account. Weight loss is also taken into account.
@@ -265,15 +272,15 @@ The purpose of this class is to enable a user to easily get desired characterist
 ## AtmosphereProperties:
 
 ### Overview:
-The purpose of the Atmosphere Properties Class is to enable the calculations of atmosphere properties in a simple manner. ```A user will be able to create an object, set the height of that object, and instantly be able to get the atmosphere properties (imperial units) with basic function calls on the object.``` In general, and particularly because of the amount of classes in this project, this is extremely beneficial, for readability and removing excess code (without this class you'd need to implement these functions in every class that you would need them in). 
+The purpose of the Atmosphere Properties Class is to enable the calculations of atmosphere properties in a simple manner. __A user will be able to create an object, set the height of that object, and instantly be able to get the atmosphere properties (imperial units) with basic function calls on the object.__ In general, and particularly because of the amount of classes in this project, this is extremely beneficial, for readability and removing excess code (without this class you'd need to implement these functions in every class that you would need them in). 
 
 ### Disclosures / Assumptions:
-1. This class ```relies NASA's empirical  equations``` for the troposphere and stratosphere
-    - ```This class will only work accurately in the troposphere and stratosphere```
-        - ```Troposphere is from 0ft - 36152 ft```
-        - ```Stratosphere is from 36152ft - 82345ft```
+1. This class __relies NASA's empirical  equations__ for the troposphere and stratosphere
+    - __This class will only work accurately in the troposphere and stratosphere__
+        - __Troposphere is from 0ft - 36152 ft__
+        - __Stratosphere is from 36152ft - 82345ft__
 2. The Sutherland equation is used for viscosity calculation
-3. ```Again this class only works with imperial units```
+3. __Again this class only works with imperial units__
     - It takes in feet 
     - It returns the imperial unit you would expect... if unsure, just look at the header comment.
 
@@ -303,7 +310,7 @@ The purpose of the Atmosphere Properties Class is to enable the calculations of 
 8. ```double getHeight()  const;```
     - Returns height in ft (not sure when you'd need this, but there for modularity)
 
-9. ```Note: There are also calc"WantedProperty" for all the properties there are getters for.```
+9. __Note: There are also ```calc"WantedProperty"``` for all the properties there are getters for.__
     - Use setHeight() mutator if you want to re-calc all properties... it is more efficient and recommended (over say using the calc functions for every property).
 
 
@@ -315,7 +322,7 @@ The purpose of the Atmosphere Properties Class is to enable the calculations of 
 ## CF_34_3B1:
 
 ### Overview:
-```The main purpose of the CF_34_3B1 Class is to be able to calculate the current thrust, the current thrust curve function, and the current fuel loss, in a simple and readable manner. The performance map (thrust and fuel loss) was digitized for this engine. This class does rely on kadenMath functions in order to evaluate the polynomial equations.```
+__The main purpose of the CF_34_3B1 Class is to be able to calculate the current thrust, the current thrust curve function, and the current fuel loss, in a simple and readable manner. The performance map (thrust and fuel loss) was digitized for this engine. This class does rely on kadenMath functions in order to evaluate the polynomial equations.__
  - ___For this class (and other classes that use continuous polynomial functions), I developed a way of storing them in a vector. The coefficient of the largest term is stored in the lowest index, then the coefficient of the largest degree - 1, ... , then constant. My evaluateFunction() in kadenMath, can evaluate any degree polynomial function efficiently and accurately. Read the kadenMath header comments for more details___
     - ___The thrust curve and fuel loss functions are stored as const vector<double> private data members, using the above format___
  
@@ -323,7 +330,7 @@ The purpose of the Atmosphere Properties Class is to enable the calculations of 
 Note: This class is derived from the TurboFan Class. We will ignore this implementation detail, and talk about it as if it was a stand alone class. It is derived from the TurboFan Class because it is a specific TurboFan engine. By deriving it, it would be easier to implement different types of TurboFan engines into the Airplane object. (However, the base class is fairly useless right now, since I simply implemented the functions (and private data members) in the CF_34_3B1 Class, since changing the engine is difficult - due to the amount of curves that have to be digitized). Still, even having this structure, allows modularity - in the future - to be enhanced  without too much thought. 
 
 ### Disclosures / Assumptions:
-1. ```Switches the Thrust Curve and Fuel Loss functions half way between the two (rounds up).```
+1. __Switches the Thrust Curve and Fuel Loss functions half way between the two (rounds up).__
     - This is to avoid having to interpolate. Interpolation can be implemented, but it is a fairly minor approx.
 2. The Thrust Curve is fitted to a second degree polynomial with R^2 > .98 (but it could still be a bit off)
 3. The Fuel Loss Curve is fitted to a linear line with R^2 > .99 (but it could still be a bit off)
@@ -353,12 +360,14 @@ Note: This class is derived from the TurboFan Class. We will ignore this impleme
 ## DragCoeff:
 
 ### Overview:
-```The purpose of the DragCoeff Class is to be able to calculate the drag on a wing or fuselage easily. This class is able to calculate the parasite drag coefficient, induced drag coefficient, compressibility drag coefficient, and form coefficient. ```
+__The purpose of the DragCoeff Class is to be able to calculate the drag on a Wing, Fuselage, and Nacelle easily. This class is able to calculate the parasite drag coefficient, induced drag coefficient, compressibility drag coefficient, and form coefficient.__
+- __Drag Coeff for Wing = parasite drag coefficient + induced drag coefficient + compressibility drag coefficient__
 
-```- Drag Coeff for Wing = parasite drag coefficient + induced drag coefficient + compressibility drag coefficient```
-```- Drag Coeff for Fuselage = parasite drag coefficient + compressibility drag coefficient```
+- __Drag Coeff for Fuselage = parasite drag coefficient + compressibility drag coefficient__
 
-```This Class is primarily used in the Fuselage and Wing Classes, for those class's specific calcTotalDragCoeff() functions.```
+- __Drag Coeff for Nacelle = parasite drag coefficient + compressibility drag coefficient__
+
+__This Class is primarily used in the Fuselage and Wing Classes, for those class's specific calcTotalDragCoeff() functions.__
 
 ### Disclosures / Assumptions:
 1. ```This class is dependent on Wing and Fuselage Class.```
@@ -371,23 +380,23 @@ Note: This class is derived from the TurboFan Class. We will ignore this impleme
 ### Notable Functions:
 
 1. ```double calcCompressibilityCoeff(double Mach, double AoA) const```
-    - Can only handle Wing objects
+    - __Can only handle Wing objects__
     - Compressibility Coefficient is based on Shevell's methods: Reading a graph 
         - The x-axis of the graph is Freestream Mach / Crest Critical Mach
-            - ```Crest Critical Mach is calculated by the Wing Object```
+            - Crest Critical Mach is calculated by the Wing Object
                 - Read the functions listed below, in the Wing Class Section to understand this more:
                     - ```double calcMcc(AoA) const, which relies on:```
                         - ```double calcSweptMExponent(AoA_rad) const```
                         - ```double calcMccZeroSweep(AoA_rad) const```
         - The y-axis of the graph is C_Dc / cos^3(sweepAngle_quarterChord)
-    - ```If the Freestream Mach / Crest Critical Mach < 0.75, we assume compressibility drag is 0```
+    - __If the Freestream Mach / Crest Critical Mach < 0.75, we assume compressibility drag is 0__
         - Since the graph says's 0.75 is ~= 0
 
 
 2. ```double calcParasiteCoeff(double Renyolds, double wetAreaRatio) const```
-    - Can handle both Wing and Fuselage objects
+    - Can handle both Wing, Fuselage, and Nacelle objects
     - Based on the Reynold's number, calculates the dragParasiteCoeff.
-    - ```The assumed critical Reynolds number (for laminar vs turbulent) is 500,000```
+    - __The assumed critical Reynolds number (for laminar vs turbulent) is 500,000__
 
 3. ```double calcInducedCoeff(double AoA) const```
     - Can only handle Wing objects
@@ -395,13 +404,13 @@ Note: This class is derived from the TurboFan Class. We will ignore this impleme
     - Then calculates the induced drag coeff: (CL^2 / (pi * e * AR))
 
 4. ```double calcFormDragCoeff(double Cf) const```
-    - Can handle both Wing and Fuselage objects
+    - Can handle both Wing, Fuselage, and Nacelle objects
     - formDragCoeff = k*skinFrictionCoeff;
 
 5. ```double calcTotalDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const```
     - ***This is the most used function***
-    - Can handle both Wing and Fuselage objects
-    - ```Depending on if the object is a Fuselage or a Wing, it calls on the needed functions in order to calculate the totalDragCoeff for that object.```
+    - Can handle both Wing, Fuselage, and Nacelle objects
+    - __Depending on if the object is a Fuselage or a Wing, it calls on the needed functions in order to calculate the totalDragCoeff for that object.__
     - The assumptions used in the Wing Classes's Induced Drag 
 
 
@@ -417,9 +426,9 @@ Note: This class is derived from the TurboFan Class. We will ignore this impleme
 The purpose of the Fuselage Class is to provide the functionality needed to calculate a total Airplane weight, lift coefficient, and drag coefficient. Therefore, the functionality of this class is fairly limited, but still sufficient for most purposes. 
 
 ### Disclosures / Assumptions:
-1. ```Assuming the form factor of every Fuselage object is 1.2```
-2. ```Assuming the CL_alpha of every Fuselage object is 0.20```
-3. ```Assuming the CL_knott of every Fuselage object is 0.00```
+1. __Assuming the form factor of every Fuselage object is 1.2__
+2. __Assuming the CL_alpha of every Fuselage object is 0.20__
+3. __Assuming the CL_knott of every Fuselage object is 0.00__
 
 ### Notable Functions:
 
@@ -479,9 +488,9 @@ The purpose of the Nacelle Class is to provide the functionality needed to calcu
 
 
 ### Disclosures / Assumptions:
-1. ```Assuming the form factor of every Nacelle object is 1.50```
-2. ```Assuming the CL_alpha of every Nacelle object is 0.00```
-3. ```Assuming the CL_knott of every Nacelle object is 0.00```
+1. __Assuming the form factor of every Nacelle object is 1.50__
+2. __Assuming the CL_alpha of every Nacelle object is 0.00__
+3. __Assuming the CL_knott of every Nacelle object is 0.00__
 
 
 ### Notable Functions:
@@ -512,7 +521,7 @@ The purpose of the Nacelle Class is to provide the functionality needed to calcu
 ## Wing:
 
 ### Overview:
-The purpose of this class is to easily declare a (trapezoidal) wing object. From this class, the user will easily be able to get necessary Wing attributes like area, Mach Critical Crest Number, the lift coefficient, the drag coefficient, and much more.
+__The purpose of this class is to easily declare a (trapezoidal) wing object. From this class, the user will easily be able to get necessary Wing attributes like area, Mach Critical Crest Number, the lift coefficient, the drag coefficient, and much more.__
 
 The minimum amount of variables needed to define a Wing object is: an Airfoil object, the span, the tip chord, the root chord, and the sweep angle. 
 
@@ -521,10 +530,10 @@ Note: The Wing class is meant to be used in tandem with the Airplane class. You 
 
 
 ### Disclosures / Assumptions:
-1. Assumes a linearly tapered trapezoidal wing
-1. Oswald efficiency of the Wing is assumed to be equal to 0.80
-    - The empirical equations (that I have tried) for Oswald efficiency usually give below 0.80 (often below 0.70), which doesn't seem accurate, hence the assumption.
-1. Calculating Mach Critical Crest Number (Mcc) is done using Shevell graphs.
+1. __Assumes a linearly tapered trapezoidal wing__
+1. __Oswald efficiency of the Wing is assumed to be equal to 0.80__
+    - __The empirical equations (that I have tried) for Oswald efficiency usually give below 0.80 (often below 0.70), which doesn't seem accurate, hence the assumption.__
+1. __Calculating Mach Critical Crest Number (Mcc) is done using Shevell graphs.__
     - There are limitations on the bounds of the graphs
         - For example, Mcc for an unswept wing is calculated, but those equations are limited to a lift coefficient of 0.60. 
             - The program approximates any lift coefficient > 0.60 with the 0.60 equations.
@@ -554,17 +563,17 @@ Note: The Wing class is meant to be used in tandem with the Airplane class. You 
     - This function calculates, from the digitized Shevell Graph, the Mcc if the Wing had has a sweep angle = 0. 
     - __Assumptions:__
         - Mcc Zero sweep is only defined for CL > 0 and CL <= .60, so:
-            - ```If AoA is negative, CL is calculated using the negative AoA, then the abs value is taken and used for the reading (this *should* work).```
+            - __If AoA is negative, CL is calculated using the negative AoA, then the abs value is taken and used for the reading (this *should* work).__
                 - CL is not symmetric around zero, hence why it calculated with the negative AoA, then the abs value is taken.
-            - ```If CL > .60, the function just uses the CL = .60 case. This is simply an assumption that has to be made because the of the limited data set.``` It is not the worst assumption ever, but it certainly contributes to error.
+            - __If CL > .60, the function just uses the CL = .60 case. This is simply an assumption that has to be made because the of the limited data set.__ It is not the worst assumption ever, but it certainly contributes to error.
 
 1. ```double calcSweptMExponent(double AoA_rad) const```
     - This function calculates, from the digitized Shevell Graph, the m exponent needed for the calcMcc() function.
     - __Assumptions:__
         - Mcc Zero sweep is only defined for CL > 0 and CL <= .60, so:
-            - ```If AoA is negative, CL is calculated using the negative AoA, then the abs value is taken and used for the reading (this *should* work).```
+            - __If AoA is negative, CL is calculated using the negative AoA, then the abs value is taken and used for the reading (this *should* work).__
                 - CL is not symmetric around zero, hence why it calculated with the negative AoA, then the abs value is taken.
-            - ```If CL > .60, the function returns m = .5``` It is not the worst assumption ever, but it certainly contributes to error. Although, it is my belief this is a conservative estimate.
+            - __If CL > .60, the function returns m = .50__ It is not the worst assumption ever, but it certainly contributes to error. Although, it is my belief this is a conservative estimate.
 
 1. ```double calcRootInertiaEstimate() const```
     - This function
@@ -611,4 +620,4 @@ Note: The Wing class is meant to be used in tandem with the Airplane class. You 
 1. ```Accessors```
     - This function
 
-
+a
