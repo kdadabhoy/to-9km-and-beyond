@@ -13,14 +13,14 @@
 ### Main Objective 
 __The main objective of this project is to optimize the main wing of an aircraft to beat the FAI record for C-1k planes climbing to 9,000m with a 1,000kg payload (https://fai.org/record/4918), currently held by Gary M. Freeman.__ In other words, the goal of this program is to optimize a main wing around the airplane's climb time to 9,000m. 
 
-For any aircraft configuration (set by the user), this program will also produce best wing* and it's corresponding climb time to 9,000m. This climb time can then be prepared to Freeman's 5 min 54s record. Using this program, one can easily design (at least the wing) of an airplane, which can beat Freeman's record. which can then be compared to Freeman's 5 min 54s record, 
+For any aircraft configuration (set by the user), this program will also produce best wing* and its corresponding climb time to 9,000m. This climb time can then be prepared to Freeman's 5 min 54s record. Using this program, one can easily design (at least the wing) of an airplane, which can beat Freeman's record. which can then be compared to Freeman's 5 min 54s record, 
 
-__Note: The program is currently setup to output the simulation data into the console, and produce two .csv files. One csv file is a bunch of wing spans simulated, and one csv file is a bunch of sweep angles simulated for the best span. Currently, the program is setup to only simulate 25 wing spans, and 25 sweep angles\*. In order for it to act as an optimizer, increase the number of simulations to 200+ for span and 100+ for sweep angle, or drastically reduce the range.__ 
+__Note: The program is currently set up to output the simulation data into the console, and produce two .csv files. One csv file is a bunch of wing spans simulated, and one csv file is a bunch of sweep angles simulated for the best span. Currently, the program is set up to only simulate 25 wing spans, and 25 sweep angles\*. In order for it to act as an optimizer, increase the number of simulations to 200+ for span and 100+ for sweep angle, or drastically reduce the range.__ 
 
 
 __Data used in the "Results" section is based on 300 simulations for span, and 150 simulations for sweep angle.__
 
-\* The program is setup in the current manner, in order for a user to be able to easily see how it works, without needing to wait 10 mins for a bunch of simulations. A user should expect to only wait around 1-2mins for the program to run with it's current setup. __Additionally, since this program does not account for structural feasibility (due to empirical equations not being reliable), it is my belief that it is more beneficial for the program to produce an easily plottable .csv file, for the user to interpret, rather than a traditional optimizer that just outputs one wing.__ 
+\* The program is set up in the current manner, in order for a user to be able to easily see how it works, without needing to wait 10 mins for a bunch of simulations. A user should expect to only wait around 1-2mins for the program to run with its current set up. __Additionally, since this program does not account for structural feasibility (due to empirical equations not being reliable), it is my belief that it is more beneficial for the program to produce an easily plottable .csv file, for the user to interpret, rather than a traditional optimizer that just outputs one wing.__ 
 
 <br>
 <br>
@@ -54,11 +54,11 @@ __Object Oriented Programming (OOP) essentially allows a programmer to create a 
             - You don't need to know how the public member functions are implemented, just that they exist
 
 
-This methodology, as those familiar with OOP already know, enables the Airplane class to treat each of these components (class objects) as a "black box." In other words, it does not matter, from the Airplane Class's point of view, how the Wing (for example) object is implemented, just that we have a type Wing, and we can call on it's public member functions. Again, as those familiar with OOP already know, this is an incredibly robust approach, since we are now able to change the implementation of major components, without having to change anything in the Airplane class, as long as the same functions still exist. It is incredibly hard to underscore how useful this is.
+This methodology, as those familiar with OOP already know, enables the Airplane class to treat each of these components (class objects) as a "black box." In other words, it does not matter, from the Airplane Class's point of view, how the Wing (for example) object is implemented, just that we have a type Wing, and we can call on its public member functions. Again, as those familiar with OOP already know, this is an incredibly robust approach, since we are now able to change the implementation of major components, without having to change anything in the Airplane class, as long as the same functions still exist. It is incredibly hard to underscore how useful this is.
 
 For example, if we ever wanted to code an Airplane to go supersonically, we would just need to modify the classes whose implementation changes based on if an aircraft is subsonic or supersonic (namely the Drag Class).
 
-Another example, is currently the Wing class operates under the assumption that every wing is trapezoidal . The airplane class doesn't care about these assumptions, just that it has a Wing object that can call on certain (neccessary) public member functions that the Airplane Class's implementation may need. So, if we ever wanted to run this program with a non-trapezoidal wing, the only thing we would have to change is the implementation of Wing Class to be able to handle trapezoidal Wings. (Note: One approach (polymorphism) is making the Wing class a base class and deriving a trapezoidal wing class from the Wing Class, and then deriving the other type of wing from the Wing Class, which is a bit more advanced than just changing the member functions of the Wing Class, but is still in essence, just changing the implementation of the Wing Class). 
+Another example, is currently the Wing class operates under the assumption that every wing is trapezoidal . The airplane class doesn't care about these assumptions, just that it has a Wing object that can call on certain (necessary) public member functions that the Airplane Class's implementation may need. So, if we ever wanted to run this program with a non-trapezoidal wing, the only thing we would have to change is the implementation of Wing Class to be able to handle trapezoidal Wings. (Note: One approach (polymorphism) is making the Wing class a base class and deriving a trapezoidal wing class from the Wing Class, and then deriving the other type of wing from the Wing Class, which is a bit more advanced than just changing the member functions of the Wing Class, but is still in essence, just changing the implementation of the Wing Class). 
 
 __The cost of the robustness gained from using this methodology, is the time and effort it takes to implement the classes.__ Each class, at the bare minimum, needs a constructor, accessors, and mutators (if it is dynamic it needs copy constructors, assignment operators, etc).
 
@@ -71,7 +71,7 @@ This cost is worth it for me, as will be explained in "Why C++."
 
 
 ### Why C++
-When I first started to brainstorm and outline how I wanted to do this project, I realized it __would be a lot more readable if an OOP language was used.__ This is due to the fact that having classes is very desirable for this program (especially for it's readability). Take a moment to try and think of how to make a robust program without using classes for the major components of the Airplane... In my opinion, any program developed for this project, not using OOP, will be significantly less robust, less readable, and frankly a lot more annoying to code. Additionally, I realized __the need (or at least desire) to have an efficient program.__ This desirability for efficiency is due to the fact that since there would be many classes, many objects would be created - especially in the optimization portion. 
+When I first started to brainstorm and outline how I wanted to do this project, I realized it __would be a lot more readable if an OOP language was used.__ This is due to the fact that having classes is very desirable for this program (especially for its readability). Take a moment to try and think of how to make a robust program without using classes for the major components of the Airplane... In my opinion, any program developed for this project, not using OOP, will be significantly less robust, less readable, and frankly a lot more annoying to code. Additionally, I realized __the need (or at least desire) to have an efficient program.__ This desirability for efficiency is due to the fact that since there would be many classes, many objects would be created - especially in the optimization portion. 
 
 C++ is a low level, OOP, programming language, which enables more efficiency than say Python. __Personally, I am also more familiar with C++ than any other programming language, since most of the courses I have taken for my Computer Science Minor, have been taught in C++.__ __The cost of getting this extra efficiency is that almost everything had to be built from the ground up__ (like kadenMath functions, which a language like Python might already have a library for).
 
@@ -104,7 +104,7 @@ By programming using the aforementioned methodologies, the classes I developed i
 __The main() program, this program, is currently set up to:__
 1. __Run an optimizer* for the wing span__ 
     - __Produces "Span_OptimizerData.csv" in the folder the same folder the solution is in__
-    - Code is also implemented to print the ranked wing spans and their corresponding climb timess to the command window
+    - Code is also implemented to print the ranked wing spans and their corresponding climb times to the command window
 2. __Run an optimizer* for the wing sweep angle__ 
     - __ONLY FOR THE BEST WING SPAN, from the wing span optimizer__
     - __Produces "SweepAngle_OptimizerData.csv" in the folder the same folder the solution is in__
@@ -118,7 +118,7 @@ __The main() program, this program, is currently set up to:__
             - In other words, it is an essential part of basically every important airplane (simulation) function for this project.
     - ***"Sanity Check Span Optimizer"***
         - This optimizer uses a function that only calculates the power curve once (for steady level climb), and does not steady level accelerate after it reaches the first velocity for max excess power.
-        - As it's name implies, it is a sanity check to compare the current adjusted velocity climb logic to.
+        - As its name implies, it is a sanity check to compare the current adjusted velocity climb logic to.
 4. __(Optional) Below those sections the implementation is where the optimizers (and some other useful main() functions) are implemented__
 
 
@@ -135,7 +135,7 @@ __\* The explanation for the "optimizer" being setup how it currently is, explai
 <br>
 
 
-A note on implementation: The classes, which will be described in much more detail in the "Classes and Assumptions" section, whole purpose is to make it easier, among other things (readbility, modularity, etc), to code the optimizers. The main function first initializes an Airplane (by first initializing all the objects that compose and airplane) with the specific characteristics given in the project description (for objects like mainWing and Airfoil, which aren't given, we initialize them with realistic values). The main function then passes these objects into the optimizers. The optimizers run NUMBER_OF_SIMULATIONS simulations and return the sorted data (in ascending climb order) in a vector. This data is printed to the command window, but more importantly exported to .csv files, so the user can visually analyze it by plotting it (and keep it).
+A note on implementation: The classes, which will be described in much more detail in the "Classes and Assumptions" section, whole purpose is to make it easier, among other things (readability, modularity, etc), to code the optimizers. The main function first initializes an Airplane (by first initializing all the objects that compose an airplane) with the specific characteristics given in the project description (for objects like mainWing and Airfoil, which aren't given, we initialize them with realistic values). The main function then passes these objects into the optimizers. The optimizers run NUMBER_OF_SIMULATIONS simulations and return the sorted data (in ascending climb order) in a vector. This data is printed to the command window, but more importantly exported to .csv files, so the user can visually analyze it by plotting it (and keep it).
 
 
 
@@ -153,10 +153,10 @@ A note on implementation: The classes, which will be described in much more deta
         - In reality it produces sorted data (by ascending climb times) based on the range and number of steps.
 1. ```void sortWingsByClimbTime(vector<double>& wingSpans, vector<double>& climbTimes)```
     - Sorts the first inputted vector by the second inputted vector in an ascending order
-    - __Essentially sorts both the optimized parameter characteritic by the climb time in an efficient manner__
+    - __Essentially sorts both the optimized parameter characteristic by the climb time in an efficient manner__
     - This sorting algorithm needed to be developed because without it there would be no way to sort the first vector by the second vector's values. 
 1. ```wingSpanOptimizerResults spanOptimizerApprox(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight, double minSpanFt, double maxSpanFt, int numSteps)```
-    - Same as the spanOptimizer() function, except calls the calcRoughApproxTimeTo9km() simulation function instead of the calcBestTimeTo9km() simulation function.
+    - Same as the spanOptimizer() function, except it calls the calcRoughApproxTimeTo9km() simulation function instead of the calcBestTimeTo9km() simulation function.
 1. ```void printUsefulCharacteristics(Wing& inWing, Airplane& inAirplane)```
     - Useful print statement of desirable Wing and Airplane characteristics.
 1. ```void spanOptimizerResultsToCSV(wingSpanOptimizerResults& results, string fileName)```
@@ -187,7 +187,7 @@ A note on implementation: The classes, which will be described in much more deta
 ## Airplane:
 
 ### Overview:
-__The purpose of this class is to enable a user to easily get desired characteristics of an airplane and have an functional airplane object to use (like for simulations). An airplane object is initialized with three Wing objects (Main Wing, Horizontal Tail, and Vertical Tail), an CF34_3B1 object (the engines), a Nacelle object, a Fuselage object, a fuel weight, and a payload weight.__
+__The purpose of this class is to enable a user to easily get desired characteristics of an airplane and have a functional airplane object to use (like for simulations). An airplane object is initialized with three Wing objects (Main Wing, Horizontal Tail, and Vertical Tail), an CF34_3B1 object (the engines), a Nacelle object, a Fuselage object, a fuel weight, and a payload weight.__
 
 
 ### Disclosures:
@@ -232,7 +232,7 @@ __The purpose of this class is to enable a user to easily get desired characteri
 9. Assumes the Vertical Tail makes no lift.
 10. __Assumes liftoff occurs at 1.2*V_stall__
 11. __Assumes 15 deg for takeoff AoA_stall,__ this is actually a conservative estimate.
-12. __The Wing Class assumes a trapezodial wing. This class relies on the Wing Class.__
+12. __The Wing Class assumes a trapezoidal wing. This class relies on the Wing Class.__
 
 
 ### Notable Functions:
@@ -275,7 +275,7 @@ __The purpose of this class is to enable a user to easily get desired characteri
 7. ```bool isWingPossible() const;```
     - The goal of this function was to see if the wing would be able to withstand the root bending moment (and possibly takeoff considerations). 
     - This function depends on functions from the Wing Class to calculate the moment of inertia.
-    - Three attempts were made at implementing this function with three different methods (all within the code, 2/3 commented out) - mainly differing in how they approx the inertia at the root of the wing. The results of these implementations were fairly useless (some methods gave unreasonably high estimates, some gave unreasonable low estimates)
+    - Three attempts were made at implementing this function with three different methods (all within the code, 2/3 commented out) - mainly differing in how they approximate the inertia at the root of the wing. The results of these implementations were fairly useless (some methods gave unreasonably high estimates, some gave unreasonable low estimates)
         - A MIT Lab had an empirical equation for inertia  that involved using airfoil characteristics (which this class is robust enough to implement)
         - A method of calculating the inertia caused by the caps in the wing (assuming their characteristics and scaling based on rootChord)
             - Multiple Airplane design books (structure design mainly) made claims along the lines that the caps account for most of the inertia in the wing.
@@ -577,7 +577,7 @@ __The purpose of the Nacelle Class is to provide the functionality needed to cal
 ### Overview:
 __The purpose of this class is to easily declare a (trapezoidal) wing object. From this class, the user will easily be able to get necessary Wing attributes like area, Mach Critical Crest Number, the lift coefficient, the drag coefficient, and much more.__
 
-The minimum amount of variables needed to define a Wing object is: an Airfoil object, the span, the tip chord, the root chord, and the sweep angle. 
+The minimum number of variables needed to define a Wing object is: an Airfoil object, the span, the tip chord, the root chord, and the sweep angle. 
 
 Note: The Wing class is meant to be used in tandem with the Airplane class. You can either pass in a weight (or use a mutator to set the weight) of the Wing, or when the Wing is used to initialize an Aircraft object, the weight of the Wing will be automatically calculated using an empirical calculation (more details in the Airplane Class's Section)
 
@@ -617,23 +617,23 @@ Note: The Wing class is meant to be used in tandem with the Airplane class. You 
     - It returns the Mcc for the given Angle of Attack (AoA).
 
 1. ```double calcMccZeroSweep(double AoA_rad) const```
-    - This function calculates, from the digitized Shevell Graph, the Mcc if the Wing had has a sweep angle = 0. 
+    - This function calculates, from the digitized Shevell Graph, the Mcc if the Wing has a sweep angle = 0. 
     - __Assumptions:__
         - Mcc Zero sweep is only defined for CL > 0 and CL <= .60, so:
             - __If AoA is negative, CL is calculated using the negative AoA, then the abs value is taken and used for the reading (this *should* work).__
-                - CL is not symmetric around zero, hence why it calculated with the negative AoA, then the abs value is taken.
-            - __If CL > .60, the function just uses the CL = .60 case. This is simply an assumption that has to be made because the of the limited data set.__ It is not the worst assumption ever, but it certainly contributes to error.
+                - CL is not symmetric around zero, hence why it is calculated with the negative AoA, then the abs value is taken.
+            - __If CL > .60, the function just uses the CL = .60 case. This is simply an assumption that has to be made because of the limited data set.__ It is not the worst assumption ever, but it certainly contributes to error.
 
 1. ```double calcSweptMExponent(double AoA_rad) const```
     - This function calculates, from the digitized Shevell Graph, the m exponent needed for the calcMcc() function.
     - __Assumptions:__
         - Mcc Zero sweep is only defined for CL > 0 and CL <= .60, so:
             - __If AoA is negative, CL is calculated using the negative AoA, then the abs value is taken and used for the reading (this *should* work).__
-                - CL is not symmetric around zero, hence why it calculated with the negative AoA, then the abs value is taken.
+                - CL is not symmetric around zero, hence why it is calculated with the negative AoA, then the abs value is taken.
             - __If CL > .60, the function returns m = .50__ It is not the worst assumption ever, but it certainly contributes to error. Although, it is my belief this is a conservative estimate.
 
 1. ```double calcRootInertiaEstimate() const```
-     - Three attempts were made at implementing this function with three different methods (all within the code, 2/3 commented out) - mainly differing in how they approx the inertia at the root of the wing. The results of these implementations were fairly useless (some methods gave unreasonably high estimates, some gave unreasonable low estimates)
+     - Three attempts were made at implementing this function with three different methods (all within the code, 2/3 commented out) - mainly differing in how they approximate the inertia at the root of the wing. The results of these implementations were fairly useless (some methods gave unreasonably high estimates, some gave unreasonable low estimates)
         - A MIT Lab had an empirical equation for inertia  that involved using airfoil characteristics (which this class is robust enough to implement)
         - A method of calculating the inertia caused by the caps in the wing (assuming their characteristics and scaling based on rootChord)
             - Multiple Airplane design books (structure design mainly) made claims along the lines that the caps account for most of the inertia in the wing.
@@ -647,15 +647,15 @@ Note: The Wing class is meant to be used in tandem with the Airplane class. You 
         - There is no error or bound checks implemented (be careful to not pass in a distance longer than the span)
 
 1. ```double calcArea(double inSpan, double inRootChord, double inTaperRatio) const```
-    - This function calculates and the returns the area for a trapezoidal wing, with the passed in parameters.
-        - There is a private helper function that uses the same calculations, but doesn't take in any parameters, used behind the scences (calcAndSetArea()).
+    - This function calculates and returns the area for a trapezoidal wing, with the parameters passed in.
+        - There is a private helper function that uses the same calculations, but doesn't take in any parameters, used behind the scenes (calcAndSetArea()).
 
 1. ```double calcMAC(double inRootChord, double inTaperRatio) const;```
-    - This function calculates and the returns the Mean Aerodynamic Chord (MAC) for a trapezoidal wing, with the passed in parameters.
+    - This function calculates and then returns the Mean Aerodynamic Chord (MAC) for a trapezoidal wing, with the parameters passed in.
         - There is a private helper function that uses the same calculations, but doesn't take in any parameters, used behind the scenes (calcAndSetMAC()).
 
 1. ```double calcAspectRatio(double inSpan, double inArea) const```
-    - This function calculates and the returns the Aspect Ratio for a trapezoidal wing, with the passed in parameters.
+    - This function calculates and then returns the Aspect Ratio for a trapezoidal wing, with the parameters passed in.
         - There is a private helper function that uses the same calculations, but doesn't take in any parameters, used behind the scenes (calcAndSetAspectRatio()).
 
 1. ```double calcEllipEfficiency(double inSweepAngleRad, double inAspectRatio, double inTaperRatio) const```
@@ -732,7 +732,7 @@ Note: The Wing class is meant to be used in tandem with the Airplane class. You 
 
 Technically not a true OOP class. __It is essentially a library of math functions that I needed for implementation of functions in other classes. There is header documentation for this file, which I copied and pasted below.__
 
-__Note: The logic behind these functions, and their actual implementation, I came up with completelty by myself. There might be better ways out there to implement these functions, however I wanted to take on the challenge of building these from the ground up. If you steal from this library, you might want to increase the discrete steps for some of these functions, so that they are more accurate.__ I have not tested their % errors, but I have tested the logic behind them, and I do know that they work and that they will be close, particularly for their implementation in this program. (Nothing will ever be perfect because of the discrete nature of some of the functions... well I suppose that statement only applies to the Vector Math and Vector-Based Functions, but the Polynomial Math functions might be... In all pratical applications of the Vector Math and Vector-Based Functions, increasing the steps will get you close enough though)
+__Note: The logic behind these functions, and their actual implementation, I came up with completely by myself. There might be better ways out there to implement these functions, however I wanted to take on the challenge of building these from the ground up. If you steal from this library, you might want to increase the discrete steps for some of these functions, so that they are more accurate.__ I have not tested their % errors, but I have tested the logic behind them, and I do know that they work and that they will be close, particularly for their implementation in this program. (Nothing will ever be perfect because of the discrete nature of some of the functions... well I suppose that statement only applies to the Vector Math and Vector-Based Functions, but the Polynomial Math functions might be... In all practical applications of the Vector Math and Vector-Based Functions, increasing the steps will get you close enough though)
 
 ### Functions / Copy Pasted Header Documentation:
 
@@ -748,14 +748,14 @@ __Note: The logic behind these functions, and their actual implementation, I cam
 	evalulateFunction() takes in one functions and the x coord to eval it at
 	
 
-	functionIntersection() takes in two functions in the for of vectors. 
+	functionIntersection() takes in two functions in the form of vectors. 
 		ASSUMES 1000 steps if you use the form where you don't specify
 		The function also takes in the domain (xmin and xmax) that you want to check intersections for.
 		The function then returns the x-cords where the curves intersect
 		The function returns an empty vector if there is no intersections
 
 
-	maxDistBetweenFunctions() takes in two functions in the for of vectors. 
+	maxDistBetweenFunctions() takes in two functions in the form of vectors. 
 		ASSUMES 1000 steps if you use the form where you don't specify
 		The function also takes in the domain (xmin and xmax)
 		The function then returns a vector with the first element being the x-cord of maxDistance
@@ -812,7 +812,7 @@ __Note: The logic behind these functions, and their actual implementation, I cam
 
 1. Fundamentals of Flight 2nd Edition by Shevell
     - Most notably used the Compressibility Drag Graphs (which rely on Mcc Graphs)
-1. Kutzmann's MAE 158 (UCI's Airplane Peformance Class) Notes
+1. Kutzmann's MAE 158 (UCI's Airplane Performance Class) Notes
     - Not publicly available
     - Used primarily for drag equations, power curve, and takeoff logic.
 1. Taha's Lec #1 Summary from his MAE 175 (UCI's Flight Dynamics Class)
