@@ -20,7 +20,7 @@ __Note: The program is currently setup to output the simulation data into the co
 
 __Data used in the "Results" section is based on 300 simulations for span, and 150 simulations for sweep angle.__
 
-\* The program is setup in the current manner, in order for a user to be able to easily see how it works, without needing to wait 10 mins for a bunch of simulations. A user should expect to only wait around 1-2mins for the program to run with it's current setup. __Additionally, since this program does not account for structural feasability (due to empirical equations not being reliable), it is my belief that it is more beneficial for the program to produce an easily plottable .csv file, for the user to intepret, rather than a traditional optimizer that just outputs one wing.__ 
+\* The program is setup in the current manner, in order for a user to be able to easily see how it works, without needing to wait 10 mins for a bunch of simulations. A user should expect to only wait around 1-2mins for the program to run with it's current setup. __Additionally, since this program does not account for structural feasibility (due to empirical equations not being reliable), it is my belief that it is more beneficial for the program to produce an easily plottable .csv file, for the user to interpret, rather than a traditional optimizer that just outputs one wing.__ 
 
 <br>
 <br>
@@ -100,26 +100,76 @@ By programming using the aforementioned methodologies, the classes I developed i
 # main() function - Optimizing the mainWing
 
 ## Overview / Approach:
-- Rework to be more of an overview (more laymans terms)
 
-The classes, which will be described in much more detail in the "Classes and Assumptions" section, whole purpose is to make it easier, among other things (readbility, modularity, etc), to code an optimizer. The main function first initializes an Airplane (by first initializing all the objects that compose and airplane) with the specific characteristics given in the project description (for objects like mainWing and Airfoil, which aren't given, we initialize them with realistic values). The main function then passes these objects into the optimizers. The optimizers run a simulation (based on a user defined amount of steps from a user defined minimum to a user defined maximum for that parameter) and return the sorted data (in ascending climb order) in a vector. After the last optimizer is called, the main function then calls a function to export the data into an excel sheet, so the user can visually see it (and keep it).
+__The main() program, this program, is currently set up to:__
+1. __Run an optimizer* for the wing span__ 
+    - __Produces "Span_OptimizerData.csv" in the folder the same folder the solution is in__
+    - Code is also implemented to print the ranked wing spans and their corresponding climb timess to the command window
+2. __Run an optimizer* for the wing sweep angle__ 
+    - __ONLY FOR THE BEST WING SPAN, from the wing span optimizer__
+    - __Produces "SweepAngle_OptimizerData.csv" in the folder the same folder the solution is in__
+     - Code is also implemented to print the ranked wing sweep angles and their corresponding climb times to the command window
+3. __(Optional) Below the optimizers there are sections of code that a user can comment and uncomment, in order to understand how the program works. Sections include:__
+    - ***"Other Functions that might be Intriguing"***
+        - __A single aircraft simulation__
+            - The optimizers essentially use this simulation for every data point they produce (for every step change of the parameter being optimized)
+        - __Power Curve Plot Function__
+            - This function is used by the single aircraft simulation. It is calculated every time step (which is around .05s) when climbing (and also calculated at possibly different time steps for takeoff and steady level acceleration functions)
+            - In other words, it is an essential part of basically every important airplane (simulation) function for this project.
+    - ***"Sanity Check Span Optimizer"***
+        - This optimizer uses a function that only calculates the power curve once (for steady level climb), and does not steady level accelerate after it reaches the first velocity for max excess power.
+        - As it's name implies, it is a sanity check to compare the current adjusted velocity climb logic to.
+4. __(Optional) Below those sections the implementation is where the optimizers (and some other useful main() functions) are implemented__
+
+
+
+
+
+
+
+__\* The explanation for the "optimizer" being setup how it currently is, explained in "Overview and Coding Methodology, Main Objective." TLDR, visual data is more useful (in my opinion), and if you increase the NUMBER_OF_SIMULATIONS to 200-300, and run it twice (narrowing the range after visually looking at the results from the first run), it is essentially an optimizer (that gives you all the data in an easily plotable .csv file to see trends, instead of just the best number :) )__
+
+
+***Note: As aforementioned, running this program, without any modifications, will run 25 simulations for 25 different wing spans, in the range that the wing span optimizer is set for. It will then take the best wing span from those simulations and then run 25 more simulations with that wing span and different sweep angles.***
+
+<br>
+
+
+A note on implementation: The classes, which will be described in much more detail in the "Classes and Assumptions" section, whole purpose is to make it easier, among other things (readbility, modularity, etc), to code the optimizers. The main function first initializes an Airplane (by first initializing all the objects that compose and airplane) with the specific characteristics given in the project description (for objects like mainWing and Airfoil, which aren't given, we initialize them with realistic values). The main function then passes these objects into the optimizers. The optimizers run NUMBER_OF_SIMULATIONS simulations and return the sorted data (in ascending climb order) in a vector. This data is printed to the command window, but more importantly exported to .csv files, so the user can visually analyze it by plotting it (and keep it).
+
 
 
 
 ## Functions:
 
 
+1. ```wingSpanOptimizerResults spanOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight, double minSpanFt, double maxSpanFt, int numSteps)```
+    - __This function simulates a numSteps amount of airplanes, each having a different, evenly spaced span from minSpanFt to maxSpanFt. It then calls on the sortWingsByClimbTime() function and returns the sorted data in the form of a wingSpanOptimizerResults struct.__
+    - This is the function that "optimizes" the Wing based on span.
+        - In reality it produces sorted data (by ascending climb times) based on the range and number of steps.
+1. ```wingSweepOptimizerResults sweepOptimizer(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight, double minSweepDeg, double maxSweepDeg, int numSteps)```
+    - __This function simulates a numSteps amount of airplanes, each having a different, evenly spaced sweep angle (quarter chord) from minSweepDeg to maxSweepDeg. It then calls on the sortWingsByClimbTime() function and returns the sorted data in the form of a wingSweepOptimizerResults struct.__
+    - This is the function that "optimizes" the Wing based on sweep angle.
+        - In reality it produces sorted data (by ascending climb times) based on the range and number of steps.
+1. ```void sortWingsByClimbTime(vector<double>& wingSpans, vector<double>& climbTimes)```
+    - Sorts the first inputted vector by the second inputted vector in an ascending order
+    - __Essentially sorts both the optimized parameter characteritic by the climb time in an efficient manner__
+    - This sorting algorithm needed to be developed because without it there would be no way to sort the first vector by the second vector's values. 
+1. ```wingSpanOptimizerResults spanOptimizerApprox(Wing& inWing, Wing& inHT, Wing& inVT, CF34_3B1& inEngine, Nacelle& inNacelle, Fuselage& inFuselage, double inFuelWeight, double inPayLoadWeight, double minSpanFt, double maxSpanFt, int numSteps)```
+    - Same as the spanOptimizer() function, except calls the calcRoughApproxTimeTo9km() simulation function instead of the calcBestTimeTo9km() simulation function.
+1. ```void printUsefulCharacteristics(Wing& inWing, Airplane& inAirplane)```
+    - Useful print statement of desirable Wing and Airplane characteristics.
+1. ```void spanOptimizerResultsToCSV(wingSpanOptimizerResults& results, string fileName)```
+    - Relies on a kadenMath function to export the passed in data into a .csv file.
+1. ```void sweepOptimizerResultsToCSV(wingSweepOptimizerResults& results, string fileName)```
+    - Relies on a kadenMath function to export the passed in data into a .csv file.
+
+
+
+
+
 <br>
-
-## Results:
-
-
-
-
 <br>
-<br>
-
-
 
 
 
@@ -137,7 +187,7 @@ The classes, which will be described in much more detail in the "Classes and Ass
 ## Airplane:
 
 ### Overview:
-The purpose of this class is to enable a user to easily get desired characteristics of an airplane and have an functional airplane object to use (like for simulations). An airplane object is initialized with three Wing objects (Main Wing, Horizontal Tail, and Vertical Tail), an CF34_3B1 object (the engines), a Nacelle object, a Fuselage object, a fuel weight, and a payload weight. 
+__The purpose of this class is to enable a user to easily get desired characteristics of an airplane and have an functional airplane object to use (like for simulations). An airplane object is initialized with three Wing objects (Main Wing, Horizontal Tail, and Vertical Tail), an CF34_3B1 object (the engines), a Nacelle object, a Fuselage object, a fuel weight, and a payload weight.__
 
 
 ### Disclosures:
@@ -310,7 +360,7 @@ The purpose of the Atmosphere Properties Class is to enable the calculations of 
 8. ```double getHeight()  const;```
     - Returns height in ft (not sure when you'd need this, but there for modularity)
 
-9. __Note: There are also ```calc"WantedProperty"``` for all the properties there are getters for.__
+9. __Note: There are also ```calc"WantedProperty"()``` for all the properties there are getters for.__
     - Use setHeight() mutator if you want to re-calc all properties... it is more efficient and recommended (over say using the calc functions for every property).
 
 
@@ -330,7 +380,8 @@ __The main purpose of the CF_34_3B1 Class is to be able to calculate the current
 Note: This class is derived from the TurboFan Class. We will ignore this implementation detail, and talk about it as if it was a stand alone class. It is derived from the TurboFan Class because it is a specific TurboFan engine. By deriving it, it would be easier to implement different types of TurboFan engines into the Airplane object. (However, the base class is fairly useless right now, since I simply implemented the functions (and private data members) in the CF_34_3B1 Class, since changing the engine is difficult - due to the amount of curves that have to be digitized). Still, even having this structure, allows modularity - in the future - to be enhanced  without too much thought. 
 
 ### Disclosures / Assumptions:
-1. __Switches the Thrust Curve and Fuel Loss functions half way between the two (rounds up).__
+1. __Switches the Thrust Curve and Fuel Loss functions half way between the two cutoffs (rounds up).__
+    - Random example (may or may not be in the program): If height is 2499m, there is a function for 2000m and one for 3000m, the 2000m function is used. If height is 2500m, then the 3000m one is used.
     - This is to avoid having to interpolate. Interpolation can be implemented, but it is a fairly minor approx.
 2. The Thrust Curve is fitted to a second degree polynomial with R^2 > .98 (but it could still be a bit off)
 3. The Fuel Loss Curve is fitted to a linear line with R^2 > .99 (but it could still be a bit off)
@@ -423,7 +474,7 @@ __This Class is primarily used in the Fuselage and Wing Classes, for those class
 ## Fuselage:
 
 ### Overview:
-The purpose of the Fuselage Class is to provide the functionality needed to calculate a total Airplane weight, lift coefficient, and drag coefficient. Therefore, the functionality of this class is fairly limited, but still sufficient for most purposes. 
+__The purpose of the Fuselage Class is to provide the functionality needed to calculate a total Airplane weight, lift coefficient, and drag coefficient.__ Therefore, the functionality of this class is fairly limited, but still sufficient for most purposes. 
 
 ### Disclosures / Assumptions:
 1. __Assuming the form factor of every Fuselage object is 1.2__
@@ -433,20 +484,22 @@ The purpose of the Fuselage Class is to provide the functionality needed to calc
 ### Notable Functions:
 
 1. ```double calcReynolds(double velocity, double kinematicViscosity) const```
-    - This function calculates the Reynolds number of the fuselage using the length of the fuselage
+    - This function calculates the Reynolds number of the Fuselage using the length of the Fuselage
         - This function is needed for Parasite Drag
 
-2. ```double calcWetRatio(double referenceArea) const```
-    - This function returns fuselage's wettedArea / referenceArea
+1. ```double calcWetRatio(double referenceArea) const```
+    - This function returns Fuselage's wettedArea divided by the referenceArea
         - This function is needed for Parasite Drag
 
-3.  ```double calcLiftCoeff(double AoA) const;```
+1.  ```double calcLiftCoeff(double AoA) const;```
     - ***This is commonly used function***
-    - This function returns the liftCoeff of the fuselage at a given AoA
+    - This function returns the lift coefficient of the Fuselage evaluated at the given AoA
 
-4. ```double calcDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const;```
+1. ```double calcDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const;```
     - ***This is the most used function***
-    - This function uses the DragCoeff Class to calculate the fuselage's total drag coeff at the given conditions
+    - This function uses the DragCoeff Class to calculate the Fuselage's total drag coefficient at the given conditions
+1. ```double getWeight() const```
+    - Returns the Fuselage's weight in lbms
 
 
 
@@ -483,7 +536,7 @@ The purpose of the Fuselage Class is to provide the functionality needed to calc
 
 ### Overview:
 
-The purpose of the Nacelle Class is to provide the functionality needed to calculate a total Airplane weight, lift coefficient, and drag coefficient. Therefore, the functionality of this class is fairly limited, but still sufficient for most purposes. 
+__The purpose of the Nacelle Class is to provide the functionality needed to calculate a total Airplane weight, lift coefficient, and drag coefficient.__ Therefore, the functionality of this class is fairly limited, but still sufficient for most purposes. 
 
 
 
@@ -503,13 +556,14 @@ The purpose of the Nacelle Class is to provide the functionality needed to calcu
         - This function is needed for Parasite Drag
 
 1. ```double calcWetRatio(double referenceArea) const```
-    - This function returns Nacelle's wettedArea / referenceArea
+    - This function returns Nacelle's wettedArea divided by the referenceArea
         - This function is needed for Parasite Drag
 
 1. ```double calcDragCoeff(double AoA, double Reynolds, double Mach, double wetAreaRatio) const;```
     - ***This is the most used function***
-    - This function uses the DragCoeff Class to calculate the Nacelle's total drag coeff at the given conditions 
-
+    - This function uses the DragCoeff Class to calculate the Nacelle's total drag coefficient at the given conditions 
+1. ```double getWeight() const```
+    - Returns the weight of a (single) Nacelle in lbms
 
 
 <br>
@@ -541,19 +595,22 @@ Note: The Wing class is meant to be used in tandem with the Airplane class. You 
 ### Notable Functions:
 
 1. ```double calcReynolds(double velocity, double kinematicViscosity) const```
-    - This function
+    - This function calculates the Reynolds number of the Wing using it's MAC
 
 1. ```double calcWettedArea() const```
-    - This function
+    - This function calculates the Wing's wetted area (= 2 * 1.02 * area)
 
 1. ```double calcWetRatio(double referenceArea) const```
-    - This function
+    - This function returns Wing's wettedArea divided by the referenceArea
 
 1. ```double calcDragCoeff(double AoA_rad, double Reynolds, double Mach, double wetAreaRatio) const```
-    - This function
+    - ***This is one of the most used functions***
+    - This function uses the DragCoeff Class to calculate the Wing's total drag coeff at the given conditions
 
 1. ```double calcLiftCoeff(double AoA_rad) const```
-    - This function
+    - ***This is one of the most used functions***
+    - This returns the lift coefficient of the Wing at the given AoA.
+
 
 1. ```double calcMcc(double AoA_rad) const```
     - This function calls on calcMccZeroSweep(), and calcSweptMExponent(), and plugs the results into the formula that Shevell provides for Mach Critical Crest Number (Mcc). 
@@ -576,10 +633,14 @@ Note: The Wing class is meant to be used in tandem with the Airplane class. You 
             - __If CL > .60, the function returns m = .50__ It is not the worst assumption ever, but it certainly contributes to error. Although, it is my belief this is a conservative estimate.
 
 1. ```double calcRootInertiaEstimate() const```
-    - This function
+     - Three attempts were made at implementing this function with three different methods (all within the code, 2/3 commented out) - mainly differing in how they approx the inertia at the root of the wing. The results of these implementations were fairly useless (some methods gave unreasonably high estimates, some gave unreasonable low estimates)
+        - A MIT Lab had an empirical equation for inertia  that involved using airfoil characteristics (which this class is robust enough to implement)
+        - A method of calculating the inertia caused by the caps in the wing (assuming their characteristics and scaling based on rootChord)
+            - Multiple Airplane design books (structure design mainly) made claims along the lines that the caps account for most of the inertia in the wing.
+        - A method that assumed the internal structure was a box and calculating the inertia of a thin walled box.
 
 1. ```double calc_C_ForRootStress() const```
-    - This function
+    - This function returns a constant that is used in tandem with calcRootInertiaEstimate(). The same three attempts have a different corresponding constant for each of them.
 
 1. ```double calcLocalChord(double distanceFromRoot) const```
     - This function calculates the local chord (ft) at the provided distance from the root.
@@ -613,11 +674,181 @@ Note: The Wing class is meant to be used in tandem with the Airplane class. You 
 
 
 1. ```void calcAndSetAllProperties()```
-    - This function is called 
+    - This private helper function is used to calculate and set: Area, MAC, AR, Oswald efficiency, and the 3D lift coefficient of the wing. 
+        - I do not advise changing the implementation of this function, since the order of the function calls matters
+    - Implemented to make the code more readable and so that anyone modifying the code does not have to worry about what each of the calcAndSet functions pre-conditions are.
+
+1. __Mutators:__
+    - ```void setWeight(double inWeight)```
+        - Takes in lbms
+    - ```void setSpan(double inSpan)```
+        - Takes in ft
+        - Recalculates and sets all the necessary properties
+
+    - ```void setSweepAngle(double inSweepAngle_DEG)```
+        - Quarter chord, takes in deg
+        - Recalculates and sets all the necessary properties
 
 
 
-1. ```Accessors```
-    - This function
+1. __Accessors:__
+    - Common accessors to get most (but not all) of the Wing's private member variables.
+        - ```double getArea() const```
+            - returns ft^2
+        - ```double getMAC() const```
+            - returns ft
+        - ```double getRootChord() const```
+            - returns ft
+        - ```double getTaperRatio() const```
+        - ```double getAspectRatio() const```
+        - ```double getSpan() const```
+            - returns ft
+        - ```double getWeight() const```
+            - returns lbm
+        - ```double getEllipticalEffic() const```
+            - Also known as Oswald Efficiency
+        - ```double getSweepAngle() const```
+            - Quarter Chord Sweep Angle
+            - returns degrees
+        - ```double getSweepAngleRad() const```
+            - Quarter Chord Sweep Angle
+            - returns degrees
+        - ```double getLeadingEdgeSweep() const```
+            - returns radians
+        - ```double getCL_Alpha() const```
+            - Returns term in front of CL_alpha (radians)
+                - (For the 3D CL)
+        - ```double getCL_Knott() const```
+            - Returns the non-alpha term of the CL
+                - (For the 3D CL)
+        - ```Airfoil* getAirfoil() const```
+            - Returns a pointer to the Airfoil the Wing is based on
 
-a
+
+
+## kadenMath:
+
+### Overview:
+
+Technically not a true OOP class. __It is essentially a library of math functions that I needed for implementation of functions in other classes. There is header documentation for this file, which I copied and pasted below.__
+
+__Note: The logic behind these functions, and their actual implementation, I came up with completelty by myself. There might be better ways out there to implement these functions, however I wanted to take on the challenge of building these from the ground up. If you steal from this library, you might want to increase the discrete steps for some of these functions, so that they are more accurate.__ I have not tested their % errors, but I have tested the logic behind them, and I do know that they work and that they will be close, particularly for their implementation in this program. (Nothing will ever be perfect because of the discrete nature of some of the functions... well I suppose that statement only applies to the Vector Math and Vector-Based Functions, but the Polynomial Math functions might be... In all pratical applications of the Vector Math and Vector-Based Functions, increasing the steps will get you close enough though)
+
+### Functions / Copy Pasted Header Documentation:
+
+
+#### Polynomial Math:
+
+	Functions are passed in by using vectors:
+	The length of the vector determines the highest term.
+	Ex: 4x^3 + 3x^2 + x + 10 would be in a vector <4, 3, 0, 1, 10>	
+
+
+
+	evalulateFunction() takes in one functions and the x coord to eval it at
+	
+
+	functionIntersection() takes in two functions in the for of vectors. 
+		ASSUMES 1000 steps if you use the form where you don't specify
+		The function also takes in the domain (xmin and xmax) that you want to check intersections for.
+		The function then returns the x-cords where the curves intersect
+		The function returns an empty vector if there is no intersections
+
+
+	maxDistBetweenFunctions() takes in two functions in the for of vectors. 
+		ASSUMES 1000 steps if you use the form where you don't specify
+		The function also takes in the domain (xmin and xmax)
+		The function then returns a vector with the first element being the x-cord of maxDistance
+		and the second element being the maxDistance.
+
+
+
+
+
+
+#### Vector Math and Vector-Based Functions:
+
+	curveIntersection() takes in takes in 3 data sets (x, y1, y2).
+		- y1 and y2 must have the same x scale and be the same size
+		- This function will compare every single data point to see if there is an intersection
+			- If there is an intersection, it estimates the intersection x coord (midpoint of them)
+		- The function then returns a vector of x-cords where the curves intersect
+		- The function returns an empty vector if there is no intersections
+
+
+
+	curveIntersection() takes in 3 data sets and how often to check (x, y1, y2, skip).
+		- y1 and y2 must have the same x scale and be the same size
+		- skip = 2 then we compare every other point to see if there is an intersection
+			- skip = 3 then every third point... etc... lose accuracy higher skip is
+		- The function then returns a vector of x-cords where the curves intersect
+		- The function returns an empty vector if there is no intersections
+
+
+
+	maxDistBetweenCurves() takes in 3 data sets (x, y1, y2).
+		- It does not care if the curves intersect or which curve is on top.
+		- It then returns a vector = {maxLocation, maxDistance} of y1 and y2
+
+
+
+
+	maxDistBetweenCurves2() takes in 3 data sets (x, y1, y2). 
+		- It is sensitive to y1 and y2. ONLY RECORDS DISTANCES WHEN y1>y2
+		- Returns an empty vector if y1 is never greater than y2
+		- It then returns a vector = {maxLocation, maxDistance} of y1 and y2
+
+	```saveVectorsToCSV()``` takes in 2 or 3 vectors (x,y1,y2) of the same size and converts the data to a CSV file with the filename
+
+
+
+<br>
+<br>
+
+# Sources / References Used 
+\* Currently not a very formal list, but you should be able to find every reference.
+<br>
+<br>
+
+1. Fundamentals of Flight 2nd Edition by Shevell
+    - Most notably used the Compressibility Drag Graphs (which rely on Mcc Graphs)
+1. Kutzmann's MAE 158 (UCI's Airplane Peformance Class) Notes
+    - Not publicly available
+    - Used primarily for drag equations, power curve, and takeoff logic.
+1. Taha's Lec #1 Summary from his MAE 175 (UCI's Flight Dynamics Class)
+    - http://taha.eng.uci.edu/Flight_Mechanics_Course.html
+        - Lec #1 Summary
+    - Pulled trapezoidal wing equations from it
+1. NASA's Earth Atmosphere Model (Imperial Units) from Glenn Research Center
+    - https://www.grc.nasa.gov/www/k-12/airplane/atmos.html
+    - The backbone of my Atmosphere Properties Class
+1. NASA's Air Viscosity (Sutherland's Formula) from Glenn Research Center
+    - https://www.grc.nasa.gov/www/BGH/viscosity.html
+    - Also used in my Atmosphere Properties Class
+1. Raymer, D. (2012) Aircraft Design: A Conceptual Approach. 2nd Edition.
+    - https://doi.org/10.2514/4.107290
+    - Dr. Raymer's Airplane Design book.
+    - Particularly used pages 418-423 (Similar to his public weight approximations, but also the justification for the composite fudge factor used)
+1. https://aircraftdesign.com/weights-methods-sources-for-aircraft-design-a-conceptual-approach/
+    - Dr. Raymer's public wing weight approximations.
+1. Sadraey M., Aircraft Performance Analysis, VDM Verlag Dr. Müller, 2009
+    - https://studylib.net/doc/18261789/chapter-3-drag-force-and-drag-coefficient
+    - Oswald efficiency factor estimation equations 
+        - Swept wing one is unreliable from my experience
+        - Unswept wing one is reliable from my experience
+    - The same Oswald efficiency equations can also be found in Sadraey's Chapter 5:
+        - https://studylib.net/doc/27723372/wing-design-sadraey
+1. Introduction to Aircraft Stability and Control Course Notes for M&AE 5070 by Caughey
+    - https://courses.cit.cornell.edu/mae5070/Caughey_2011_04.pdf
+    - Airfoil equations are taken from this paper (page 15 - 16)
+    - 2D to 3D CL conversion also taken from this paper (page 17)
+        - Lifting line theory equations, slender body, and empirical adaptations of them
+        - In particular I used equation 2.22, which includes a correction for sweep
+            - There are other (possibly more accurate) CL conversions in this paper, see equation 2.24 others around it, if interested.
+1. https://www.law.cornell.edu/cfr/text/14/25.337
+    - FAR Cert 25 / Loading factor legal limits
+    - Equation used to verify the weight of the wing (and get the load factor)
+1. https://web.mit.edu/16.unified/www/archives%202007-2008/spring%20temps/psets/systems/beambend.pdf
+    - This is the MIT Lab report for the Inertia / Root moment attempts
+1. https://vtechworks.lib.vt.edu/server/api/core/bitstreams/82645ad0-2826-4985-bbe5-14ce2fc7149d/content
+    - This is a paper that also was used to try to estimate Inertia / Root moment.
