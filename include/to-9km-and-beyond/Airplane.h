@@ -81,11 +81,12 @@ namespace airplane {
 
 
 		// Feasability of Wing
-		bool isWingPossible() const;                       // Returns true if the mainWing can withstand the load
+		bool isWingPossible() const;        // Returns true if the mainWing can withstand the load - Not currently in a working state (estimations eqns were off)
 
 
 		// Graphing Functions
-		void getFlightEnvelopeTo9kmCSV(const std::string& fileName);
+		void getFlightEnvelopeTo9kmCSV(const std::string& fileName);  // Returns two .csv files that need to be manually combined into one, and then plotted.
+
 
 		// Accessors:
 		double getWeight() const;							// lbms

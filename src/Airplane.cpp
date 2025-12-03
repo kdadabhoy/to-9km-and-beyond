@@ -548,10 +548,14 @@ namespace airplane {
 
 	// Small Angle Approx (cos(gamma) ~= 1)
 	void Airplane::calcAndSetPowerCurveData(double height) {
+	/*
+		* Can't do this bc it induces error
 		if (powerCurveVelocityData.empty()) {
 			powerCurveVelocityData = calcPowerCurveVelocityData(height);
 		}
+	*/
 
+		powerCurveVelocityData = calcPowerCurveVelocityData(height);
 		powerRequiredData = calcPowerRequiredData(height);
 		powerAvailableData = calcPowerAvailableData(height);
 		calcAndSetMaxExcessPower();
@@ -1612,39 +1616,83 @@ namespace airplane {
 // Graphing Functions
 
 
-	// Uses small angle approx for gamma (In other words, gamma doesnt effect Power Curve)
-	// Doesn't take weight loss into account
-	void Airplane::getFlightEnvelopeTo9kmCSV(const std::string& fileName) {
-		double height = 0;
-		double endHeight = 29527.56;
-		double HEIGHT_STEP = 1000;		// Can Change if too inefficient or too inaccurate
 
-		vector<double> heightVector;    // Height
-		vector<double> maxROCVector;    // Mach for max RoC
-		vector<double> minMachVector;   // Min Mach we can fly at
-		vector<double> maxMachVector;   // Max Mach we can fly at
-		vector<double> machVector = calcPowerCurveMachData();
+
+
+
+	/*
+		- Produces a flight envelope for the given airplane... this envelope does not take into account
+		  structural or other constraints. It just gives the max and min mach that you can fly at
+		  and the mach for best RoC. 
+		- It outputs 2 .csv files. You need to copy over the Flight_Envelope_RoC_Data into the 
+		  Flight_Envelope_Max_and_Min_Mach_Data, csv. Then you need to plot (Scatter plot)
+		 the right column as x and the left column as y, for both sets of data. 
+		 This will produce the envelope.
+
+
+		 // Uses small angle approx for gamma (In other words, gamma doesnt effect Power Curve)
+		// Doesn't take weight loss into account
+	
+	*/
+	void Airplane::getFlightEnvelopeTo9kmCSV(const std::string& fileName) {
+		double height = 0.0;
+		double endHeight = 70e3;       // Used for full flight envelope
+		double HEIGHT_STEP = 500.0;		// Can Change if too inefficient or too inaccurate
+
+		vector<double> heightVector1;		// Height
+		vector<double> heightVector2;		 // Height
+		vector<double> maxROCVector;		// Mach for max RoC
+		vector<double> extermaMachVector;   // Max and Min machs we can fly at
+		vector<double> distanceBetweenCurvesRoC;
+		vector<double> machVector;
 		vector<double> intersectionPoints;
 		double maxROC_Mach = 0;
 
-		while (height <= endHeight) {
+
+
+		while (height < endHeight) {
+
 			calcAndSetPowerCurveData(height);
-			heightVector.push_back(height);
 
-			maxROC_Mach = maxDistBetweenCurves2(powerCurveVelocityData, powerAvailableData, powerRequiredData)[0];  // Returns velocity for max Roc
-			AtmosphereProperties Cond(height);
-			maxROC_Mach = maxROC_Mach / (sqrt(1.4 * GAS_CONSTANT * Cond.getTemperature()));
-			maxROCVector.push_back(maxROC_Mach);
+			distanceBetweenCurvesRoC = maxDistBetweenCurves2(powerCurveVelocityData, powerAvailableData, powerRequiredData);
+			if (distanceBetweenCurvesRoC.size() > 0) {
 
+				heightVector1.push_back(height);
+				maxROC_Mach = distanceBetweenCurvesRoC[0];
+				AtmosphereProperties Cond(height);
+				maxROC_Mach = maxROC_Mach / (sqrt(1.4 * GAS_CONSTANT * Cond.getTemperature()));
+				maxROCVector.push_back(maxROC_Mach);
+			}
+
+			machVector = calcPowerCurveMachData();
 			intersectionPoints = curveIntersection(machVector, powerAvailableData, powerRequiredData);
-			assert(intersectionPoints.size() == 2);
-			minMachVector.push_back(intersectionPoints[0]);
-			maxMachVector.push_back(intersectionPoints[1]);
-
-			height += HEIGHT_STEP;
+			int i = 0;
+			while (i < intersectionPoints.size() && intersectionPoints.size() > 0) {
+				heightVector2.push_back(height);
+				extermaMachVector.push_back(intersectionPoints[i]);
+				i++;
+			}
+		
+			height = height + HEIGHT_STEP;
 		}
 
-		saveVectorsToCSV(heightVector, maxROCVector, minMachVector, maxMachVector, fileName);
+		
+
+
+		string filename1 = fileName;
+		string filename2 = fileName;
+	
+		int pos = fileName.rfind('.');
+		if (pos == string::npos) {
+			filename1 += "_RoC_Data";
+			filename2 += "_Max_and_Min_Mach_Data";
+		} else {
+			filename1 = filename1.substr(0, pos) + "_RoC_Data" + filename1.substr(pos);
+			filename2 = filename2.substr(0, pos) + "_Max_and_Min_Mach_Data" + filename2.substr(pos);
+		}
+
+		saveVectorsToCSV(heightVector1, maxROCVector, filename1);
+		saveVectorsToCSV(heightVector2, extermaMachVector, filename2);
 
 		return;
 	}

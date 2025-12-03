@@ -344,7 +344,7 @@ int main() {
 	wingSpanOptimizerResults spanResults;
 	double MIN_SPAN_SIMULATED = 20.0;     // Min span in ft (Optimizer aborts at below ~20ft)
 	double MAX_SPAN_SIMULATED = 150.0;     // Max span in ft (Optimize aborts at ~461ft+)
-	int NUMBER_OF_SIMULATIONS = 1;      // How many evenly spaced steps in the range the optimizer will simulate
+	int NUMBER_OF_SIMULATIONS = 25;      // How many evenly spaced steps in the range the optimizer will simulate
 									      // 50 Steps ~ 1 min, obv more will take more time... and depends on computer
 
 
@@ -442,7 +442,7 @@ int main() {
 	wingSweepOptimizerResults sweepResults;
 	double MIN_SWEEP_ANGLE_SIMULATED = 0.0;     // deg
 	double MAX_SWEEP_ANGLE_SIMULATED = 60.0;    // deg
-	int NUMBER_OF_SIMULATIONS2 = 1;           // How many evenly spaced steps in the range the optimizer will simulate
+	int NUMBER_OF_SIMULATIONS2 = 25;           // How many evenly spaced steps in the range the optimizer will simulate
 									            // 50 Simulations ~ 1 min, obv more will take more time... and depends on computer
 
 	cout << "***************************************" << endl;
@@ -479,11 +479,35 @@ int main() {
 
 /*
 	 **********************************************
-					End of
-			Optimizers Used for Report
+						End of
+				Optimizers Used for Report
 	 **********************************************
 */
 
+
+
+
+
+
+
+
+
+/*
+	**********************************************
+					Flight Envelope
+	**********************************************
+
+
+	- Produces a flight envelope for the given airplane... this envelope does not take into account
+	structural or other constraints. It just gives the max and min mach that you can fly at
+	and the mach for best RoC. 
+	- It outputs 2 .csv files. You need to copy over the Flight_Envelope_RoC_Data into the 
+	Flight_Envelope_Max_and_Min_Mach_Data, csv. Then you need to plot (Scatter plot)
+	the right column as x and the left column as y, for both sets of data. 
+	This will produce the envelope.
+*/
+
+	airplane.getFlightEnvelopeTo9kmCSV("Flight_Envelope.csv");
 
 
 
@@ -581,7 +605,7 @@ int main() {
 */
 
 /*
-	double heightPowerCurveFunction = 0;
+	double heightPowerCurveFunction = 5000;
 	string fileNamePowerCurve = "PowerCurve.csv";
 	airplane.getPowerCurveCSV(heightPowerCurveFunction, fileNamePowerCurve);
 */
@@ -664,20 +688,6 @@ int main() {
 
 
 
-
-
-
-
-
-
-
-/*
-	**********************************************
-					Flight Envelope
-	**********************************************
-*/
-
-	airplane.getFlightEnvelopeTo9kmCSV("Flight_Envelope.csv");
 
 
 
