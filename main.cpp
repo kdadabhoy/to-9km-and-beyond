@@ -276,10 +276,10 @@ int main() {
 
 
 	// Main Wing Stuff (only RootChord, TipChord, and Airfoil matter, rest is optmized)
-	double mainSpan = 60.864 * FEET_TO_INCHES;				  // inches
+	double mainSpan = 69.35 * FEET_TO_INCHES;				  // inches
 	double mainRootChord = 12.0 * FEET_TO_INCHES;			  // inches
 	double mainTipChord = 4.8 * FEET_TO_INCHES;				  // inches
-	double mainSweepAngle = 20.0;							  // degrees
+	double mainSweepAngle = 20;							  // degrees
 
 	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle); 
 	Airplane airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
@@ -344,7 +344,7 @@ int main() {
 	wingSpanOptimizerResults spanResults;
 	double MIN_SPAN_SIMULATED = 20;     // Min span in ft (Optimizer aborts at below ~20ft)
 	double MAX_SPAN_SIMULATED = 150;    // Max span in ft (Optimize aborts at ~461ft+)
-	int NUMBER_OF_SIMULATIONS = 1;      // How many evenly spaced steps in the range the optimizer will simulate
+	int NUMBER_OF_SIMULATIONS = 25;      // How many evenly spaced steps in the range the optimizer will simulate
 									    // 50 Steps ~ 1 min, obv more will take more time... and depends on computer
 
 
@@ -440,15 +440,15 @@ int main() {
 
 	// This is the range the optimizer runs on
 	wingSweepOptimizerResults sweepResults;
-	double MIN_SWEEP_ANGLE_SIMULATED = 0.0;     // deg
-	double MAX_SWEEP_ANGLE_SIMULATED = 60.0;    // deg
+	double MIN_SWEEP_ANGLE_SIMULATED = 0;     // deg
+	double MAX_SWEEP_ANGLE_SIMULATED = 60;    // deg
 	int NUMBER_OF_SIMULATIONS2 = 25;           // How many evenly spaced steps in the range the optimizer will simulate
 									            // 50 Simulations ~ 1 min, obv more will take more time... and depends on computer
 
 	cout << "***************************************" << endl;
 	cout << "****** Running Sweep Optimizer: *******" << endl;
 	cout << "***************************************" << endl << endl;
-	sweepResults = sweepOptimizer(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight,
+	sweepResults = sweepOptimizer(mainWingSweepOptimizer, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight,
 		MIN_SWEEP_ANGLE_SIMULATED, MAX_SWEEP_ANGLE_SIMULATED, NUMBER_OF_SIMULATIONS2);								// This will print "simulating" while operating
 
 
