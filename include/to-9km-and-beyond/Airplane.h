@@ -84,6 +84,9 @@ namespace airplane {
 		bool isWingPossible() const;                       // Returns true if the mainWing can withstand the load
 
 
+		// Graphing Functions
+		void getFlightEnvelopeTo9kmCSV(const std::string& fileName);
+
 		// Accessors:
 		double getWeight() const;							// lbms
 		double getMainWingWeight() const;                   // lbms

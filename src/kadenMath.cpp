@@ -350,6 +350,46 @@ namespace kaden_math {
 
 
 
+
+
+
+	void saveVectorsToCSV(const vector<double>& x, const vector<double>& y1, const vector<double>& y2, const vector<double>& y3, const string& filename) {
+
+		if (x.size() != y1.size() && x.size() != y2.size() && x.size() != y3.size()) {
+			cout << "Error: Vecs not the same size" << endl;
+			return;
+		}
+
+		std::ofstream file(filename);
+		if (!file.is_open()) {
+			cout << "Could not open file" << endl;
+			return;
+		}
+
+
+		file << std::fixed << std::setprecision(6);
+
+		for (int i = 0; i < x.size(); i++) {
+			file << x[i] << ", " << y1[i] << ", " << y2[i] << ", " << y3[i] << "\n";
+		}
+
+		file.close();
+		cout << "Data is saved to: " << filename << endl;
+		return;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Linear Math
 
 	double linearInterpolate(double point, double x1, double y1, double x2, double y2) {

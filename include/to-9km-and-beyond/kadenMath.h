@@ -95,6 +95,7 @@ namespace kaden_math {
 
 	void saveVectorsToCSV(const vector<double>& x, const vector<double>& y, const string& filename);
 	void saveVectorsToCSV(const vector<double>& x, const vector<double>& y1, const vector<double>& y2, const string& filename);
+	void saveVectorsToCSV(const vector<double>& x, const vector<double>& y1, const vector<double>& y2, const vector<double>& y3, const string& filename);
 
 
 	// Linear Math

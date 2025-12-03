@@ -14,6 +14,7 @@ using kaden_math::saveVectorsToCSV;
 using kaden_math::evaluateFunction;
 using kaden_math::maxDistBetweenCurves2;
 using kaden_math::linearInterpolate;
+using kaden_math::curveIntersection;
 using std::floor;
 
 using namespace std;
@@ -1603,6 +1604,50 @@ namespace airplane {
 
 
 
+
+
+
+
+
+// Graphing Functions
+
+
+	// Uses small angle approx for gamma (In other words, gamma doesnt effect Power Curve)
+	// Doesn't take weight loss into account
+	void Airplane::getFlightEnvelopeTo9kmCSV(const std::string& fileName) {
+		double height = 0;
+		double endHeight = 29527.56;
+		double HEIGHT_STEP = 1000;		// Can Change if too inefficient or too inaccurate
+
+		vector<double> heightVector;    // Height
+		vector<double> maxROCVector;    // Mach for max RoC
+		vector<double> minMachVector;   // Min Mach we can fly at
+		vector<double> maxMachVector;   // Max Mach we can fly at
+		vector<double> machVector = calcPowerCurveMachData();
+		vector<double> intersectionPoints;
+		double maxROC_Mach = 0;
+
+		while (height <= endHeight) {
+			calcAndSetPowerCurveData(height);
+			heightVector.push_back(height);
+
+			maxROC_Mach = maxDistBetweenCurves2(powerCurveVelocityData, powerAvailableData, powerRequiredData)[0];  // Returns velocity for max Roc
+			AtmosphereProperties Cond(height);
+			maxROC_Mach = maxROC_Mach / (sqrt(1.4 * GAS_CONSTANT * Cond.getTemperature()));
+			maxROCVector.push_back(maxROC_Mach);
+
+			intersectionPoints = curveIntersection(machVector, powerAvailableData, powerRequiredData);
+			assert(intersectionPoints.size() == 2);
+			minMachVector.push_back(intersectionPoints[0]);
+			maxMachVector.push_back(intersectionPoints[1]);
+
+			height += HEIGHT_STEP;
+		}
+
+		saveVectorsToCSV(heightVector, maxROCVector, minMachVector, maxMachVector, fileName);
+
+		return;
+	}
 
 
 
