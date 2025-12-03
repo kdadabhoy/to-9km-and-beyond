@@ -342,10 +342,10 @@ int main() {
 
 	// This is the range the optimizer runs on (Feel free to change)
 	wingSpanOptimizerResults spanResults;
-	double MIN_SPAN_SIMULATED = 20.0;     // Min span in ft (Optimizer aborts at below ~20ft)
-	double MAX_SPAN_SIMULATED = 150.0;     // Max span in ft (Optimize aborts at ~461ft+)
-	int NUMBER_OF_SIMULATIONS = 25;      // How many evenly spaced steps in the range the optimizer will simulate
-									      // 50 Steps ~ 1 min, obv more will take more time... and depends on computer
+	double MIN_SPAN_SIMULATED = 20;     // Min span in ft (Optimizer aborts at below ~20ft)
+	double MAX_SPAN_SIMULATED = 150;    // Max span in ft (Optimize aborts at ~461ft+)
+	int NUMBER_OF_SIMULATIONS = 1;      // How many evenly spaced steps in the range the optimizer will simulate
+									    // 50 Steps ~ 1 min, obv more will take more time... and depends on computer
 
 
 
@@ -432,7 +432,7 @@ int main() {
 
 
 	// Otherwise use this line:
-	double SPAN_FOR_SWEEP_OPTIMIZER = 60.864 * FEET_TO_INCHES;      // ft, you pick
+	double SPAN_FOR_SWEEP_OPTIMIZER = 69.35 * FEET_TO_INCHES;      // ft, you pick
 	Wing mainWingSweepOptimizer(NACA2412, SPAN_FOR_SWEEP_OPTIMIZER, mainTipChord, mainRootChord, mainSweepAngle);
 
 
