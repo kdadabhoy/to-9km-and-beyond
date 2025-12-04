@@ -269,7 +269,7 @@ int main() {
 	double fuselageWeight = 0.95 * givenAirplaneWeight;		   // lbms... we will also store the VT and HT weight in this
 	double nacelleWeight = 0.025 * givenAirplaneWeight;		   // lbms.. we will just said each one is 2.5% of fuselage+VT+HT
 	double fuselageLength = 51.817 * FEET_TO_INCHES;		   // inches, from CAD
-	double fuselageWettedArea = 811.55 * FEET_TO_INCHES;       // inches, from Doc
+	double fuselageWettedArea = 811.55 * FEET_TO_INCHES * FEET_TO_INCHES;       // inches, from Doc
 	double nacelleWettedArea = 159.87 * FEET_TO_INCHES;        // inches, from Doc
 	double nacelleLength = 7.27 * FEET_TO_INCHES;              // inches, from CAD
 	Nacelle nacelle(nacelleWeight, nacelleLength, nacelleWettedArea);                 

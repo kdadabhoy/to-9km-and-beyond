@@ -21,8 +21,8 @@ namespace airplane {
 
 	Fuselage::Fuselage(double inWeight, double inLength, double inWettedArea) {
 		weight = inWeight;
-		length = inLength / 12;
-		wettedArea = inWettedArea / 12;
+		length = inLength / FEET_TO_INCHES;
+		wettedArea = inWettedArea / (FEET_TO_INCHES * FEET_TO_INCHES);
 	}
 
 

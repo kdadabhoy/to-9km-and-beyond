@@ -43,6 +43,10 @@ namespace airplane {
 		double CL_alpha = .20;          // CL_alpha ~.1-.3
 		double CL_knott = 0.0;           // CL_knott ~ 0... 
 	
+
+
+		static constexpr double FEET_TO_INCHES = 12.0;    
+
 	};
 
 
