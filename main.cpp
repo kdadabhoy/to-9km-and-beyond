@@ -102,6 +102,7 @@
 				- That section, is "nicer" "debugging" code that can help you see
 				what the code is generating for each simulation
 					- Like the power curve
+					- Also has a rough version of a flight envelope
 
 
 			- *** You probably will want to look at Airplane.cpp first ***
@@ -279,7 +280,7 @@ int main() {
 	double mainSpan = 69.35 * FEET_TO_INCHES;				  // inches
 	double mainRootChord = 12.0 * FEET_TO_INCHES;			  // inches
 	double mainTipChord = 4.8 * FEET_TO_INCHES;				  // inches
-	double mainSweepAngle = 20;							  // degrees
+	double mainSweepAngle = 19.957;							  // degrees
 
 	Wing mainWing(NACA2412, mainSpan, mainTipChord, mainRootChord, mainSweepAngle); 
 	Airplane airplane(mainWing, HT, VT, CF34_3B1, nacelle, fuselage, startingFuelWeight, payLoadWeight);
@@ -492,22 +493,24 @@ int main() {
 
 
 
-/*
-	**********************************************
-					Flight Envelope
-	**********************************************
 
 
-	- Produces a flight envelope for the given airplane... this envelope does not take into account
-	structural or other constraints. It just gives the max and min mach that you can fly at
-	and the mach for best RoC. 
-	- It outputs 2 .csv files. You need to copy over the Flight_Envelope_RoC_Data into the 
-	Flight_Envelope_Max_and_Min_Mach_Data, csv. Then you need to plot (Scatter plot)
-	the right column as x and the left column as y, for both sets of data. 
-	This will produce the envelope.
-*/
 
-	airplane.getFlightEnvelopeTo9kmCSV("Flight_Envelope.csv");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -613,6 +616,33 @@ int main() {
 
 
 
+
+
+
+
+
+
+
+
+/*
+	**********************************************
+					Flight Envelope
+	**********************************************
+
+
+	- Produces a flight envelope for the given airplane... this envelope does not take into account
+	structural or other constraints. It just gives the max and min mach that you can fly at
+	and the mach for best RoC.
+	- It outputs 2 .csv files. You need to copy over the Flight_Envelope_RoC_Data into the
+	Flight_Envelope_Max_and_Min_Mach_Data, csv. Then you need to plot (Scatter plot)
+	the right column as x and the left column as y, for both sets of data.
+	This will produce the envelope.
+*/
+
+
+/*
+	airplane.getFlightEnvelopeTo9kmCSV("Flight_Envelope.csv");
+*/
 
 
 
