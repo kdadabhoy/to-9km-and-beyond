@@ -119,11 +119,12 @@ Finally, this program (in the Airplane class) also provides a getFlightEnvelopeC
 <br>
 
 ### Power Curve Example:
+![Power Curve](images/PowerCurveExample.png)
 
 <br>
 
 ### Rough Flight Envelope Example:
-
+![Rough Flight Envelope](images/RoughFlightEnvelopePic.png)
 
 <br>
 
@@ -136,6 +137,7 @@ Read “main() function - Optimizing the mainWing,” in particular the “Overv
 <br>
 
 ### Proof of Concept Span Optimizer Example:
+![Proof of Concept Span Optimizer](images/ProofOfConceptSpanOptimizer.png)
 
 
 
