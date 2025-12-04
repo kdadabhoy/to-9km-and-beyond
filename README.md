@@ -1,6 +1,7 @@
 <div align="center">
 
 # to-9km-and-beyond 
+![Optimized Airplane](images/airplanePic.png)
 ## Time to Climb Project (Wing Optimization Program for a Subsonic Aircraft)
 ## by Kaden Dadabhoy
 
