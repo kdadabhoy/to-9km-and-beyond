@@ -903,6 +903,15 @@ __Note: The logic behind these functions, and their actual implementation, I cam
 <br>
 <br>
 
+# Digitizations Used:
+1. __CF_34_3B1 Performance Map Curves__
+    - https://docs.google.com/spreadsheets/d/1ph23VEj1hugerYqMQoeUu9L1_QRhiHzcaX5llZechK0/edit?usp=sharing
+1. __Shevell Curves__
+    - https://docs.google.com/spreadsheets/d/1aDkdCQmh1su8NraLLbz6UOE5q9HRwRi64MOMwgoXtHI/edit?usp=sharing
+    - https://docs.google.com/spreadsheets/d/191bTttgEXNpdaZQEr0Y62Cjn6OVTYuN3DE_PHHSkxU4/edit?usp=sharing
+    - https://docs.google.com/spreadsheets/d/13HA03-wWHd9-3D6zMz48A2FV5OsTXPBYq9QVKQSBH8Q/edit?usp=sharing
+
+
 # Sources / References Used 
 \* Currently not a very formal list, but you should be able to find every reference.
 <br>
