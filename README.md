@@ -11,16 +11,16 @@
 ## Overview and Coding Methodology
 
 ### Main Objective 
-__The main objective of this project is to optimize the main wing of an aircraft to beat the FAI record for C-1k planes climbing to 9,000m with a 1,000kg payload (https://fai.org/record/4918), currently held by Gary M. Freeman.__ In other words, the goal of this program is to optimize a main wing around the airplane's climb time to 9,000m. 
+__The main objective of this program is to be used to optimize the main wing of an aircraft to beat the FAI record for C-1k planes climbing to 9,000m with a 1,000kg payload (https://fai.org/record/4918), currently held by Gary M. Freeman.__ In other words, the goal of this program is to be used to optimize a main wing around the airplane's climb time to 9,000m. 
 
 For any aircraft configuration (set by the user), this program will also produce best wing* and its corresponding climb time to 9,000m. This climb time can then be prepared to Freeman's 5 min 54s record. Using this program, one can easily design (at least the wing) of an airplane, which can beat Freeman's record. which can then be compared to Freeman's 5 min 54s record, 
 
 __Note: The program is currently set up to output the simulation data into the console, and produce two .csv files. One csv file is a bunch of wing spans simulated, and one csv file is a bunch of sweep angles simulated for the best span. Currently, the program is set up to only simulate 25 wing spans, and 25 sweep angles\*. In order for it to act as an optimizer, increase the number of simulations to 200+ for span and 100+ for sweep angle, or drastically reduce the range.__ 
 
 
-__Data used in the "Results" section is based on 300 simulations for span, and 150 simulations for sweep angle.__
-
 \* The program is set up in the current manner, in order for a user to be able to easily see how it works, without needing to wait 10 mins for a bunch of simulations. A user should expect to only wait around 1-2mins for the program to run with its current set up. __Additionally, since this program does not account for structural feasibility (due to empirical equations not being reliable), it is my belief that it is more beneficial for the program to produce an easily plottable .csv file, for the user to interpret, rather than a traditional optimizer that just outputs one wing.__ 
+
+\** __One simulation of an airplane object to 9km should take ~1.2 seconds__ (if not aborted because the airplane can't takeoff, can't reach 9km, etc). __CSV functions should be almost instatenous__
 
 <br>
 <br>
@@ -94,6 +94,52 @@ By programming using the aforementioned methodologies, the classes I developed i
 
 
 <br>
+<br>
+
+
+# Brief Overviews of *Some* Important Logic
+
+## Copy and pasted from the MAE 158 Report PDF
+
+<br>
+
+## Drag Functions Overview
+The drag functions for the three main objects of an airplane (Fuselage, Wing - note a VT, HT, and the mainWing are all “Wing” objects, and Nacelle) are provided by the DragCoeff class. The DragCoeff class has a “calcTotalDragCoeff()” that is implemented to work with any of those three objects. This function relies on calcParasiteCoeff(), calcInducedCoeff(), calcCompressibilityCoeff(), and calcFormDragCoeff() in order to calculate the total DragCoeff of the object. We assume no separation drag, but in the Airplane Class, we account for this assumption (and other assumptions) by having an EXTRANEOUS_DRAG_MULTIPLIER that is currently set at 15%. The form factor of any Fuselage object is assumed to be 1.2 and the form factor of any Nacelle object is assumed to be 1.5. This calcTotalDragCoeff() function is used by the Airplane Class (in a calcDragCoeff() - which gives the total airplane drag coefficient at the passed in parameters), namely for power curve functions, but also others. 
+
+<br>
+
+## Power Curve Functions Overview
+Since the airplane we are tasked with analyzing in this report has a jet engine, a power curve is necessary to get the best time to climb. (Currently the project doesn’t work with a propeller). As will be explained later, the power curve for any airplane object is calculated at a time step (say 0.05s). So in order to understand how much excess power the airplane has (and therefore its max rate of climb (RoC)), we need to generate the power curve and be able to calculate where the max excess power is and how much excess power the airplane currently has. This implementation is done discreetly through calcPowerCurveVelocityData(), calcPowerRequiredData(), and calcPowerAvailableData(). calcPowerAvailableData() depends on the CF_34_3B1, which has the thrust curves digitized. The logic behind this implementation is in the Github. There are also two implementations of some of these functions (namely calcPowerRequiredData()), which differ depending on accounting for flight path angle (gamma) or not. In other words, one implementation assumes a small angle approx (power curve does not depend on gamma), while the other is the accurate power curve. Currently, due not being able to easily solve for gamma (and the time not changing significantly when experimenting with a constant gamma), the power curve functions independent of gamma (small angle approx versions) are used the most. 
+
+This program provides (in the Airplane class) a function getPowerCurveCSV(height), that produces the power curve of the initialized Airplane object, at any height the user passes in. Recall that the climb functions rely on calculating and analyzing this curve at very small time steps, so this function is more for the user to understand (and verify) that the power curves, which again are the backbone of the climb functions, make sense. An example is pasted below. It is also important to note that the implementation of calculating the maxExcessPower() and currentExcessPower() is done by custom math functions in “kadenMath.h” You can read the Github or look at the code to understand this in more detail.
+
+
+Finally, this program (in the Airplane class) also provides a getFlightEnvelopeCSV(). This flight envelope is by no means perfect, and does not have a bunch of constraints like structural feasibility, but it can still be useful to show that the program is working as intended (by the graph having resembling a typical flight envelope) and as a quick (first take) graph that can be used to compare different airplane configurations quickly. 
+
+<br>
+
+### Power Curve Example:
+
+<br>
+
+### Rough Flight Envelope Example:
+
+
+<br>
+
+## Time to Climb Function Overview
+Read Airplane Overview and "calcBestTimeTo9km()"
+
+## Optimizers Overview
+Read “main() function - Optimizing the mainWing,” in particular the “Overview / Approach:” subsection on Github. A span and sweep angle optimizer are implemented. The optimizer is technically not a pure optimizer because it does not automatically look for the best plane (it runs a a user inputted amount of simulations across a range given by the user and produces a CSV with that data - plot it, then visually inspect, then change the range you pass into the optimizer), but as explained, I believe my implementation is more useful (and the user can use it as an optimizer, as we do later in this report, but very technically it isn’t). Additionally, to make it act more like an optimizer, the data is sorted in ascending climb time orders, and also outputted to the command window (also the sorted data is the data produced in the CSV). Again, more details can be found on Github.
+
+<br>
+
+### Proof of Concept Span Optimizer Example:
+
+
+
+
 <br>
 <br>
 
@@ -179,10 +225,41 @@ A note on implementation: The classes, which will be described in much more deta
 
 
 ## Airfoil:
+
 ### Overview:
+__The purpose of this class is to enable a user to easily create and use 4 digit NACA airfoils.__ Originally, the intent was to have the user just initialize an Airfoil object using the 4 digit NACA code. Unfortunately,there does not appear to be an equation to calculate the AoA for zero lift of the airfoil. So, the user has to initialize the Airfoil object with the 4 digit NACA code and the alpha zero lift (radians). This makes using an optimizer with this class difficult (probably would need to create a database and/or an API to some source).
+
+NACA 4 digit number:
+ - First digit is max camber in % of chord
+ - Second digit is max chamber in 1/10th chord
+ - Last two digits is max t/c in % chord
+ - Ex: 
+    - NACA 2412
+    - Max camber = .02 * chord
+    - Location of max camber = 4/10
+    - Max t/c in % chord = .12 (12%)
+
+
 ### Assumptions:
+1. The slope of the 2D Cl for any NACA airfoil is 2*pi
+2. Only intended to work with NACA 4 digit airfoils
+### Notable Functions:
+
+1. Accessors:
+    - double getCl_AlphaTerm() const
+        - Returns radians
+    - double getCl_KnottTerm() const
+    - double getCl_alphaZeroLift() const
+        - Returns passed in value
+    - double getThicknessRatio() const
+        - Returns t/c as a fraction
+    - double getMaxCamberRatio() const
+        - Returns maxCamber (1st digit / 100, it is camber/chord) as a fraction
 
 <br>
+<br>
+
+
 
 ## Airplane:
 
@@ -251,7 +328,6 @@ __The purpose of this class is to enable a user to easily get desired characteri
 5. ```void getPowerCurveCSV(double gamma, double height, string fileName) const;```
     - Returns the data (in a file with the passed in fileName) needed to plot a Power Curve at a specific gamma and height
         - If your file name is "exampleName.csv", then you can open it in Excel, select the three columns, create a scatter plot, and you will be able to visually see the Power Curve
-            - Ex: (ADD POWER CURVE PIC)
     - This is an identical plot that returns a Power Curve with the small angle gamma assumption (in other words it just needs a height variable)
 
 6. ```Power Curve Private Helper Functions```
@@ -309,6 +385,12 @@ __The purpose of this class is to enable a user to easily get desired characteri
     - This function calls on the calcTakeoffPropertites() and calcBestClimbTime() to get the total amount of time it takes for the Airplane to climb to 9km from rest on a runway (assuming it can instantly have max power in the engines).
     - This function is one that is called 
 
+1. ```void getFlightEnvelopeCSV(const std::string& fileName)```
+    - Produces a flight envelope for the given airplane... this envelope does not take into account structural or other constraints. It just gives the max and min mach that you can fly at and the mach for best RoC.
+        - Currently it generates data from 0 to 70,000ft with HEIGHT_STEP = 100 ft. (Calculates the data every 100 ft).
+    - It outputs 2 .csv files. You need to copy over the Flight_Envelope_RoC_Data into the Flight_Envelope_Max_and_Min_Mach_Data, csv. Then you need to plot (Scatter plot) the right column as x and the left column as y, for both sets of data. This will produce the envelope.
+        - Again, this is more of a proof of concept / proof that the other power functions are working
+
 11. Typical Accessors (but not for every private data member) are also available
     - Namely for weights 
 
@@ -317,7 +399,7 @@ __The purpose of this class is to enable a user to easily get desired characteri
 
 <br>
 <br>
-<br>
+
 
 ## AtmosphereProperties:
 
@@ -366,7 +448,7 @@ The purpose of the Atmosphere Properties Class is to enable the calculations of 
 
 <br>
 <br>
-<br>
+
 
 
 ## CF_34_3B1:
@@ -406,7 +488,7 @@ Note: This class is derived from the TurboFan Class. We will ignore this impleme
 
 <br>
 <br>
-<br>
+
 
 ## DragCoeff:
 
@@ -469,7 +551,7 @@ __This Class is primarily used in the Fuselage and Wing Classes, for those class
 
 <br>
 <br>
-<br>
+
 
 ## Fuselage:
 
@@ -506,20 +588,33 @@ __The purpose of the Fuselage Class is to provide the functionality needed to ca
 
 <br>
 <br>
-<br>
+
 
 
 ## LiftCoeff:
 
 
 ### Overview:
+__This class was intended to make dealing with CL terms easier.__ 
 
+This class is used within other classes, since this class is very small, it might be better to delete this class at some point, and redo the dependent classes by rewriting these functions in them. This change would make those dependent classes more like black boxes and probably very very slightly more efficient.
 ### Disclosures / Assumptions:
+1. None
 
 ### Notable Functions:
 
-1. ```void ;```
-    - This function
+1. ```double calcLiftCoefficient(double alpha) const```
+    - This function multiplies the CL_alpha term by passed in alpha, adds the result with the CL_knott term, and returns the CL at the given alpha.
+
+1. Accessors:
+    - ```double getCL_Alpha() const```
+        - Returns term in front of the alpha, in radians
+    - ```double getCL_Knott() const```
+
+1. Mutators:
+    - ```void setCL_Alpha(double inTerm)```
+        - Takes in radians
+    - ```void setCL_Knott(double inTerm)```
 
 
 
@@ -529,7 +624,7 @@ __The purpose of the Fuselage Class is to provide the functionality needed to ca
 
 <br>
 <br>
-<br>
+
 
 
 ## Nacelle:
@@ -568,7 +663,7 @@ __The purpose of the Nacelle Class is to provide the functionality needed to cal
 
 <br>
 <br>
-<br>
+
 
 
 
