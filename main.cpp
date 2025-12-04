@@ -641,7 +641,7 @@ int main() {
 
 
 /*
-	airplane.getFlightEnvelopeTo9kmCSV("Flight_Envelope.csv");
+	airplane.getFlightEnvelopeCSV("Flight_Envelope.csv");
 */
 
 

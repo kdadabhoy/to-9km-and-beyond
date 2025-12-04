@@ -85,7 +85,7 @@ namespace airplane {
 
 
 		// Graphing Functions
-		void getFlightEnvelopeTo9kmCSV(const std::string& fileName);  // Returns two .csv files that need to be manually combined into one, and then plotted.
+		void getFlightEnvelopeCSV(const std::string& fileName);  // Returns two .csv files that need to be manually combined into one, and then plotted.
 
 
 		// Accessors:

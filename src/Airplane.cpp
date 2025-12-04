@@ -1634,7 +1634,7 @@ namespace airplane {
 		// Doesn't take weight loss into account
 	
 	*/
-	void Airplane::getFlightEnvelopeTo9kmCSV(const std::string& fileName) {
+	void Airplane::getFlightEnvelopeCSV(const std::string& fileName) {
 		double height = 0.0;
 		double endHeight = 70e3;       // Used for full flight envelope
 		double HEIGHT_STEP = 100;		// Can Change if too inefficient or too inaccurate
