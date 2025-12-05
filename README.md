@@ -386,7 +386,7 @@ __The purpose of this class is to enable a user to easily get desired characteri
 10. ```double calcBestTimeTo9km(double startHeight, double takeOffEndHeight);```
     - ***The most important function for the purposes of this project***
     - This function calls on the calcTakeoffPropertites() and calcBestClimbTime() to get the total amount of time it takes for the Airplane to climb to 9km from rest on a runway (assuming it can instantly have max power in the engines).
-    - This function is one that is called 
+    - This function is one that is called by the optimizers (used for the report) in main()
 
 1. ```void getFlightEnvelopeCSV(const std::string& fileName)```
     - Produces a flight envelope for the given airplane... this envelope does not take into account structural or other constraints. It just gives the max and min mach that you can fly at and the mach for best RoC.
