@@ -277,17 +277,17 @@ __The purpose of this class is to enable a user to easily get desired characteri
 
 ### Major Assumptions 
 #### Note: Assumptions from other classes used within this class may not be specified but do apply.
-1. The Wing weight is approximated using a method from Raymond 
+1. The Wing weight is approximated using a method from Raymer 
     - The Class only runs this approx for the mainWing (and only if the mainWing has a weight of 0 when passed in)
 2. __The airplane has two engines__ (numEngines = 2) and __two identical Nacelles.__
 3. The __engines are identical__ (same thrust, same fuel loss)
-4. The __Wing weight is approximated using a method from Raymond (Cargo/Transport Approx)__
+4. The __Wing weight is approximated using a method from Raymer (Cargo/Transport Approx)__
     - Assuming 10% of the mainWing is used for control surfaces
         - PERCENT_CONTROL_SURFACE_AREA = 0.10
     - Additionally, assumes FAR 25 cert:
         - Which means that n = 2.1 + (24000 / MTOW), 2.5 <= n <= 3.8
     - Additionally an advanced composite wing is assumed (aka less weight and a higher yield strength)
-        - SMUDGE_FACTOR = .80, which is given by Raymond for composite wings
+        - SMUDGE_FACTOR = .80, which is given by Raymer for composite wings
         - SIGMA_YIELD_COMPOSITE = 101.526 ksi (700 MPa)
             - Rough estimate
 
