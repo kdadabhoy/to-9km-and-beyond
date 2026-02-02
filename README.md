@@ -1,8 +1,8 @@
 <div align="center">
 
-# to-9km-and-beyond 
+# Multi-Disciplinary Analysis (MDA) Tool for Subsonic Aircraft Wing Optimization
 ![Optimized Airplane](images/airplanePic.png)
-## Time to Climb Project (Wing Optimization Program for a Subsonic Aircraft)
+## "to-9km-and-beyond"
 ## by Kaden Dadabhoy
 
 </div>
